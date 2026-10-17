@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Risk Management Quiz · SY0-701 (Section 09)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 09</div>
+    <h1>Risk Management — Practice Quiz</h1>
+    <p>44 questions across all 8 lessons (OBJ 5.2): the five-step risk management lifecycle, the four risk assessment frequencies (ad-hoc, recurring, one-time, continuous), risk identification and business impact analysis, the RTO / RPO / MTTR / MTBF metrics, the risk register (KRIs, risk owner, appetite vs tolerance), qualitative vs quantitative analysis with SLE / EF / ARO / ALE math, the four treatment strategies (transfer, accept, avoid, mitigate), and risk monitoring & reporting (residual and control risk).</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+// ---- Lesson 81 · Risk Management ----
+  {
+    lesson: "Lesson 81 · Risk Management",
+    q: "What is the correct order of the risk management lifecycle as taught in the course?",
+    options: [
+      "Analysis, identification, treatment, reporting, monitoring",
+      "Identification, analysis, treatment, monitoring, reporting",
+      "Identification, treatment, analysis, monitoring, reporting",
+      "Treatment, identification, analysis, reporting, monitoring"
+    ],
+    answer: 1,
+    why: "The lifecycle: (1) identify risks, (2) analyze likelihood and impact, (3) treat them with a strategy, (4) monitor ongoing/residual risks, (5) report to stakeholders. You cannot treat a risk before analyzing it — analysis produces the prioritized list that guides treatment."
+  },
+  {
+    lesson: "Lesson 81 · Risk Management",
+    q: "What does the risk analysis step produce?",
+    options: [
+      "A list of every possible threat in existence",
+      "A prioritized list of risks based on their potential severity",
+      "Signed contracts transferring risk to insurers",
+      "A completed risk report for stakeholders"
+    ],
+    answer: 1,
+    why: "Risk analysis evaluates likelihood and impact of identified risks — qualitatively (categories/scales) or quantitatively (numerical values) — and its outcome is a prioritized list of risks by potential severity, which then guides the risk treatment process."
+  },
+  {
+    lesson: "Lesson 81 · Risk Management",
+    q: "Risk treatment strategies include which of the following sets?",
+    options: [
+      "Avoidance, reduction, sharing, acceptance",
+      "Identification, categorization, escalation, closure",
+      "Transfer only, through insurance",
+      "Monitoring, reporting, auditing, compliance"
+    ],
+    answer: 0,
+    why: "Risk treatment means developing strategies to manage identified risks: avoidance, reduction (mitigation), sharing (transfer), and acceptance. The choice depends on the risk's potential impact and the organization's risk tolerance, with the goal of reducing potential impact to an acceptable level."
+  },
+  {
+    lesson: "Lesson 81 · Risk Management",
+    q: "Why is risk monitoring described as a crucial step?",
+    options: [
+      "It replaces the need for risk identification",
+      "It keeps the risk management process dynamic and responsive to changes in the internal and external environment",
+      "It is the step where risks are formally accepted",
+      "It eliminates the need for risk reporting"
+    ],
+    answer: 1,
+    why: "Risk monitoring is ongoing: tracking identified risks, monitoring residual risk, identifying new risks, and reviewing process effectiveness. This keeps the process dynamic and responsive — without it, the risk picture would go stale as the environment changes."
+  },
+  {
+    lesson: "Lesson 81 · Risk Management",
+    q: "Risk reporting should be tailored to:",
+    options: [
+      "The IT department only",
+      "Regulators only",
+      "The needs of the audience receiving it",
+      "A single company-wide template that never changes"
+    ],
+    answer: 2,
+    why: "Risk reporting communicates risk information and process effectiveness to all relevant stakeholders. It can take many forms — dashboards, heat maps, detailed reports — and should be tailored to meet the needs of the audience, ensuring accountability and supporting informed decision making."
+  },
+// ---- Lesson 82 · Risk Assessment Frequency ----
+  {
+    lesson: "Lesson 82 · Risk Assessment Frequency",
+    q: "A company launches a risk assessment specifically because a new regulation was announced last week. Which type of assessment is this?",
+    options: [
+      "Recurring",
+      "One-time",
+      "Ad-hoc",
+      "Continuous"
+    ],
+    answer: 2,
+    why: "Ad-hoc assessments are conducted as and when needed, often in response to a specific event or situation — a new product, a new market, a natural disaster, or (as here) a major regulatory change. Recurring assessments follow a fixed calendar instead."
+  },
+  {
+    lesson: "Lesson 82 · Risk Assessment Frequency",
+    q: "A financial institution runs credit-risk, market-risk, and operational-risk assessments every quarter as part of standard operating procedure. This is an example of:",
+    options: [
+      "Ad-hoc assessment",
+      "Recurring assessment",
+      "One-time assessment",
+      "Continuous assessment"
+    ],
+    answer: 1,
+    why: "Recurring assessments are conducted at regular intervals — annually, quarterly, or monthly — as part of standard operating procedures, ensuring risks are continually identified, analyzed, and managed. A tech company scheduling regular penetration tests is another course example."
+  },
+  {
+    lesson: "Lesson 82 · Risk Assessment Frequency",
+    q: "An organization assesses risk once, for the specific purpose of implementing a new IT system, and never repeats it. Which type of assessment is this?",
+    options: [
+      "Ad-hoc",
+      "Recurring",
+      "One-time",
+      "Continuous"
+    ],
+    answer: 2,
+    why: "One-time assessments are conducted for a specific purpose — a particular project or initiative like a new IT system, construction project, or organizational change — and are not repeated. Trap: ad-hoc sounds similar, but ad-hoc is event-driven and MAY be repeated if similar circumstances recur."
+  },
+  {
+    lesson: "Lesson 82 · Risk Assessment Frequency",
+    q: "What is the key difference between ad-hoc and one-time risk assessments?",
+    options: [
+      "Ad-hoc is always more expensive",
+      "One-time is tied to a specific project and never repeated; ad-hoc responds to an event and may be repeated if similar circumstances arise",
+      "Ad-hoc uses quantitative analysis; one-time uses qualitative",
+      "There is no difference — the terms are interchangeable"
+    ],
+    answer: 1,
+    why: "One-time assessments are associated with a specific project or initiative and are not repeated. Ad-hoc assessments respond to a specific event or situation and may be repeated if similar circumstances arise in the future. The distinction is repeatability and trigger, not cost or method."
+  },
+  {
+    lesson: "Lesson 82 · Risk Assessment Frequency",
+    q: "A SOC uses tooling that collects and analyzes threat and vulnerability data in real time so the team can respond quickly. Which assessment frequency does this represent?",
+    options: [
+      "Ad-hoc",
+      "Recurring",
+      "One-time",
+      "Continuous"
+    ],
+    answer: 3,
+    why: "Continuous risk assessment involves ongoing monitoring and evaluation of risk — typically technology-enabled with real-time data collection and analysis. A cybersecurity team continuously monitoring threats and vulnerabilities to respond quickly is the course's flagship example."
+  },
+// ---- Lesson 83 · Risk Identification ----
+  {
+    lesson: "Lesson 83 · Risk Identification",
+    q: "Which of these is NOT a technique the course lists for risk identification?",
+    options: [
+      "Brainstorming",
+      "Interviews",
+      "Scenario analysis",
+      "Annualized loss expectancy"
+    ],
+    answer: 3,
+    why: "Risk identification techniques include brainstorming, checklists, interviews, and scenario analysis. Annualized loss expectancy (ALE) belongs to quantitative risk ANALYSIS, not identification — a classic cross-step distractor."
+  },
+  {
+    lesson: "Lesson 83 · Risk Identification",
+    q: "A business impact analysis (BIA) does all of the following EXCEPT:",
+    options: [
+      "Identify and prioritize critical business functions",
+      "Assess the potential impact of disruption on those functions",
+      "Determine how quickly functions need to be recovered",
+      "Assign insurance premiums for each business function"
+    ],
+    answer: 3,
+    why: "A BIA evaluates the potential effects of disruption: it identifies and prioritizes critical functions, assesses impact/risk on them, and determines recovery speed requirements. Insurance pricing is part of risk transference, not the BIA."
+  },
+  {
+    lesson: "Lesson 83 · Risk Identification",
+    q: "An e-commerce site can be down for at most two hours before sales and customer satisfaction damage becomes severe. Which metric is defined here?",
+    options: [
+      "RPO",
+      "RTO",
+      "MTTR",
+      "MTBF"
+    ],
+    answer: 1,
+    why: "The recovery time objective (RTO) is the maximum acceptable length of time before the lack of a business function severely impacts the organization — the target time to RESTORE the function. Two hours of tolerable downtime is an RTO of two hours."
+  },
+  {
+    lesson: "Lesson 83 · Risk Identification",
+    q: "A bank determines it can afford to lose at most 15 minutes of transaction data in a failure. What does this mean for its backup schedule?",
+    options: [
+      "Backups must run at least every 15 minutes",
+      "Backups can run once a day",
+      "The RTO is 15 minutes",
+      "The MTBF is 15 minutes"
+    ],
+    answer: 0,
+    why: "This is a recovery point objective (RPO) of 15 minutes — the maximum acceptable data loss measured in time. To meet it, systems must be backed up at least every 15 minutes. Trap: this says nothing about how fast systems must be restored (that's RTO)."
+  },
+  {
+    lesson: "Lesson 83 · Risk Identification",
+    q: "RPO and RTO differ in that:",
+    options: [
+      "RPO is about downtime; RTO is about data loss",
+      "RPO is about data loss measured in time; RTO is about how quickly a function must be restored",
+      "RPO applies to hardware; RTO applies to software",
+      "They are two names for the same metric"
+    ],
+    answer: 1,
+    why: "RPO = maximum acceptable DATA LOSS measured in time (drives backup frequency). RTO = maximum acceptable DOWNTIME — the target time to restore a business function. Both guide disaster recovery and business continuity planning, but they measure different things."
+  },
+  {
+    lesson: "Lesson 83 · Risk Identification",
+    q: "A machine broke down five times last year, and each repair took an average of four hours. What are its MTTR and MTBF?",
+    options: [
+      "MTTR 4 hours; MTBF about 2.4 months",
+      "MTTR 2.4 months; MTBF 4 hours",
+      "MTTR 20 hours; MTBF 4 hours",
+      "MTTR 4 hours; MTBF 4 hours"
+    ],
+    answer: 0,
+    why: "MTTR = average repair time = 4 hours (lower is better — fast repair). MTBF = average time BETWEEN failures: five failures spread over a year ≈ every 2.4 months (~72 days) — higher is better, meaning it fails less often. The 5×4=20 hours is a distractor; MTBF measures intervals, not cumulative repair time."
+  },
+  {
+    lesson: "Lesson 83 · Risk Identification",
+    q: "Which statement about MTTR and MTBF is TRUE?",
+    options: [
+      "A lower MTBF indicates a more reliable system",
+      "A higher MTTR means repairs happen faster",
+      "Lower MTTR and higher MTBF are both desirable",
+      "MTTR measures reliability; MTBF measures maintainability"
+    ],
+    answer: 2,
+    why: "MTTR (mean time to REPAIR) measures maintainability — lower is better. MTBF (mean time BETWEEN failures) measures reliability — higher is better. A system you want: rarely fails (high MTBF) and is quick to fix when it does (low MTTR)."
+  },
+// ---- Lesson 84 · Risk Register ----
+  {
+    lesson: "Lesson 84 · Risk Register",
+    q: "A risk register is BEST described as:",
+    options: [
+      "A document recording details about identified risks — description, impact, likelihood, and mitigation actions",
+      "A financial statement listing insured assets",
+      "A firewall rule set ranked by severity",
+      "A list of employees authorized to accept risk"
+    ],
+    answer: 0,
+    why: "The risk register (a.k.a. risk log) records details about identified risks — description, impact, likelihood, and mitigation actions. It's a crucial communication tool for tracking and managing risks throughout the project lifecycle, may resemble a heat map risk matrix, and should be shared with shareholders."
+  },
+  {
+    lesson: "Lesson 84 · Risk Register",
+    q: "In the risk register, the risk level (or threshold) is determined by combining:",
+    options: [
+      "Cost and schedule",
+      "Impact and likelihood",
+      "Appetite and tolerance",
+      "Owner and description"
+    ],
+    answer: 1,
+    why: "Risk level/threshold is determined by combining impact and likelihood. It categorizes risk as high, medium, or low and drives prioritization — which risks require immediate attention."
+  },
+  {
+    lesson: "Lesson 84 · Risk Register",
+    q: "Key risk indicators (KRIs) are best described as:",
+    options: [
+      "Historical statistics compiled after incidents occur",
+      "Predictive metrics that provide an early signal of increasing risk exposure",
+      "The dollar cost assigned to each risk",
+      "Mandatory regulatory checkboxes"
+    ],
+    answer: 1,
+    why: "KRIs are critical predictive metrics providing a forward-looking early signal of increasing risk exposure — a barometer of risk. Example: a sudden rise in loan defaults warns a bank of growing credit-default risk before it escalates. They're tied to risk appetite and organizational objectives."
+  },
+  {
+    lesson: "Lesson 84 · Risk Register",
+    q: "The risk owner is responsible for:",
+    options: [
+      "Auditing the risk register annually",
+      "Monitoring the risk, implementing mitigation actions, and updating the risk register",
+      "Purchasing insurance for the organization",
+      "Defining the organization's risk appetite"
+    ],
+    answer: 1,
+    why: "The risk owner is the person or group responsible for MANAGING the risk: monitoring it, implementing mitigation actions, and updating the risk register as necessary. Example: a construction project manager owns risks like weather delays and material cost overruns, and mitigates them (schedule dry-weather work, lock in prices early)."
+  },
+  {
+    lesson: "Lesson 84 · Risk Register",
+    q: "Risk appetite vs risk tolerance:",
+    options: [
+      "Appetite is the max risk you'll endure; tolerance is how much you pursue",
+      "Tolerance is the maximum risk you're prepared to accept while achieving objectives; appetite is the amount and type of risk you're willing to pursue or retain to achieve strategic objectives",
+      "They are identical concepts with different names",
+      "Appetite applies to individuals; tolerance applies only to organizations"
+    ],
+    answer: 1,
+    why: "Risk tolerance/acceptance = the maximum amount of risk you're prepared to accept while achieving objectives (a ceiling — beyond it, countermeasures are mandatory). Risk appetite = the amount and TYPE of risk you're willing to pursue or retain for strategic objectives (your posture toward risk-taking). Identify BOTH up front, before categorizing risk levels."
+  },
+  {
+    lesson: "Lesson 84 · Risk Register",
+    q: "A startup aggressively pursues risky new markets for the chance of much higher returns. Its risk appetite is best described as:",
+    options: [
+      "Conservative",
+      "Neutral",
+      "Expansionary",
+      "Adversarial"
+    ],
+    answer: 2,
+    why: "Expansionary risk appetite = willing to take on MORE risk for potentially higher returns (aggressive growth businesses). Conservative = less risk, lower returns, prioritizing stability. Neutral = balanced risk and return, steady growth. 'Adversarial' is not a risk appetite type."
+  },
+  {
+    lesson: "Lesson 84 · Risk Register",
+    q: "A bank is NOT subject to a certain reporting rule at all, freeing it from both the compliance burden and the rule's protection. This is an example of:",
+    options: [
+      "A risk exception",
+      "A risk exemption",
+      "Risk transference",
+      "Risk mitigation"
+    ],
+    answer: 1,
+    why: "An exemption is a provision that excludes a party from a rule or requirement entirely — the party is not subject to it, bears no compliance burden, and accepts the risk of operating without the rule's protection. An exception, by contrast, means you're normally subject to the rule but can avoid it under specific circumstances."
+  },
+  {
+    lesson: "Lesson 84 · Risk Register",
+    q: "A company is normally subject to a data-protection rule, but the regulation allows it to process personal data without consent under specific, narrow circumstances. This provision is a(n):",
+    options: [
+      "Exemption",
+      "Exception",
+      "Expansion",
+      "Exclusion"
+    ],
+    answer: 1,
+    why: "An exception lets a party avoid a rule under specific circumstances — generally subject to the rule, but released from the associated risk when conditions apply. An exemption would mean the party is never subject to the rule at all."
+  },
+  {
+    lesson: "Lesson 84 · Risk Register",
+    q: "Which of these is NOT one of the six building blocks of a risk register entry covered in the course?",
+    options: [
+      "Risk description",
+      "Risk outcome",
+      "Risk likelihood",
+      "Risk appetite type"
+    ],
+    answer: 3,
+    why: "The six register blocks: risk description, impact, likelihood, outcome, level/threshold, and cost. Risk appetite (expansionary/conservative/neutral) is an organizational characteristic you define BEFORE categorizing risk levels — it influences the register but is not an entry field."
+  },
+// ---- Lesson 85 · Qualitative Risk Analysis ----
+  {
+    lesson: "Lesson 85 · Qualitative Risk Analysis",
+    q: "Qualitative risk analysis is BEST characterized as:",
+    options: [
+      "A numerical method using statistical techniques",
+      "A subjective method rating risks as high, medium, or low based on likelihood and impact",
+      "A method that eliminates the need for expert judgment",
+      "A technique that only works for financial risks"
+    ],
+    answer: 1,
+    why: "Qualitative analysis assesses risks using descriptive/categorical scales — high/medium/low — for likelihood and impact. It's subjective, relying on the expertise and experience of the project team and stakeholders, and deliberately avoids the complexity of the quantitative approach."
+  },
+  {
+    lesson: "Lesson 85 · Qualitative Risk Analysis",
+    q: "In qualitative analysis, a HIGH impact rating means:",
+    options: [
+      "Minor damage with essential functions still operational",
+      "Significant damage or loss to assets",
+      "Major damage — essential functions cannot be performed",
+      "Any impact that costs less than expected"
+    ],
+    answer: 2,
+    why: "Impact scale: LOW = minor damage/loss, essential functions still operational. MEDIUM = significant damage or loss to assets. HIGH = major damage, essential functions cannot be performed. Match the wording — exam questions quote these tiers directly."
+  },
+  {
+    lesson: "Lesson 85 · Qualitative Risk Analysis",
+    q: "A project manager rates a key developer leaving mid-project as medium likelihood but high impact, then prioritizes cross-training and documentation. Which analysis method is being used?",
+    options: [
+      "Quantitative risk analysis",
+      "Qualitative risk analysis",
+      "Continuous risk assessment",
+      "Business impact analysis"
+    ],
+    answer: 1,
+    why: "Rating likelihood and impact on descriptive scales (medium/high) and prioritizing based on expert judgment is qualitative analysis — the course's exact example. Quantitative would compute dollar figures (SLE/ALE); BIA evaluates disruption effects on business functions; continuous assessment is a monitoring frequency."
+  },
+  {
+    lesson: "Lesson 85 · Qualitative Risk Analysis",
+    q: "Likelihood in qualitative analysis is determined based on:",
+    options: [
+      "Insurance premium tables",
+      "Past experience, statistical analysis, or expert judgment",
+      "The risk register's cost column",
+      "Regulatory mandate"
+    ],
+    answer: 1,
+    why: "Likelihood (probability) — the chance a risk occurs — is expressed qualitatively as low/medium/high and determined from past experience, statistical analysis, or expert judgment. Like impact, it's a subjective, judgment-based rating."
+  },
+// ---- Lesson 86 · Quantitative Risk Analysis ----
+  {
+    lesson: "Lesson 86 · Quantitative Risk Analysis",
+    q: "A flood would destroy 70% of headquarters assets. In quantitative risk analysis, this 70% is the:",
+    options: [
+      "Single loss expectancy",
+      "Exposure factor",
+      "Annualized rate of occurrence",
+      "Annualized loss expectancy"
+    ],
+    answer: 1,
+    why: "The exposure factor (EF) is the PROPORTION of an asset lost in an event, expressed as a percentage from 0 (no loss) to 100% (total loss). 70% of assets destroyed = EF of 70%. It's an input to the SLE calculation, not a monetary figure itself."
+  },
+  {
+    lesson: "Lesson 86 · Quantitative Risk Analysis",
+    q: "Assets worth $100,000 face an exposure factor of 70%. What is the single loss expectancy (SLE)?",
+    options: [
+      "$100,000",
+      "$70,000",
+      "$30,000",
+      "$7,000"
+    ],
+    answer: 1,
+    why: "SLE = asset value × exposure factor = $100,000 × 70% = $70,000 — the monetary value expected to be lost in a single event. The formula chain to memorize: SLE = AV × EF, then ALE = SLE × ARO."
+  },
+  {
+    lesson: "Lesson 86 · Quantitative Risk Analysis",
+    q: "A server crashes once every two years. What is its annualized rate of occurrence (ARO)?",
+    options: [
+      "2",
+      "1",
+      "0.5",
+      "0.25"
+    ],
+    answer: 2,
+    why: "ARO is the estimated frequency a threat occurs within a year. Once every two years = 1 ÷ 2 = 0.5. Trap: don't answer 2 — the ARO is a per-year rate, so a slower-occurring event has a LOWER ARO."
+  },
+  {
+    lesson: "Lesson 86 · Quantitative Risk Analysis",
+    q: "A $10,000 server has an exposure factor of 50% and fails once every two years. What is the annualized loss expectancy (ALE)?",
+    options: [
+      "$5,000",
+      "$10,000",
+      "$2,500",
+      "$500"
+    ],
+    answer: 2,
+    why: "Step by step: SLE = $10,000 × 50% = $5,000. ARO = 0.5 (once every 2 years). ALE = SLE × ARO = $5,000 × 0.5 = $2,500 per year. This is the course's worked example — expect exactly this style of calculation on the exam."
+  },
+  {
+    lesson: "Lesson 86 · Quantitative Risk Analysis",
+    q: "A redundant server would fail once every 10 years instead of once every two years, dropping the ALE from $2,500 to $500 — but it costs $40,000 extra with a 3-year life. What should the analysis conclude?",
+    options: [
+      "Buy it — any risk reduction is worth pursuing",
+      "Not worth it — it saves $2,000/year ($6,000 over 3 years) but costs $40,000 extra",
+      "Buy it only if the EF also drops",
+      "The ALE savings make it free"
+    ],
+    answer: 1,
+    why: "Quantitative analysis exists for exactly this decision: the new server saves $2,000/year × 3 years = $6,000, but costs $40,000 more. The mitigation is far more expensive than the expected loss it prevents — so it's not worth pursuing. Always compare control cost against ALE savings."
+  },
+  {
+    lesson: "Lesson 86 · Quantitative Risk Analysis",
+    q: "Quantitative risk analysis differs from qualitative in that it:",
+    options: [
+      "Uses numerical measurements and statistical techniques for an objective, probabilistic evaluation",
+      "Relies on expert judgment and descriptive scales",
+      "Cannot be used for financial decisions",
+      "Is faster but less precise"
+    ],
+    answer: 0,
+    why: "Quantitative analysis assigns concrete numerical values to risk factors, providing a probabilistic, objective evaluation — typically used for financial, safety, and scheduling decisions. Qualitative is the subjective, categorical one. 'Faster but less precise' describes qualitative, not quantitative."
+  },
+// ---- Lesson 87 · Risk Management Strategies ----
+  {
+    lesson: "Lesson 87 · Risk Management Strategies",
+    q: "A company buys liability insurance so that if a lawsuit occurs, the insurer covers the financial loss up to the policy limit. Which risk strategy is this?",
+    options: [
+      "Risk avoidance",
+      "Risk mitigation",
+      "Risk transference",
+      "Risk acceptance"
+    ],
+    answer: 2,
+    why: "Risk transference (sharing) shifts the risk to another party — and insurance is by far the most common method: you pay a premium, and the insurance company carries the financial loss up to the policy limit. An indemnity clause in a contract is the other main transfer mechanism."
+  },
+  {
+    lesson: "Lesson 87 · Risk Management Strategies",
+    q: "Which statement about risk transference is TRUE?",
+    options: [
+      "It eliminates the risk entirely",
+      "It shifts the financial burden to another party, but reputation risk remains with the original party",
+      "It is only available through insurance",
+      "It is the most common risk strategy"
+    ],
+    answer: 1,
+    why: "Transference does NOT eliminate risk — it shifts responsibility for the FINANCIAL consequences. If the event still occurs, your reputation still suffers. Contracts (indemnity clauses) transfer risk as well as insurance. The most common strategy overall is mitigation, not transfer."
+  },
+  {
+    lesson: "Lesson 87 · Risk Management Strategies",
+    q: "A company decides NOT to launch a product that could infringe a competitor's patent, eliminating the lawsuit risk completely. Which strategy is this?",
+    options: [
+      "Mitigation",
+      "Acceptance",
+      "Transference",
+      "Avoidance"
+    ],
+    answer: 3,
+    why: "Risk avoidance means changing plans or strategies to ELIMINATE the risk entirely — not launching the risky product, or not operating in a politically unstable country. It's chosen when the risk is too great to accept or transfer. Mitigation would reduce the risk; avoidance removes it."
+  },
+  {
+    lesson: "Lesson 87 · Risk Management Strategies",
+    q: "A manufacturer implements rigorous safety training to reduce the likelihood and impact of workplace accidents. Which strategy is this, and what makes it notable?",
+    options: [
+      "Avoidance — the only strategy that eliminates risk",
+      "Mitigation — the most common risk management strategy",
+      "Transference — via contract clause",
+      "Acceptance — because training is cheap"
+    ],
+    answer: 1,
+    why: "Mitigation reduces the likelihood or impact of a risk through controls, training, or safety measures — and the course flags it as the MOST COMMON risk management strategy. Avoidance eliminates risk entirely (e.g., canceling the hazardous activity), which is not what training does."
+  },
+  {
+    lesson: "Lesson 87 · Risk Management Strategies",
+    q: "Risk acceptance is most appropriate when:",
+    options: [
+      "The risk is too great to endure",
+      "The cost of managing the risk outweighs the potential loss, or the impact is unlikely to be significant",
+      "A regulator requires full mitigation",
+      "Insurance is unavailable at any price"
+    ],
+    answer: 1,
+    why: "Acceptance means acknowledging a risk and dealing with it if and when it occurs — the right call when prevention/mitigation costs more than the potential loss, or the impact is minor. It's a deliberate, documented strategy (implemented via exemption or exception), not negligence."
+  },
+// ---- Lesson 88 · Risk Monitoring and Reporting ----
+  {
+    lesson: "Lesson 88 · Risk Monitoring and Reporting",
+    q: "Residual risk is:",
+    options: [
+      "The risk that remains after mitigation, transference, or acceptance has been applied to the inherent risk",
+      "The total risk before any treatment",
+      "Risk transferred to an insurance company",
+      "The portion of risk a control removes"
+    ],
+    answer: 0,
+    why: "Residual risk = the likelihood and impact REMAINING after treatment measures have been applied to the inherent risk. Monitoring tracks this residue — how much risk is left — plus new risks and the effectiveness of the response plans."
+  },
+  {
+    lesson: "Lesson 88 · Risk Monitoring and Reporting",
+    q: "An antivirus that caught malware well by signature initially, but gets steadily worse as hackers obfuscate their code, illustrates:",
+    options: [
+      "Residual risk",
+      "Control risk — a security control becoming less effective over time",
+      "Risk avoidance",
+      "An expansionary risk appetite"
+    ],
+    answer: 1,
+    why: "Control risk measures how much LESS effective a security control has become over time. The course's example: signature-based antivirus degrades as attackers hide their code. Residual risk is what's left after treatment; control risk is the decay of the treatment itself."
+  },
+  {
+    lesson: "Lesson 88 · Risk Monitoring and Reporting",
+    q: "Which of these is NOT one of the four reasons the course gives for why risk monitoring and reporting are essential?",
+    options: [
+      "Informed decision making",
+      "Stakeholder communication",
+      "Regulatory compliance",
+      "Guaranteed elimination of all risks"
+    ],
+    answer: 3,
+    why: "The four reasons: informed decision making (resources, timelines, strategy), risk mitigation (act before a growing risk becomes a problem), stakeholder communication (manage expectations, demonstrate control), and regulatory compliance (risk reporting is legally required in many industries). No process guarantees eliminating all risks."
+  }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"risk-management-quiz.html",title:"Risk Management Quiz \u00b7 SY0-701 (Section 09)"};</script><script src="analytics.js"></script>
+</body>
+</html>

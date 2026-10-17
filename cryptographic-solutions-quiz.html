@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cryptographic Solutions Quiz · SY0-701 (Section 08)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 08</div>
+    <h1>Cryptographic Solutions — Practice Quiz</h1>
+    <p>44 questions across all 13 lessons (OBJ 1.4, 2.3 &amp; 2.4): symmetric vs asymmetric encryption, stream vs block ciphers, symmetric algorithms (DES, 3DES, AES, RC4), asymmetric algorithms (Diffie-Hellman, RSA, ECC), hashing (MD5, SHA, HMAC) and digital signatures, hash attacks and defenses (salting, nonces, key stretching), PKI and digital certificates (X.509, wildcard, SAN, CSR, CRL, OCSP), blockchain, encryption tools (TPM, HSM, KMS, secure enclave), obfuscation (steganography, tokenization, data masking), and cryptographic attacks (downgrade, collision, quantum).</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+// ---- Lesson 68 · Cryptographic Solutions ----
+  {
+    lesson: "Lesson 68 · Cryptographic Solutions",
+    q: "In cryptography, where does the strength of an encryption implementation actually come from?",
+    options: [
+      "The secrecy of the algorithm's source code",
+      "The length and secrecy of the key",
+      "The number of rounds in the cipher",
+      "The obscurity of the protocol design"
+    ],
+    answer: 1,
+    why: "All modern algorithms are publicly reviewed and open by design — security through obscurity is considered unreliable. Key length is directly proportional to security (256-bit is exponentially stronger than 128-bit, not just 2x), and the secrecy of the key is what keeps data confidential."
+  },
+  {
+    lesson: "Lesson 68 · Cryptographic Solutions",
+    q: "Which statement about cryptographic keys is a best practice?",
+    options: [
+      "Keys should be kept short so encryption stays fast",
+      "Keys should never change once issued to a system",
+      "Use long, strong keys and rotate them regularly",
+      "Algorithms should be kept secret so keys matter less"
+    ],
+    answer: 2,
+    why: "Use long, strong keys (128-bit minimum for most uses; 256-bit for higher protection) and rotate them regularly — e.g., TLS keys rotated annually by policy or cloud keys auto-rotated every 90 days — to mitigate the risk of unauthorized decryption over time."
+  },
+  {
+    lesson: "Lesson 68 · Cryptographic Solutions",
+    q: "Data moving across the network or between RAM and the CPU is in which state?",
+    options: [
+      "Data at rest",
+      "Data in transit",
+      "Data in use",
+      "Data archived"
+    ],
+    answer: 1,
+    why: "Data in transit is data moving around — across the network or residing in memory (RAM) moving to/from the processor. Data at rest is inactive data on storage; data in use is data actively being changed inside the processor."
+  },
+  {
+    lesson: "Lesson 68 · Cryptographic Solutions",
+    q: "In the ROT13 example, what is the 'key'?",
+    options: [
+      "The cipher alphabet itself",
+      "The number 13 — how many places to rotate",
+      "The length of the message",
+      "The tool used to perform the rotation"
+    ],
+    answer: 1,
+    why: "The algorithm (rotation) is public knowledge; the key is the specific piece of information that determines the output — in ROT13, knowing to move 13 places. The same principle holds for all modern ciphers: the key, not the algorithm, provides security."
+  },
+// ---- Lesson 69 · Symmetric vs Asymmetric ----
+  {
+    lesson: "Lesson 69 · Symmetric vs Asymmetric",
+    q: "The main weakness of symmetric key encryption at scale is:",
+    options: [
+      "It is too slow for bulk data transfer",
+      "Distributing the shared secret key to everyone who needs it",
+      "It cannot provide confidentiality",
+      "It requires certificates from a CA"
+    ],
+    answer: 1,
+    why: "Symmetric encryption is 100–1,000x faster than asymmetric, but everyone who communicates needs a shared secret. For n people you need n(n−1)/2 key pairs (6 people = 15 keys) — an unmanageable distribution problem at scale."
+  },
+  {
+    lesson: "Lesson 69 · Symmetric vs Asymmetric",
+    q: "The real-world 'hybrid' approach to encryption works by:",
+    options: [
+      "Using symmetric keys to exchange asymmetric keys",
+      "Using asymmetric encryption to exchange a symmetric session key for bulk data",
+      "Encrypting the same data twice with both methods",
+      "Alternating algorithms per packet"
+    ],
+    answer: 1,
+    why: "Asymmetric (public key) encryption solves the key distribution problem — it's used to securely exchange a randomly generated symmetric session key. Then both parties switch to fast symmetric encryption (e.g., AES) for the bulk of the transfer. This is exactly how HTTPS/TLS works."
+  },
+  {
+    lesson: "Lesson 69 · Symmetric vs Asymmetric",
+    q: "A stream cipher differs from a block cipher because it:",
+    options: [
+      "Encrypts data one byte/bit at a time using a keystream and XOR",
+      "Breaks input into fixed 64-bit blocks before encrypting",
+      "Uses a public and private key pair",
+      "Requires padding for short messages"
+    ],
+    answer: 0,
+    why: "A stream cipher encrypts bit by bit/byte at a time using a keystream generator combined with the plaintext via XOR — well suited to real-time audio/video streams. A block cipher processes fixed-size blocks and pads the final partial block; block ciphers are easier to implement in software and less susceptible to security problems."
+  },
+// ---- Lesson 70 · Symmetric Algorithms ----
+  {
+    lesson: "Lesson 70 · Symmetric Algorithms",
+    q: "Which symmetric algorithm is the current de facto standard, chosen by NIST to replace DES and 3DES?",
+    options: [
+      "Blowfish",
+      "IDEA",
+      "AES (Rijndael)",
+      "RC4"
+    ],
+    answer: 2,
+    why: "AES — the Advanced Encryption Standard, also known as the Rijndael cipher — won the NIST contest to replace DES/3DES. It uses 128, 192, or 256-bit keys, is the US government standard for sensitive-but-unclassified data, and is the strongest and most widely used symmetric algorithm."
+  },
+  {
+    lesson: "Lesson 70 · Symmetric Algorithms",
+    q: "DES uses a 64-bit key, but its effective key length is only:",
+    options: [
+      "64 bits",
+      "56 bits (8 bits are used for parity)",
+      "128 bits",
+      "112 bits"
+    ],
+    answer: 1,
+    why: "DES's 64-bit key includes 8 parity bits, leaving 56 effective bits — far too weak against modern computing. DES breaks data into 64-bit blocks and runs 16 rounds of transposition and substitution."
+  },
+  {
+    lesson: "Lesson 70 · Symmetric Algorithms",
+    q: "3DES strengthens DES by:",
+    options: [
+      "Doubling the block size to 128 bits",
+      "Applying DES three times with three different keys (encrypt–decrypt–encrypt), effectively 112-bit",
+      "Adding a salt to each block",
+      "Converting it from a block to a stream cipher"
+    ],
+    answer: 1,
+    why: "3DES runs DES three times with three 56-bit keys — encrypt with key 1, decrypt with key 2 (which just scrambles further), encrypt with key 3 — creating an effective 112-bit key. It was a stopgap and is now deprecated in favor of AES."
+  },
+  {
+    lesson: "Lesson 70 · Symmetric Algorithms",
+    q: "Which of these symmetric algorithms is a STREAM cipher?",
+    options: [
+      "AES",
+      "Twofish",
+      "RC4",
+      "3DES"
+    ],
+    answer: 2,
+    why: "RC4 is the only stream cipher in this group — variable key size from 40 to 2,048 bits, used historically in SSL and WEP. All the others (DES, 3DES, IDEA, AES, Blowfish, Twofish, RC5, RC6) are block ciphers."
+  },
+// ---- Lesson 71 · Asymmetric Algorithms ----
+  {
+    lesson: "Lesson 71 · Asymmetric Algorithms",
+    q: "To send a confidential message to Mary using asymmetric encryption, you encrypt it with:",
+    options: [
+      "Your private key",
+      "Your public key",
+      "Mary's public key",
+      "Mary's private key"
+    ],
+    answer: 2,
+    why: "Encrypt with the RECEIVER's public key — only Mary's private key can decrypt it, so only she can read it. Even you, the sender, can't decrypt it back. (Encrypting with your own private key provides non-repudiation, not confidentiality — anyone can read it.)"
+  },
+  {
+    lesson: "Lesson 71 · Asymmetric Algorithms",
+    q: "Diffie-Hellman is primarily used for:",
+    options: [
+      "Bulk file encryption",
+      "Securely exchanging symmetric keys, such as when establishing VPN/IPsec tunnels",
+      "Creating digital signatures",
+      "Hashing passwords"
+    ],
+    answer: 1,
+    why: "Diffie-Hellman is an asymmetric algorithm built for key exchange — it lets two parties establish a shared secret over an insecure channel, e.g., before an IPsec VPN tunnel switches to symmetric encryption. It is susceptible to on-path (person-in-the-middle) attacks, so pair it with authentication (password or certificate)."
+  },
+  {
+    lesson: "Lesson 71 · Asymmetric Algorithms",
+    q: "RSA's security relies on the difficulty of:",
+    options: [
+      "Solving elliptic curves over finite fields",
+      "Factoring the product of two large prime numbers",
+      "Reversing a one-way hash",
+      "Finding collisions in a birthday attack"
+    ],
+    answer: 1,
+    why: "RSA (Rivest–Shamir–Adleman) relies on how hard it is to factor a large number back into its two prime factors. It supports 1,024–4,096-bit keys and is used for key exchange, encryption, and digital signatures — including the rotating 6-digit codes on MFA hardware tokens."
+  },
+  {
+    lesson: "Lesson 71 · Asymmetric Algorithms",
+    q: "Why is ECC (Elliptic Curve Cryptography) favored on mobile devices?",
+    options: [
+      "It is a symmetric cipher, so it needs no key pair",
+      "It delivers equivalent security to RSA with much smaller keys, needing less processing power",
+      "It is immune to quantum computers",
+      "It does not require certificates"
+    ],
+    answer: 1,
+    why: "ECC is about 6x more efficient than RSA: a 256-bit ECC key provides security comparable to a 2,048-bit RSA key. That means less processing and battery drain — ideal for phones, tablets, and other low-power devices. Variants include ECDH, ECDHE (ephemeral — a new key per session), and ECDSA (US government digital signatures)."
+  },
+  {
+    lesson: "Lesson 71 · Asymmetric Algorithms",
+    q: "Encrypting a hash digest with the sender's PRIVATE key produces:",
+    options: [
+      "A confidential message only the receiver can read",
+      "A digital signature providing integrity and non-repudiation",
+      "A certificate signing request",
+      "A salted password hash"
+    ],
+    answer: 1,
+    why: "A digital signature is created by hashing the message and encrypting that digest with the sender's private key. Anyone can decrypt it with the sender's public key to verify the hash matches — proving the message wasn't altered (integrity) and that only the sender could have signed it (non-repudiation)."
+  },
+// ---- Lesson 72 · Hashing ----
+  {
+    lesson: "Lesson 72 · Hashing",
+    q: "Which statement about hashing is TRUE?",
+    options: [
+      "It is a two-way function that can be reversed with the key",
+      "It produces a fixed-length digest regardless of input size, and cannot be reversed",
+      "It encrypts data for confidentiality",
+      "Longer input always produces a longer digest"
+    ],
+    answer: 1,
+    why: "Hashing is a one-way function: any input (one word or one million words) produces a fixed-length message digest — a digital fingerprint. There is no way to recover the original message from the digest, which is why hashing provides integrity, not confidentiality."
+  },
+  {
+    lesson: "Lesson 72 · Hashing",
+    q: "MD5 produces a hash of what size?",
+    options: [
+      "128 bits",
+      "160 bits",
+      "256 bits",
+      "512 bits"
+    ],
+    answer: 0,
+    why: "MD5 creates a 128-bit hash value. Because only 128 bits of output exist, the number of unique values is limited and collisions are feasible — MD5 is no longer suitable for security certificates or signatures. SHA-1 is 160-bit; SHA-256 is 256-bit."
+  },
+  {
+    lesson: "Lesson 72 · Hashing",
+    q: "Code signing works by:",
+    options: [
+      "Encrypting the whole application with the developer's public key",
+      "Hashing the file and encrypting the digest with the developer's private key",
+      "Hiding the code inside an image using steganography",
+      "Adding a random salt to the executable"
+    ],
+    answer: 1,
+    why: "Code signing is a digital signature on software: the installer is hashed, and the hash is encrypted with the developer's private key (issued by Apple/Google after registration). App stores and users verify it to confirm the file hasn't been modified or corrupted since publication."
+  },
+// ---- Lesson 73 · Increasing Hash Security ----
+  {
+    lesson: "Lesson 73 · Increasing Hash Security",
+    q: "A pass-the-hash attack works by:",
+    options: [
+      "Finding two inputs that produce the same hash",
+      "Stealing a password's hash and reusing it directly to authenticate — without cracking it",
+      "Brute forcing the plaintext from a salted hash",
+      "Rolling back to an older hashing algorithm"
+    ],
+    answer: 1,
+    why: "In a pass-the-hash attack the attacker steals the stored hash (via tools like Mimikatz) and simply replays it to authenticate — the hash is functionally equivalent to the password, so there's no need to reverse it. Defenses: patching, proper domain trusts, MFA, and least privilege."
+  },
+  {
+    lesson: "Lesson 73 · Increasing Hash Security",
+    q: "The birthday attack gets its name from:",
+    options: [
+      "The day a hash algorithm was first broken",
+      "The birthday paradox — the probability that two inputs share the same hash (a collision)",
+      "An attack launched on a user's birthday",
+      "The minimum age for password rotation"
+    ],
+    answer: 1,
+    why: "The birthday paradox says that in a room of just 23 people there's a >50% chance two share a birthday (99% at 57). Applied to hashing, it means an attacker needs far fewer attempts than brute force to find two different messages with the same digest. Longer digests (SHA-256 over MD5) reduce this risk."
+  },
+  {
+    lesson: "Lesson 73 · Increasing Hash Security",
+    q: "Adding random data to a password before hashing it is called:",
+    options: [
+      "Key stretching",
+      "Salting",
+      "Tokenizing",
+      "Masking"
+    ],
+    answer: 1,
+    why: "Salting adds random data (the salt) to the password before the one-way hash, so identical passwords produce different hashes. This thwarts dictionary attacks, brute force attacks, and rainbow tables — the attacker would need to rebuild a rainbow table for every possible salt."
+  },
+  {
+    lesson: "Lesson 73 · Increasing Hash Security",
+    q: "A nonce defends primarily against:",
+    options: [
+      "Collision attacks",
+      "Replay attacks",
+      "Pass-the-hash attacks",
+      "Downgrade attacks"
+    ],
+    answer: 1,
+    why: "A nonce ('number used once') is a unique, often random value added to the authentication process so that captured authentication data produces a different hash each time — stolen credentials can't be resubmitted. This directly defeats replay attacks."
+  },
+// ---- Lesson 74 · Public Key Infrastructure (PKI) ----
+  {
+    lesson: "Lesson 74 · Public Key Infrastructure (PKI)",
+    q: "The key difference between PKI and public key cryptography is:",
+    options: [
+      "They are two names for the same thing",
+      "PKI is the entire system that creates and manages key pairs and certificates; public key cryptography is just the encrypt/decrypt process within it",
+      "PKI only handles symmetric keys",
+      "Public key cryptography requires a CA but PKI does not"
+    ],
+    answer: 1,
+    why: "PKI is the full framework — hardware, software, policies, procedures, and people — built on asymmetric encryption to create, distribute, and manage key pairs and certificates. Public key cryptography is only the encryption/decryption piece inside that larger architecture."
+  },
+  {
+    lesson: "Lesson 74 · Public Key Infrastructure (PKI)",
+    q: "Key escrow means:",
+    options: [
+      "Deleting keys securely at the end of their lifecycle",
+      "Storing cryptographic keys with a secure third party so they can be recovered if lost",
+      "Encrypting keys with a second key for extra protection",
+      "Publishing public keys to a public ledger"
+    ],
+    answer: 1,
+    why: "Key escrow stores keys with a trusted third party so encrypted data remains accessible if a key is lost (departing employee, lost private key) or for legal investigations. It is controversial: whoever holds the escrowed keys could decrypt vast amounts of data, so escrow access must be tightly regulated."
+  },
+// ---- Lesson 75 · Digital Certificates ----
+  {
+    lesson: "Lesson 75 · Digital Certificates",
+    q: "A digital certificate is best described as:",
+    options: [
+      "A digitally signed electronic document that binds a public key to an identity",
+      "An encrypted copy of a private key",
+      "A list of revoked certificates",
+      "A password-protected symmetric key"
+    ],
+    answer: 0,
+    why: "A digital certificate (commonly X.509) binds a public key to a user, server, or device identity. It contains the owner's info (name, organization, public key) plus CA information. The identity can be a person, server, workstation, or other device."
+  },
+  {
+    lesson: "Lesson 75 · Digital Certificates",
+    q: "Your company runs www.example.com, shop.example.com, and mail.example.com. The simplest way to cover all of them with one certificate is:",
+    options: [
+      "A self-signed certificate",
+      "A wildcard certificate for *.example.com",
+      "A dual-sided certificate",
+      "An OCSP stapled certificate"
+    ],
+    answer: 1,
+    why: "A wildcard certificate lets all subdomains of the same root domain use one public key certificate — cheaper and easier to manage. The tradeoff: if the server is compromised and the certificate is revoked, ALL subdomains are affected until reissued."
+  },
+  {
+    lesson: "Lesson 75 · Digital Certificates",
+    q: "You need ONE certificate to cover two DIFFERENT root domains (example.com and example.net). You should use:",
+    options: [
+      "A wildcard certificate",
+      "The SAN (Subject Alternate Name) field",
+      "A self-signed certificate",
+      "Key escrow"
+    ],
+    answer: 1,
+    why: "Wildcard certificates only cover subdomains of a single root domain. For multiple distinct domains, you modify the SAN field in the certificate so one certificate supports both domains. Exam trap: same root domain → wildcard; different domains → SAN."
+  },
+  {
+    lesson: "Lesson 75 · Digital Certificates",
+    q: "A self-signed certificate is appropriate when:",
+    options: [
+      "Hosting a public e-commerce site",
+      "Testing environments, closed systems, or non-production systems where trust is already established",
+      "You need the highest level of trust",
+      "Multiple subdomains must be covered"
+    ],
+    answer: 1,
+    why: "Self-signed certificates are signed by the entity itself rather than a trusted CA. They provide encryption but no third-party verification of identity, so browsers warn about them. They fit testing/dev/internal closed systems — not publicly-facing sites, where third-party CA certificates are preferred."
+  },
+  {
+    lesson: "Lesson 75 · Digital Certificates",
+    q: "During a Certificate Signing Request (CSR), what NEVER leaves the requester?",
+    options: [
+      "The organization's name",
+      "The domain name",
+      "The private key",
+      "The public key"
+    ],
+    answer: 2,
+    why: "The CSR contains the entity's information (org name, domain, locality, country) and its PUBLIC key. The private key stays securely with the requester — sending it to the CA would destroy the confidentiality of the key pair."
+  },
+  {
+    lesson: "Lesson 75 · Digital Certificates",
+    q: "OCSP improves on the CRL approach by:",
+    options: [
+      "Checking the revocation status of a single certificate by serial number — faster, but unencrypted",
+      "Downloading the entire revocation list in the background",
+      "Encrypting the revocation list with the CA's private key",
+      "Preventing certificates from ever expiring"
+    ],
+    answer: 0,
+    why: "The CRL is the CA's full list of every certificate ever revoked — slow to download and search. OCSP queries the status of one certificate by serial number, quickly and efficiently. The tradeoff: OCSP traffic is not encrypted, making it less secure."
+  },
+  {
+    lesson: "Lesson 75 · Digital Certificates",
+    q: "If a root Certificate Authority is compromised, what happens?",
+    options: [
+      "Only newly issued certificates are affected",
+      "Every certificate ever issued by that CA must be revoked and reissued",
+      "Nothing — root CAs cannot be compromised",
+      "Only wildcard certificates are affected"
+    ],
+    answer: 1,
+    why: "Everything in digital certificates comes down to the chain of trust. If the root CA is compromised, every certificate it ever issued is now considered compromised and must be revoked and reissued. This is especially critical for organizations running their own internal CA."
+  },
+  {
+    lesson: "Lesson 75 · Digital Certificates",
+    q: "Public key pinning defends against:",
+    options: [
+      "Expired certificates",
+      "Server impersonation and fraudulent certificates",
+      "Collision attacks on hashes",
+      "Pass-the-hash attacks"
+    ],
+    answer: 1,
+    why: "Public key pinning lets an HTTPS website present a set of trusted public keys in its HTTP header. If the browser doesn't receive a matching public key from the CA, it knows the site is being impersonated and alerts the user — resisting fraudulent certificates."
+  },
+// ---- Lesson 77 · Blockchain ----
+  {
+    lesson: "Lesson 77 · Blockchain",
+    q: "What makes a blockchain tamper-evident?",
+    options: [
+      "Each block contains the hash of the previous block, plus a timestamp and its own transactions",
+      "Blocks are encrypted with the sender's private key",
+      "A central authority digitally signs every block",
+      "All data is stored in a single secure server"
+    ],
+    answer: 0,
+    why: "Each block stores the previous block's hash, a timestamp, and hashed transaction data (rolled up into a root hash). Alter any earlier block and every subsequent hash breaks, exposing the tampering. The ledger is shared and immutable across a decentralized peer-to-peer network."
+  },
+  {
+    lesson: "Lesson 77 · Blockchain",
+    q: "A smart contract is:",
+    options: [
+      "A legal paper contract scanned into the blockchain",
+      "Self-executing code whose terms are written into the code and run automatically when conditions are met",
+      "A contract signed with a digital signature only",
+      "An SLA between a cloud provider and customer"
+    ],
+    answer: 1,
+    why: "Smart (digital) contracts are self-executing: the agreement's terms are written directly into code, and actions execute automatically when conditions are met — e.g., funds release to a seller when the buyer confirms receipt. Once deployed on the blockchain they cannot be altered, making them tamper-proof (popularized by Ethereum)."
+  },
+// ---- Lesson 78 · Encryption Tools ----
+  {
+    lesson: "Lesson 78 · Encryption Tools",
+    q: "A TPM (Trusted Platform Module) is:",
+    options: [
+      "An enterprise appliance for financial key management",
+      "A dedicated microcontroller that secures hardware through integrated cryptographic keys — used by BitLocker",
+      "A software vault for password storage",
+      "A co-processor for biometric data"
+    ],
+    answer: 1,
+    why: "A TPM is a dedicated microcontroller on the device that provides hardware-level security so digital secrets stay confidential and unaltered — like a personal vault. Windows BitLocker uses the TPM to secure its drive-encryption keys, adding protection against software-based attacks."
+  },
+  {
+    lesson: "Lesson 78 · Encryption Tools",
+    q: "An HSM (Hardware Security Module) differs from a TPM in that it is:",
+    options: [
+      "A physical appliance that safeguards and manages keys in a tamper-proof environment, often for mission-critical financial transactions and compliance",
+      "A small chip built into a single laptop",
+      "A type of digital certificate",
+      "A software-only key generator"
+    ],
+    answer: 0,
+    why: "If a TPM is a personal vault, an HSM is a high-security bank vault: a physical device that generates, stores, and manages digital keys and performs accelerated cryptographic operations inside a tamper-proof environment. Organizations use HSMs to meet regulatory compliance for sensitive data like payment transactions."
+  },
+  {
+    lesson: "Lesson 78 · Encryption Tools",
+    q: "The secure enclave in a smartphone protects biometric data by:",
+    options: [
+      "Uploading it to the vendor's cloud for safekeeping",
+      "Isolating a co-processor from the main CPU so the data is shielded even if the device is compromised",
+      "Encrypting it with the user's PIN",
+      "Storing it in the blockchain"
+    ],
+    answer: 1,
+    why: "A secure enclave is a co-processor integrated into the main processor but isolated from it — a fortress inside the device. Face ID/Touch ID and payment data are processed and stored there and never leave; even a fully compromised main processor cannot access the enclave's contents."
+  },
+// ---- Lesson 79 · Obfuscation ----
+  {
+    lesson: "Lesson 79 · Obfuscation",
+    q: "Steganography differs from encryption because it:",
+    options: [
+      "Uses stronger mathematics than AES",
+      "Hides the very existence of a message inside an ordinary file rather than making it unreadable",
+      "Requires a public and private key pair",
+      "Produces a fixed-length digest"
+    ],
+    answer: 1,
+    why: "Steganography ('covered writing') hides secret data within an ordinary non-secret file — a message inside a cat photo looks like just a cat photo. The goal isn't to prevent reading, but to prevent suspicion that hidden data exists. It is not true encryption and is often combined with encryption for extra layers."
+  },
+  {
+    lesson: "Lesson 79 · Obfuscation",
+    q: "A payment system stores a random string instead of your actual credit card number, mapping back to the real number only in a secured vault. This is:",
+    options: [
+      "Data masking",
+      "Steganography",
+      "Tokenization",
+      "Salting"
+    ],
+    answer: 2,
+    why: "Tokenization substitutes sensitive data elements with nonsensitive equivalents called tokens that have no exploitable meaning. The real data stays in a separate secure vault, so a breach exposes only useless tokens. This reduces PCI DSS compliance scope and is standard in payment systems."
+  },
+  {
+    lesson: "Lesson 79 · Obfuscation",
+    q: "A support agent can only see the last four digits of your credit card. This is an example of:",
+    options: [
+      "Tokenization",
+      "Data masking (data obfuscation)",
+      "Hashing",
+      "Key stretching"
+    ],
+    answer: 1,
+    why: "Data masking disguises original data to protect sensitive information while keeping it recognizable and usable for a specific purpose — e.g., masking the first 12 digits of a card so staff can identify a payment with just the last 4, or masking the first five digits of an SSN. Test databases with fictional-but-realistic data work the same way."
+  },
+// ---- Lesson 80 · Cryptographic Attacks ----
+  {
+    lesson: "Lesson 80 · Cryptographic Attacks",
+    q: "A downgrade (version rollback) attack works by:",
+    options: [
+      "Forcing a system to use a weaker or older protocol version than it supports, exploiting known flaws in the old version",
+      "Lowering the bit length of a symmetric key during transit",
+      "Reducing the number of hash rounds in SHA-3",
+      "Downgrading a user's account privileges"
+    ],
+    answer: 0,
+    why: "During the protocol handshake, the attacker manipulates version negotiation so both ends 'agree' on an older, insecure protocol they still support for backward compatibility. POODLE (Padding Oracle On Downgraded Legacy Encryption) famously forced connections back to SSL 3.0. Defenses: drop legacy protocols, use version-intolerance checks."
+  },
+  {
+    lesson: "Lesson 80 · Cryptographic Attacks",
+    q: "A collision attack against hashing aims to:",
+    options: [
+      "Reverse a hash back to its original input",
+      "Find two different inputs that produce the same hash output",
+      "Steal a hash and replay it for authentication",
+      "Force a certificate authority to issue a rogue certificate"
+    ],
+    answer: 1,
+    why: "A collision attack finds two different inputs with the same hash output. Researchers produced two different sequences hashing to the same MD5 digest, rendering MD5 unsuitable for certificates and signatures. The birthday paradox explains why collisions are found far sooner than brute force would suggest."
+  },
+  {
+    lesson: "Lesson 80 · Cryptographic Attacks",
+    q: "Quantum computing threatens current cryptography primarily because it can:",
+    options: [
+      "Break all symmetric ciphers instantly",
+      "Quickly factor large prime numbers and solve discrete logarithms — breaking asymmetric algorithms like RSA and ECC",
+      "Reverse any hash digest back to plaintext",
+      "Decrypt data without ever accessing it"
+    ],
+    answer: 1,
+    why: "Asymmetric algorithms (RSA, ECC, DH) rely on hard math problems — factoring large primes — that quantum computers can solve rapidly. Symmetric crypto fares better: moving from AES-128 to AES-256 squares the brute-force work. Post-quantum candidates (NIST 2022): CRYSTALS-Kyber for encryption; CRYSTALS-Dilithium, FALCON, SPHINCS+ for signatures."
+  }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"cryptographic-solutions-quiz.html",title:"Cryptographic Solutions Quiz \u00b7 SY0-701 (Section 08)"};</script><script src="analytics.js"></script>
+</body>
+</html>

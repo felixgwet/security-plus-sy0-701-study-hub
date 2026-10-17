@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SY0-701 Practice Exam 8 · Instant Feedback (Section 09)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #3fb950;
+    --accent-dim: rgba(63,185,80,.12);
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+    --blue: #58a6ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 860px; }
+
+  /* ---------- Start / Result ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 36px;
+  }
+  .center { text-align: center; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(63,185,80,.4);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 14px; }
+  .screen p { color: var(--muted); line-height: 1.65; margin-bottom: 10px; font-size: 15px; }
+  .exam-facts { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin: 22px 0 6px; }
+  .fact {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .fact b { display: block; color: var(--text); font-size: 17px; margin-bottom: 2px; }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 32px;
+    cursor: pointer;
+    margin-top: 22px;
+    transition: filter .15s;
+  }
+  .btn:hover:not(:disabled) { filter: brightness(1.12); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); margin-left: 8px; }
+  .btn.nav-btn { margin-top: 0; padding: 10px 24px; }
+  .score-big { font-size: 60px; font-weight: 700; margin: 10px 0 2px; }
+  .pass-line { color: var(--muted); font-size: 14px; margin-bottom: 4px; }
+  .verdict { font-size: 18px; font-weight: 600; margin: 8px 0 2px; }
+  .verdict.pass { color: var(--green); }
+  .verdict.fail { color: var(--red); }
+  .scale-track {
+    position: relative; height: 10px; background: var(--border);
+    border-radius: 5px; margin: 26px auto 6px; max-width: 560px;
+  }
+  .scale-pass-mark { position: absolute; left: 81.25%; top: -5px; bottom: -5px; width: 2px; background: var(--gold); }
+  .scale-fill {
+    height: 100%; border-radius: 5px; width: 0%;
+    background: linear-gradient(90deg, var(--red), var(--gold) 70%, var(--green));
+    transition: width 1s ease;
+  }
+  .scale-labels { display: flex; justify-content: space-between; max-width: 560px; margin: 0 auto; font-size: 12px; color: var(--muted); }
+  .review { text-align: left; margin-top: 30px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; font-size: 14px; }
+  .review-item .qhead { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  .review-item .pts { color: var(--muted); white-space: nowrap; }
+  .review-item .q { line-height: 1.5; margin-bottom: 6px; }
+  .review-item .a { color: var(--muted); line-height: 1.55; }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+
+  /* ---------- Question screen ---------- */
+  .exam-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 14px; color: var(--muted); }
+  .qtype-tag {
+    display: inline-block; font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--accent); background: var(--accent-dim);
+    border: 1px solid rgba(63,185,80,.35); border-radius: 4px; padding: 2px 8px; margin-bottom: 10px;
+  }
+  .q-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 26px 28px; }
+  .q-text { font-size: 17px; line-height: 1.55; margin-bottom: 20px; }
+  .pick-hint { font-size: 13px; color: var(--gold); margin: -12px 0 16px; font-weight: 600; }
+
+  .option {
+    display: block; width: 100%; text-align: left;
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; font-size: 15px; margin-bottom: 9px;
+    cursor: pointer; transition: border-color .15s, background .15s; user-select: none;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.selected { border-color: var(--accent); background: var(--accent-dim); }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter { display: inline-block; width: 22px; font-weight: 700; color: var(--muted); }
+
+  .match-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .match-term {
+    min-width: 190px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; font-size: 14px; font-weight: 600;
+  }
+  .match-term.good { border-color: var(--green); background: rgba(63,185,80,.1); }
+  .match-term.bad { border-color: var(--red); background: rgba(248,81,73,.1); }
+  .match-arrow { color: var(--muted); }
+  select.match-select {
+    flex: 1; min-width: 220px; background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 14px;
+  }
+  select.match-select.selected { border-color: var(--accent); }
+  select.match-select:disabled { opacity: .85; }
+
+  .order-seq-label { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .order-seq { border: 1px dashed var(--border); border-radius: 8px; padding: 12px; min-height: 54px; margin-bottom: 16px; }
+  .order-seq .placeholder { color: var(--muted); font-size: 13px; }
+  .order-item {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 9px 14px; font-size: 14px; margin: 4px 6px 4px 0; cursor: pointer; user-select: none;
+  }
+  .order-item:hover:not(.used) { border-color: var(--accent); }
+  .order-item .num {
+    display: inline-block; width: 20px; height: 20px; line-height: 20px; text-align: center;
+    background: var(--accent); color: #0d1117; border-radius: 50%; font-size: 12px; font-weight: 700;
+  }
+  .order-item .num.good { background: var(--green); }
+  .order-item .num.bad { background: var(--red); }
+  .order-item.used { opacity: .35; pointer-events: none; }
+  .order-reset { background: none; border: none; color: var(--blue); font-size: 13px; cursor: pointer; margin-bottom: 8px; }
+
+  .feedback {
+    display: none; margin-top: 18px; border-radius: 8px; padding: 14px 16px;
+    font-size: 14px; line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback.part { background: rgba(210,153,34,.08); border: 1px solid rgba(210,153,34,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+
+  .check-btn { margin-top: 6px; width: 100%; }
+  .exam-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; gap: 10px; flex-wrap: wrap; }
+
+  .palette { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-top: 18px; }
+  .palette h3 { font-size: 13px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
+  .pal-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pal-btn {
+    width: 34px; height: 34px; background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px; font-size: 13px; cursor: pointer; position: relative;
+  }
+  .pal-btn.current { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .pal-btn.answered::after {
+    content: ''; position: absolute; right: 3px; top: 3px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  }
+  .legend { display: flex; gap: 16px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+  .legend span::before { content: '● '; }
+  .legend .l-ans::before { color: var(--green); }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen center">
+    <div class="badge">CompTIA Security+ SY0-701 · Feedback Mode</div>
+    <h1>Practice Exam 8 — Instant Feedback</h1>
+    <p><b style="color:var(--text)">Same exam-paper question styles as the simulator</b> — single-answer multiple choice, multiple-response, and performance-based matching &amp; ordering tasks — but in study mode: after each answer you immediately see whether you're right, your points, and an explanation. A completely new question set on Risk Management.</p>
+    <div class="exam-facts">
+      <div class="fact"><b id="fact-q">20</b>All-new questions</div>
+      <div class="fact"><b id="fact-t">—</b>Timer</div>
+      <div class="fact"><b>750 / 900</b>Passing score</div>
+      <div class="fact"><b>Instant</b>Feedback</div>
+    </div>
+    <p style="margin-top:16px">The clock counts up (no pressure) and records your total time. Answer every question, then get a full CompTIA-style score report with review.</p>
+    <button class="btn" onclick="beginExam()">Start Practice Exam</button>
+  </div>
+
+  <!-- EXAM -->
+  <div id="exam-screen" class="hidden">
+    <div class="exam-top">
+      <span id="exam-pos">Question 1 of 20</span>
+      <span>Score: <b id="live-score">0.00</b> / 20 &nbsp;·&nbsp; ⏱ <span id="timer">00:00</span></span>
+    </div>
+    <div class="q-card">
+      <div class="qtype-tag" id="q-type"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-body"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn check-btn" id="check-btn" onclick="checkAnswer()">Check Answer</button>
+      <div class="exam-footer">
+        <button class="btn ghost nav-btn" id="prev-btn" onclick="gotoQuestion(current-1)">← Previous</button>
+        <button class="btn nav-btn" id="next-btn" onclick="gotoQuestion(current+1)">Next →</button>
+      </div>
+    </div>
+    <div class="palette">
+      <h3>Question Summary</h3>
+      <div class="pal-grid" id="palette"></div>
+      <div class="legend"><span class="l-ans">Answered</span></div>
+      <div style="margin-top:14px">
+        <button class="btn" style="margin-top:0" onclick="finishExam()">Finish &amp; See Score Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen center hidden">
+    <div class="badge">Exam Score Report</div>
+    <div class="score-big" id="scaled-score">—</div>
+    <div class="pass-line">Scale: 100 – 900 · Passing score: 750</div>
+    <div class="verdict" id="verdict"></div>
+    <p id="raw-line" style="margin-top:10px"></p>
+    <div class="scale-track">
+      <div class="scale-fill" id="scale-fill"></div>
+      <div class="scale-pass-mark"></div>
+    </div>
+    <div class="scale-labels"><span>100</span><span style="color:var(--gold)">750 ▲</span><span>900</span></div>
+    <div>
+      <button class="btn" onclick="beginExam()">Retake Exam</button>
+      <button class="btn ghost" onclick="toggleReview()" id="review-btn">Review Questions</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   PRACTICE EXAM (FEEDBACK MODE) — SY0-701 Section 09 content
+   Domain 5: Risk Management Process (Obj 5.2)
+   All-new question set — distinct from the quiz & simulator.
+   ============================================================ */
+const EXAM = [
+// ---------- Single-answer multiple choice ----------
+  {
+    type: 'mcq',
+    q: "During risk analysis, a team decides whether to rate risks with descriptive scales or numerical values. These two choices correspond to:",
+    options: [
+      "Ad-hoc vs recurring assessment",
+      "Qualitative vs quantitative analysis",
+      "Transfer vs acceptance strategies",
+      "Tolerance vs appetite"
+    ],
+    answer: 1,
+    why: "Risk analysis evaluates likelihood and impact — qualitatively using categories and scales (high/medium/low), or quantitatively using numerical values (EF, SLE, ARO, ALE). The outcome of either method is a prioritized list of risks by severity to guide treatment."
+  },
+  {
+    type: 'mcq',
+    q: "A risk register entry reads: 'Risk: supplier insolvency. Impact: high. Likelihood: low. Outcome: production halt. Level: medium. Cost: $1.5M.' The risk LEVEL was derived from:",
+    options: [
+      "The cost figure alone",
+      "Combining the impact and likelihood ratings",
+      "The risk owner's seniority",
+      "Multiplying cost by the number of suppliers"
+    ],
+    answer: 1,
+    why: "Risk level (threshold) is determined by COMBINING impact and likelihood — here high impact × low likelihood = medium level. The level categorizes risk as high/medium/low and decides which risks need immediate attention. Cost is recorded separately."
+  },
+  {
+    type: 'mcq',
+    q: "A company that prioritizes stability and long-term sustainability prefers lower risk even at the cost of lower returns. Its risk appetite is:",
+    options: [
+      "Expansionary",
+      "Neutral",
+      "Conservative",
+      "Continuous"
+    ],
+    answer: 2,
+    why: "Conservative risk appetite = preferring less risk even if it means accepting lower returns — typical of stability-focused businesses. Expansionary = more risk for higher returns; neutral = balanced. 'Continuous' is an assessment frequency, not an appetite type."
+  },
+  {
+    type: 'mcq',
+    q: "An IT manager asks: 'If this system dies at 9 AM, how far back could we restore data — and how long until we're back online?' Which two metrics answer these questions?",
+    options: [
+      "MTBF and MTTR",
+      "RPO and RTO",
+      "SLE and ALE",
+      "EF and ARO"
+    ],
+    answer: 1,
+    why: "'How far back can we restore' = RPO — the recovery POINT, the maximum acceptable data loss in time. 'How long until back online' = RTO — the recovery TIME objective, maximum tolerable downtime. MTBF/MTTR describe failure and repair statistics; SLE/ALE/EF/ARO are quantitative loss-analysis terms."
+  },
+  {
+    type: 'mcq',
+    q: "A PM rates a supply-chain delay as HIGH likelihood and HIGH impact for a skyscraper project, then secures multiple vendors, schedules deliveries early, and stocks buffer materials. The analysis and response are, respectively:",
+    options: [
+      "Quantitative; risk avoidance",
+      "Qualitative; risk mitigation",
+      "Qualitative; risk acceptance",
+      "Quantitative; risk transference"
+    ],
+    answer: 1,
+    why: "Rating likelihood/impact qualitatively (high/high) based on judgment = qualitative analysis — the course's construction example. The response reduces likelihood and impact (more vendors, early scheduling, buffer stock) without eliminating the activity = risk MITIGATION, the most common strategy."
+  },
+  {
+    type: 'mcq',
+    q: "A warehouse asset worth $200,000 would suffer 25% damage in a flood expected once every 20 years. What is the single loss expectancy?",
+    options: [
+      "$50,000",
+      "$200,000",
+      "$2,500",
+      "$25,000"
+    ],
+    answer: 0,
+    why: "SLE = asset value × exposure factor = $200,000 × 25% = $50,000 per event. (For completeness: ARO = 1/20 = 0.05, so ALE = $50,000 × 0.05 = $2,500/year — but the question asked for SLE.)"
+  },
+  {
+    type: 'mcq',
+    q: "An insurer charges $3,000/year to cover a risk with an ALE of $9,000, and the policy would cover the full loss. Buying the policy is BEST described as:",
+    options: [
+      "Risk acceptance with an exception",
+      "Risk mitigation through training",
+      "Risk avoidance by eliminating the activity",
+      "Risk transference — shifting the financial burden for less than the expected annual loss"
+    ],
+    answer: 3,
+    why: "Insurance is the most common risk TRANSFER mechanism: for a $3,000 premium, the insurer carries a loss whose expected annual cost (ALE) is $9,000 — financially rational transfer. Note it doesn't eliminate the risk itself or the reputational fallout; it shifts the monetary burden."
+  },
+  {
+    type: 'mcq',
+    q: "A startup keeps operating with a known, minor risk because engineering a fix would cost ten times the potential damage, and it documents the decision for the board. Which strategy, and how is it properly formalized?",
+    options: [
+      "Negligence; no documentation needed",
+      "Risk acceptance — a deliberate strategy used when mitigation cost outweighs potential loss",
+      "Risk avoidance; the activity must stop",
+      "Risk transference; via an indemnity clause"
+    ],
+    answer: 1,
+    why: "Risk acceptance acknowledges the risk and deals with it if and when it occurs — appropriate when prevention cost exceeds potential loss or impact is minor. It's a deliberate, documented strategy (often implemented via exemption or exception), not negligence."
+  },
+  {
+    type: 'mcq',
+    q: "Which is a distinguishing feature of quantitative — not qualitative — risk analysis?",
+    options: [
+      "It is subjective and relies on expert judgment",
+      "It avoids numerical complexity",
+      "It assigns concrete numerical values and supports cost-benefit decisions on controls",
+      "It rates risks only as high, medium, or low"
+    ],
+    answer: 2,
+    why: "Quantitative analysis assigns concrete values (EF, SLE, ARO, ALE) giving an objective, probabilistic evaluation — enabling precise decisions like 'this $40,000 control only saves $6,000, don't buy it.' All the other options describe the qualitative approach."
+  },
+  {
+    type: 'mcq',
+    q: "A risk report shared with executives shows the risk landscape, response actions, and their effectiveness. According to the course, this primarily supports:",
+    options: [
+      "Informed decision making and stakeholder communication",
+      "Guaranteeing zero residual risk",
+      "Replacing the risk register",
+      "Eliminating regulatory requirements"
+    ],
+    answer: 0,
+    why: "Risk reporting communicates risk-management activities to stakeholders. Two of its four core purposes: informed decision making (resources, timelines, strategy) and stakeholder communication (manage expectations, demonstrate effective management). The others: risk mitigation (act before risks grow) and regulatory compliance (reporting is legally required in many industries)."
+  },
+  {
+    type: 'mcq',
+    q: "After applying a mitigation plan, a company measures the risk that STILL remains. Which term describes what they measured, and what was it measured against?",
+    options: [
+      "Inherent risk; measured against zero",
+      "Residual risk; the risk remaining after treatment of the inherent risk",
+      "Control risk; the cost of the mitigation",
+      "Risk appetite; the tolerance ceiling"
+    ],
+    answer: 1,
+    why: "Residual risk = the likelihood and impact remaining AFTER mitigation, transference, or acceptance has been applied to the inherent (pre-treatment) risk. Monitoring tracks residual risk over time. Control risk, by contrast, is how much the control itself has decayed."
+  },
+  {
+    type: 'mcq',
+    q: "A risk register must be shared with shareholders primarily because it:",
+    options: [
+      "Legally transfers risk to them",
+      "Serves as a crucial communication tool so they better understand the risks in the work they manage",
+      "Replaces the need for risk reporting",
+      "Determines their salaries"
+    ],
+    answer: 1,
+    why: "The register is a crucial communication tool — sharing it with shareholders/stakeholders helps them understand the risks attached to the work they manage, and it supports tracking risks throughout the project lifecycle. It doesn't transfer risk or replace tailored risk reporting (dashboards, heat maps, reports)."
+  },
+  // ---------- Multiple response ----------
+  {
+    type: 'multi',
+    pick: 4,
+    q: "Which of the following are the four risk treatment (management) strategies? (Select FOUR.)",
+    options: [
+      "Risk transference",
+      "Risk acceptance",
+      "Risk avoidance",
+      "Risk mitigation",
+      "Risk expansion",
+      "Risk documentation",
+      "Risk recycling"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "The four strategies: transference (shift to another party — insurance or indemnity clauses), acceptance (acknowledge and bear it), avoidance (change plans to eliminate it), and mitigation (reduce likelihood or impact — the most common). The other options are invented distractors that sound like plausible business terms."
+  },
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which statements about risk tolerance and risk appetite are TRUE? (Select THREE.)",
+    options: [
+      "Risk tolerance is the maximum amount of risk an organization is prepared to accept",
+      "Risk appetite reflects the organization's approach toward risk-taking",
+      "Both should be identified up front, before risk levels are categorized",
+      "Risk appetite only applies to financial institutions",
+      "A conservative appetite means chasing higher returns at any risk level",
+      "Tolerance and appetite are identical and interchangeable"
+    ],
+    answer: [0, 1, 2],
+    why: "Tolerance = max acceptable risk while achieving objectives (the ceiling). Appetite = amount/type of risk willing to be pursued or retained for strategic objectives (the posture: expansionary/conservative/neutral). Both are defined BEFORE categorizing risk levels. Appetite applies to any organization; conservative means LESS risk for lower returns; the two terms are distinct."
+  },
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which are valid likelihood scales or ratings mentioned in the course for qualitative analysis? (Select THREE.)",
+    options: [
+      "Rare, unlikely, possible, likely, almost certain",
+      "A 1-to-5 or 1-to-10 numerical scale",
+      "Low, medium, high",
+      "Definitely, certainly, absolutely",
+      "Red, amber, green traffic lights as the likelihood value itself"
+    ],
+    answer: [0, 1, 2],
+    why: "Likelihood is rated numerically (1–5 or 1–10) or descriptively on the rare → unlikely → possible → likely → almost certain scale; both impact and likelihood are also commonly expressed low/medium/high. 'Definitely/certainly' and color-only ratings are not the course's likelihood scales."
+  },
+  {
+    type: 'multi',
+    pick: 4,
+    q: "Which of the following are reasons risk monitoring and reporting are essential, per the course? (Select FOUR.)",
+    options: [
+      "Informed decision making",
+      "Risk mitigation — acting before a growing risk becomes a problem",
+      "Stakeholder communication",
+      "Regulatory compliance",
+      "Guaranteed elimination of all future risks",
+      "Replacing the risk register"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "The four: informed decision making (allocation, timelines, strategy), risk mitigation (catch rising likelihood/impact early), stakeholder communication (expectations, demonstrating control), and regulatory compliance (required by law in many industries). No process eliminates all risk, and reporting complements — never replaces — the register."
+  },
+  // ---------- Performance-based: matching ----------
+  {
+    type: 'match',
+    q: "PBQ — Match each risk assessment frequency to its defining characteristic. Each characteristic may be used once; not all characteristics will be used.",
+    terms: ["Ad-hoc", "Recurring", "One-time", "Continuous"],
+    defs: [
+      "Triggered by a specific event or situation; may be repeated if similar circumstances arise",
+      "Runs at regular intervals such as annually, quarterly, or monthly as standard procedure",
+      "Performed for a specific project or initiative and never repeated",
+      "Ongoing real-time monitoring and evaluation, typically technology-enabled",
+      "Conducted only once a decade regardless of events",
+      "Triggered exclusively by regulatory fines"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "Ad-hoc = event-driven and repeatable. Recurring = calendar-driven (a bank's quarterly credit-risk review; scheduled penetration tests). One-time = project-bound, never repeated (a new IT system rollout). Continuous = always-on, tech-enabled (SOC threat monitoring). The distractors exaggerate edge cases into false definitions."
+  },
+  {
+    type: 'match',
+    q: "PBQ — Match each formula to its name. Each name may be used once; not all names will be used.",
+    terms: [
+      "Asset value × Exposure factor",
+      "Single loss expectancy × Annualized rate of occurrence",
+      "1 ÷ years between events",
+      "Percentage of the asset destroyed in one event"
+    ],
+    defs: [
+      "Single loss expectancy (SLE)",
+      "Annualized loss expectancy (ALE)",
+      "Annualized rate of occurrence (ARO)",
+      "Exposure factor (EF)",
+      "Recovery point objective (RPO)",
+      "Mean time between failures (MTBF)"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "The calculation chain: EF is the percentage lost; SLE = AV × EF is the loss per event; ARO converts the interval into a yearly rate (1÷years); ALE = SLE × ARO is the yearly expected loss. RPO and MTBF are recovery/reliability metrics — the classic wrong-category distractors."
+  },
+  // ---------- Performance-based: ordering ----------
+  {
+    type: 'order',
+    q: "PBQ — A team performs qualitative risk analysis on the risk of a key developer leaving mid-project. Order the reasoning flow from the course. Click the steps in sequence.",
+    items: [
+      "Assess the likelihood qualitatively — medium, based on industry turnover and project duration",
+      "Assess the impact qualitatively — high, given delays, cost increases, and quality risk",
+      "Combine the ratings to prioritize the risk against others",
+      "Develop mitigation strategies: cross-training, documentation, and retention efforts"
+    ],
+    why: "Qualitative flow: judge likelihood from experience (medium), judge impact if it materializes (high), combine to prioritize, then treat. This is the course's software-project example — the ratings are subjective and expert-based, and the treatment reduces rather than eliminates the risk."
+  },
+  {
+    type: 'order',
+    q: "PBQ — An organization responds to a brand-new data-privacy regulation by running the full risk process. Order the lifecycle. Click the steps in sequence.",
+    items: [
+      "Identify the potential risks the new regulation introduces",
+      "Analyze each risk's likelihood and impact, producing a prioritized list",
+      "Select treatment strategies — avoidance, mitigation, transference, or acceptance",
+      "Monitor the risks, residual risk, and new risks on an ongoing basis",
+      "Report risk status and process effectiveness to stakeholders in tailored formats"
+    ],
+    why: "The five-step lifecycle: identify → analyze (qualitative or quantitative; output = prioritized list) → treat (the four strategies) → monitor (ongoing, dynamic) → report (dashboards, heat maps, detailed reports tailored to the audience). Analysis always precedes treatment."
+  }
+];
+
+/* ============================================================
+   ENGINE — feedback mode
+   ============================================================ */
+let answers = [];
+let checked = [];
+let points = [];
+let current = 0;
+let elapsed = 0;
+let timerId = null;
+
+const TYPE_LABELS = {
+  mcq: 'Multiple Choice',
+  multi: 'Multiple Response',
+  match: 'Performance-Based · Matching',
+  order: 'Performance-Based · Ordering'
+};
+
+function fmtTime(s) {
+  const m = Math.floor(s / 60), r = s % 60;
+  return `${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`;
+}
+
+function beginExam() {
+  answers = EXAM.map(q => {
+    if (q.type === 'mcq') return null;
+    if (q.type === 'multi') return [];
+    if (q.type === 'match') return q.terms.map(() => null);
+    if (q.type === 'order') return [];
+    return null;
+  });
+  checked = EXAM.map(() => false);
+  points = EXAM.map(() => 0);
+  current = 0;
+  elapsed = 0;
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('exam-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Questions';
+  document.getElementById('fact-q').textContent = EXAM.length;
+  document.getElementById('fact-t').textContent = 'elapsed';
+  startTimer();
+  renderQuestion();
+  renderPalette();
+}
+
+function startTimer() {
+  clearInterval(timerId);
+  updateTimerDisplay();
+  timerId = setInterval(() => { elapsed++; updateTimerDisplay(); }, 1000);
+}
+
+function updateTimerDisplay() {
+  document.getElementById('timer').textContent = fmtTime(elapsed);
+}
+
+function isAnswered(i) { return checked[i]; }
+
+function isInputComplete(i) {
+  const q = EXAM[i], a = answers[i];
+  if (q.type === 'mcq') return a !== null;
+  if (q.type === 'multi') return a.length > 0;
+  if (q.type === 'match') return a.every(v => v !== null);
+  if (q.type === 'order') return a.length === q.items.length;
+  return false;
+}
+
+function updateLiveScore() {
+  const total = points.reduce((s, p) => s + p, 0);
+  document.getElementById('live-score').textContent = total.toFixed(2);
+}
+
+function renderQuestion() {
+  const q = EXAM[current];
+  const done = checked[current];
+  document.getElementById('exam-pos').textContent = `Question ${current + 1} of ${EXAM.length}`;
+  document.getElementById('q-type').textContent = TYPE_LABELS[q.type];
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('prev-btn').disabled = current === 0;
+  document.getElementById('next-btn').textContent = current === EXAM.length - 1 ? 'Last Question' : 'Next →';
+
+  const body = document.getElementById('q-body');
+  body.innerHTML = '';
+  if (q.type === 'mcq') renderMcq(q, body, done);
+  else if (q.type === 'multi') renderMulti(q, body, done);
+  else if (q.type === 'match') renderMatch(q, body, done);
+  else if (q.type === 'order') renderOrder(q, body, done);
+
+  const checkBtn = document.getElementById('check-btn');
+  const fb = document.getElementById('feedback');
+  if (done) {
+    checkBtn.classList.add('hidden');
+    showFeedback(q);
+  } else {
+    checkBtn.classList.remove('hidden');
+    checkBtn.disabled = !isInputComplete(current);
+    checkBtn.textContent = 'Check Answer';
+    fb.className = 'feedback';
+    fb.innerHTML = '';
+  }
+  updateLiveScore();
+  renderPalette();
+}
+
+function renderMcq(q, body, done) {
+  const letters = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    if (done) {
+      btn.disabled = true;
+      if (i === q.answer) btn.classList.add('correct');
+      else if (answers[current] === i) btn.classList.add('wrong');
+    } else {
+      if (answers[current] === i) btn.classList.add('selected');
+      btn.onclick = () => { answers[current] = i; renderQuestion(); };
+    }
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    body.appendChild(btn);
+  });
+}
+
+function renderMulti(q, body, done) {
+  const hint = document.createElement('div');
+  hint.className = 'pick-hint';
+  const names = { 2: 'TWO', 3: 'THREE', 4: 'FOUR' };
+  hint.textContent = `Select ${names[q.pick] || q.pick}.`;
+  body.appendChild(hint);
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    const chosen = answers[current].includes(i);
+    if (done) {
+      btn.disabled = true;
+      if (q.answer.includes(i)) btn.classList.add('correct');
+      else if (chosen) btn.classList.add('wrong');
+    } else {
+      if (chosen) btn.classList.add('selected');
+      btn.onclick = () => {
+        const sel = answers[current];
+        const pos = sel.indexOf(i);
+        if (pos >= 0) sel.splice(pos, 1);
+        else {
+          if (sel.length >= q.pick) sel.shift();
+          sel.push(i);
+        }
+        renderQuestion();
+      };
+    }
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    body.appendChild(btn);
+  });
+}
+
+function renderMatch(q, body, done) {
+  if (!q._defOrder) {
+    q._defOrder = q.defs.map((_, i) => i);
+    for (let i = q._defOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q._defOrder[i], q._defOrder[j]] = [q._defOrder[j], q._defOrder[i]];
+    }
+  }
+  q.terms.forEach((term, ti) => {
+    const row = document.createElement('div');
+    row.className = 'match-row';
+    const label = document.createElement('div');
+    label.className = 'match-term';
+    if (done) label.classList.add(answers[current][ti] === q.answer[ti] ? 'good' : 'bad');
+    label.textContent = term;
+    const arrow = document.createElement('span');
+    arrow.className = 'match-arrow';
+    arrow.textContent = '→';
+    const sel = document.createElement('select');
+    sel.className = 'match-select' + (answers[current][ti] !== null ? ' selected' : '');
+    if (done) sel.disabled = true;
+    const noneOpt = document.createElement('option');
+    noneOpt.value = '';
+    noneOpt.textContent = '— choose a description —';
+    sel.appendChild(noneOpt);
+    q._defOrder.forEach(di => {
+      const o = document.createElement('option');
+      o.value = di;
+      o.textContent = q.defs[di];
+      if (answers[current][ti] === di) o.selected = true;
+      sel.appendChild(o);
+    });
+    if (!done) {
+      sel.onchange = () => {
+        answers[current][ti] = sel.value === '' ? null : parseInt(sel.value, 10);
+        renderQuestion();
+      };
+    }
+    row.appendChild(label); row.appendChild(arrow); row.appendChild(sel);
+    body.appendChild(row);
+  });
+}
+
+function renderOrder(q, body, done) {
+  if (!q._itemOrder) {
+    q._itemOrder = q.items.map((_, i) => i);
+    for (let i = q._itemOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q._itemOrder[i], q._itemOrder[j]] = [q._itemOrder[j], q._itemOrder[i]];
+    }
+  }
+  const seqLabel = document.createElement('div');
+  seqLabel.className = 'order-seq-label';
+  seqLabel.textContent = 'Your answer (in order):';
+  body.appendChild(seqLabel);
+
+  const seq = document.createElement('div');
+  seq.className = 'order-seq';
+  if (answers[current].length === 0) {
+    seq.innerHTML = '<span class="placeholder">Click the items below in the correct sequence…</span>';
+  } else {
+    answers[current].forEach((itemIdx, pos) => {
+      const chip = document.createElement('span');
+      chip.className = 'order-item';
+      const num = document.createElement('span');
+      num.className = 'num';
+      num.textContent = pos + 1;
+      if (done) num.classList.add(itemIdx === pos ? 'good' : 'bad');
+      chip.appendChild(num);
+      chip.appendChild(document.createTextNode(q.items[itemIdx]));
+      if (!done) {
+        chip.onclick = () => { answers[current].splice(pos, 1); renderQuestion(); };
+        chip.title = 'Click to remove';
+      }
+      seq.appendChild(chip);
+    });
+  }
+  body.appendChild(seq);
+
+  if (!done && answers[current].length > 0) {
+    const reset = document.createElement('button');
+    reset.className = 'order-reset';
+    reset.textContent = '↺ Clear sequence';
+    reset.onclick = () => { answers[current] = []; renderQuestion(); };
+    body.appendChild(reset);
+  }
+
+  const poolLabel = document.createElement('div');
+  poolLabel.className = 'order-seq-label';
+  poolLabel.textContent = 'Available items:';
+  body.appendChild(poolLabel);
+
+  const pool = document.createElement('div');
+  pool.className = 'order-pool';
+  q._itemOrder.forEach(itemIdx => {
+    const used = answers[current].includes(itemIdx);
+    const chip = document.createElement('span');
+    chip.className = 'order-item' + (used ? ' used' : '');
+    chip.textContent = q.items[itemIdx];
+    if (!used && !done) {
+      chip.onclick = () => {
+        if (answers[current].length < q.items.length) {
+          answers[current].push(itemIdx);
+          renderQuestion();
+        }
+      };
+    }
+    pool.appendChild(chip);
+  });
+  body.appendChild(pool);
+}
+
+/* ---------- Grading & feedback ---------- */
+function gradeCurrent() {
+  const q = EXAM[current], a = answers[current];
+  if (q.type === 'mcq') return a === q.answer ? 1 : 0;
+  if (q.type === 'multi') {
+    const right = q.answer.slice().sort().join(',');
+    const mine = a.slice().sort().join(',');
+    return right === mine ? 1 : 0;
+  }
+  if (q.type === 'match') {
+    let c = 0;
+    a.forEach((v, i) => { if (v === q.answer[i]) c++; });
+    return c / q.terms.length;
+  }
+  if (q.type === 'order') {
+    if (a.length !== q.items.length) return 0;
+    let c = 0;
+    a.forEach((itemIdx, pos) => { if (itemIdx === pos) c++; });
+    return c / q.items.length;
+  }
+  return 0;
+}
+
+function checkAnswer() {
+  if (checked[current] || !isInputComplete(current)) return;
+  points[current] = gradeCurrent();
+  checked[current] = true;
+  renderQuestion();
+}
+
+function showFeedback(q) {
+  const pts = points[current];
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (pts === 1 ? 'ok' : pts > 0 ? 'part' : 'no');
+  const head = pts === 1 ? '✔ Correct!' : pts > 0 ? `◐ Partially correct — ${pts.toFixed(2)} / 1 point` : '✘ Incorrect';
+  fb.innerHTML = `<strong>${head}</strong>${q.why}`;
+}
+
+/* ---------- Navigation & palette ---------- */
+function renderPalette() {
+  const pal = document.getElementById('palette');
+  pal.innerHTML = '';
+  EXAM.forEach((q, i) => {
+    const b = document.createElement('button');
+    b.className = 'pal-btn' + (i === current ? ' current' : '') + (isAnswered(i) ? ' answered' : '');
+    b.textContent = i + 1;
+    b.onclick = () => gotoQuestion(i);
+    pal.appendChild(b);
+  });
+}
+
+function gotoQuestion(i) {
+  if (i < 0 || i >= EXAM.length) return;
+  current = i;
+  renderQuestion();
+}
+
+/* ---------- Results ---------- */
+function finishExam() {
+  const unchecked = checked.filter(c => !c).length;
+  let msg = `You've answered ${checked.filter(Boolean).length} of ${EXAM.length} questions.`;
+  if (unchecked > 0) msg += `\n\n${unchecked} question(s) haven't been checked yet — they score 0.`;
+  msg += '\n\nFinish and see your score report?';
+  if (!confirm(msg)) return;
+  showResults();
+}
+
+function showResults() {
+  clearInterval(timerId);
+  const total = points.reduce((s, p) => s + p, 0);
+  const pct = total / EXAM.length;
+  const scaled = Math.round(100 + 800 * pct);
+  const passed = scaled >= 750;
+
+  document.getElementById('exam-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('scaled-score').textContent = scaled;
+  const v = document.getElementById('verdict');
+  v.textContent = passed ? 'PASS ✔' : 'BELOW PASSING ✘';
+  v.className = 'verdict ' + (passed ? 'pass' : 'fail');
+  document.getElementById('raw-line').textContent =
+    `${total.toFixed(2)} of ${EXAM.length} points (${Math.round(pct * 100)}%) · Total time: ${fmtTime(elapsed)}`;
+
+  const fill = document.getElementById('scale-fill');
+  fill.style.width = '0%';
+  setTimeout(() => { fill.style.width = ((scaled - 100) / 800 * 100) + '%'; }, 60);
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Question Review</h2>';
+  EXAM.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = reviewItemHtml(q, answers[i], points[i], i);
+    review.appendChild(div);
+  });
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function reviewItemHtml(q, a, pts, i) {
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  let body = '';
+  if (!checked[i]) {
+    body = '<span class="bad">Not answered.</span>';
+  } else if (q.type === 'mcq') {
+    const ok = a === q.answer;
+    body = `Your answer: <span class="${ok ? 'ok' : 'bad'}">${letters[a]}. ${esc(q.options[a])}</span>` +
+      (ok ? '' : `<br>Correct answer: <span class="ok">${letters[q.answer]}. ${esc(q.options[q.answer])}</span>`);
+  } else if (q.type === 'multi') {
+    const ok = pts === 1;
+    const mine = a.map(x => letters[x] + '. ' + esc(q.options[x])).join('<br>') || '(none)';
+    const right = q.answer.map(x => letters[x] + '. ' + esc(q.options[x])).join('<br>');
+    body = `Your selections:<br><span class="${ok ? 'ok' : 'bad'}">${mine}</span>` +
+      (ok ? '' : `<br>Correct selections:<br><span class="ok">${right}</span>`);
+  } else if (q.type === 'match') {
+    body = q.terms.map((t, ti) => {
+      const ok = a[ti] === q.answer[ti];
+      const mine = a[ti] !== null ? q.defs[a[ti]] : '(none)';
+      const right = q.defs[q.answer[ti]];
+      return `<b>${esc(t)}</b> → <span class="${ok ? 'ok' : 'bad'}">${esc(mine)}</span>` +
+        (ok ? '' : ` &nbsp;(correct: <span class="ok">${esc(right)}</span>)`);
+    }).join('<br>');
+  } else if (q.type === 'order') {
+    const correctSeq = q.items.map((it, pos) => `${pos + 1}. ${esc(it)}`).join('<br>');
+    const mine = a.length
+      ? a.map((itemIdx, pos) => `${pos + 1}. ${esc(q.items[itemIdx])}${itemIdx === pos ? '' : ' ✗'}`).join('<br>')
+      : '(none)';
+    const okAll = pts === 1;
+    body = `Your sequence:<br><span class="${okAll ? 'ok' : 'bad'}">${mine}</span>` +
+      (okAll ? '' : `<br>Correct sequence:<br><span class="ok">${correctSeq}</span>`);
+  }
+  return `
+    <div class="qhead">
+      <span class="q"><b>Q${i + 1}.</b> ${esc(q.q)}</span>
+      <span class="pts">${pts.toFixed(2)} / 1 pt</span>
+    </div>
+    <div class="a">${body}<br><br>${esc(q.why)}</div>`;
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Questions' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"SY0-701-practice-exam-feedback-8.html",title:"SY0-701 Practice Exam 8 \u00b7 Instant Feedback (Section 09)"};</script><script src="analytics.js"></script>
+</body>
+</html>

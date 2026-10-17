@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SY0-701 Practice Exam 7 · Instant Feedback (Section 08)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #3fb950;
+    --accent-dim: rgba(63,185,80,.12);
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+    --blue: #58a6ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 860px; }
+
+  /* ---------- Start / Result ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 36px;
+  }
+  .center { text-align: center; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(63,185,80,.4);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 14px; }
+  .screen p { color: var(--muted); line-height: 1.65; margin-bottom: 10px; font-size: 15px; }
+  .exam-facts { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin: 22px 0 6px; }
+  .fact {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .fact b { display: block; color: var(--text); font-size: 17px; margin-bottom: 2px; }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 32px;
+    cursor: pointer;
+    margin-top: 22px;
+    transition: filter .15s;
+  }
+  .btn:hover:not(:disabled) { filter: brightness(1.12); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); margin-left: 8px; }
+  .btn.nav-btn { margin-top: 0; padding: 10px 24px; }
+  .score-big { font-size: 60px; font-weight: 700; margin: 10px 0 2px; }
+  .pass-line { color: var(--muted); font-size: 14px; margin-bottom: 4px; }
+  .verdict { font-size: 18px; font-weight: 600; margin: 8px 0 2px; }
+  .verdict.pass { color: var(--green); }
+  .verdict.fail { color: var(--red); }
+  .scale-track {
+    position: relative; height: 10px; background: var(--border);
+    border-radius: 5px; margin: 26px auto 6px; max-width: 560px;
+  }
+  .scale-pass-mark { position: absolute; left: 81.25%; top: -5px; bottom: -5px; width: 2px; background: var(--gold); }
+  .scale-fill {
+    height: 100%; border-radius: 5px; width: 0%;
+    background: linear-gradient(90deg, var(--red), var(--gold) 70%, var(--green));
+    transition: width 1s ease;
+  }
+  .scale-labels { display: flex; justify-content: space-between; max-width: 560px; margin: 0 auto; font-size: 12px; color: var(--muted); }
+  .review { text-align: left; margin-top: 30px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; font-size: 14px; }
+  .review-item .qhead { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  .review-item .pts { color: var(--muted); white-space: nowrap; }
+  .review-item .q { line-height: 1.5; margin-bottom: 6px; }
+  .review-item .a { color: var(--muted); line-height: 1.55; }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+
+  /* ---------- Question screen ---------- */
+  .exam-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 14px; color: var(--muted); }
+  .qtype-tag {
+    display: inline-block; font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--accent); background: var(--accent-dim);
+    border: 1px solid rgba(63,185,80,.35); border-radius: 4px; padding: 2px 8px; margin-bottom: 10px;
+  }
+  .q-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 26px 28px; }
+  .q-text { font-size: 17px; line-height: 1.55; margin-bottom: 20px; }
+  .pick-hint { font-size: 13px; color: var(--gold); margin: -12px 0 16px; font-weight: 600; }
+
+  .option {
+    display: block; width: 100%; text-align: left;
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; font-size: 15px; margin-bottom: 9px;
+    cursor: pointer; transition: border-color .15s, background .15s; user-select: none;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.selected { border-color: var(--accent); background: var(--accent-dim); }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter { display: inline-block; width: 22px; font-weight: 700; color: var(--muted); }
+
+  .match-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .match-term {
+    min-width: 190px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; font-size: 14px; font-weight: 600;
+  }
+  .match-term.good { border-color: var(--green); background: rgba(63,185,80,.1); }
+  .match-term.bad { border-color: var(--red); background: rgba(248,81,73,.1); }
+  .match-arrow { color: var(--muted); }
+  select.match-select {
+    flex: 1; min-width: 220px; background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 14px;
+  }
+  select.match-select.selected { border-color: var(--accent); }
+  select.match-select:disabled { opacity: .85; }
+
+  .order-seq-label { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .order-seq { border: 1px dashed var(--border); border-radius: 8px; padding: 12px; min-height: 54px; margin-bottom: 16px; }
+  .order-seq .placeholder { color: var(--muted); font-size: 13px; }
+  .order-item {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 9px 14px; font-size: 14px; margin: 4px 6px 4px 0; cursor: pointer; user-select: none;
+  }
+  .order-item:hover:not(.used) { border-color: var(--accent); }
+  .order-item .num {
+    display: inline-block; width: 20px; height: 20px; line-height: 20px; text-align: center;
+    background: var(--accent); color: #0d1117; border-radius: 50%; font-size: 12px; font-weight: 700;
+  }
+  .order-item .num.good { background: var(--green); }
+  .order-item .num.bad { background: var(--red); }
+  .order-item.used { opacity: .35; pointer-events: none; }
+  .order-reset { background: none; border: none; color: var(--blue); font-size: 13px; cursor: pointer; margin-bottom: 8px; }
+
+  .feedback {
+    display: none; margin-top: 18px; border-radius: 8px; padding: 14px 16px;
+    font-size: 14px; line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback.part { background: rgba(210,153,34,.08); border: 1px solid rgba(210,153,34,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+
+  .check-btn { margin-top: 6px; width: 100%; }
+  .exam-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; gap: 10px; flex-wrap: wrap; }
+
+  .palette { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-top: 18px; }
+  .palette h3 { font-size: 13px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
+  .pal-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pal-btn {
+    width: 34px; height: 34px; background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px; font-size: 13px; cursor: pointer; position: relative;
+  }
+  .pal-btn.current { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .pal-btn.answered::after {
+    content: ''; position: absolute; right: 3px; top: 3px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  }
+  .legend { display: flex; gap: 16px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+  .legend span::before { content: '● '; }
+  .legend .l-ans::before { color: var(--green); }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen center">
+    <div class="badge">CompTIA Security+ SY0-701 · Feedback Mode</div>
+    <h1>Practice Exam 7 — Instant Feedback</h1>
+    <p><b style="color:var(--text)">Same exam-paper question styles as the simulator</b> — single-answer multiple choice, multiple-response, and performance-based matching &amp; ordering tasks — but in study mode: after each answer you immediately see whether you're right, your points, and an explanation. A completely new question set on Cryptographic Solutions.</p>
+    <div class="exam-facts">
+      <div class="fact"><b id="fact-q">20</b>All-new questions</div>
+      <div class="fact"><b id="fact-t">—</b>Timer</div>
+      <div class="fact"><b>750 / 900</b>Passing score</div>
+      <div class="fact"><b>Instant</b>Feedback</div>
+    </div>
+    <p style="margin-top:16px">The clock counts up (no pressure) and records your total time. Answer every question, then get a full CompTIA-style score report with review.</p>
+    <button class="btn" onclick="beginExam()">Start Practice Exam</button>
+  </div>
+
+  <!-- EXAM -->
+  <div id="exam-screen" class="hidden">
+    <div class="exam-top">
+      <span id="exam-pos">Question 1 of 20</span>
+      <span>Score: <b id="live-score">0.00</b> / 20 &nbsp;·&nbsp; ⏱ <span id="timer">00:00</span></span>
+    </div>
+    <div class="q-card">
+      <div class="qtype-tag" id="q-type"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-body"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn check-btn" id="check-btn" onclick="checkAnswer()">Check Answer</button>
+      <div class="exam-footer">
+        <button class="btn ghost nav-btn" id="prev-btn" onclick="gotoQuestion(current-1)">← Previous</button>
+        <button class="btn nav-btn" id="next-btn" onclick="gotoQuestion(current+1)">Next →</button>
+      </div>
+    </div>
+    <div class="palette">
+      <h3>Question Summary</h3>
+      <div class="pal-grid" id="palette"></div>
+      <div class="legend"><span class="l-ans">Answered</span></div>
+      <div style="margin-top:14px">
+        <button class="btn" style="margin-top:0" onclick="finishExam()">Finish &amp; See Score Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen center hidden">
+    <div class="badge">Exam Score Report</div>
+    <div class="score-big" id="scaled-score">—</div>
+    <div class="pass-line">Scale: 100 – 900 · Passing score: 750</div>
+    <div class="verdict" id="verdict"></div>
+    <p id="raw-line" style="margin-top:10px"></p>
+    <div class="scale-track">
+      <div class="scale-fill" id="scale-fill"></div>
+      <div class="scale-pass-mark"></div>
+    </div>
+    <div class="scale-labels"><span>100</span><span style="color:var(--gold)">750 ▲</span><span>900</span></div>
+    <div>
+      <button class="btn" onclick="beginExam()">Retake Exam</button>
+      <button class="btn ghost" onclick="toggleReview()" id="review-btn">Review Questions</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   PRACTICE EXAM (FEEDBACK MODE) — SY0-701 Section 08 content
+   Domain 1 & 2: Appropriate Cryptographic Solutions (Obj 1.4),
+   Vulnerability Types (Obj 2.3), Indicators of Malicious Activity (Obj 2.4)
+   All-new question set — distinct from the quiz & simulator.
+   ============================================================ */
+const EXAM = [
+// ---------- Single-answer multiple choice ----------
+  {
+    type: 'mcq',
+    q: "Bob receives an asymmetrically encrypted confidential message from Alice. Which key does Bob use to read it?",
+    options: [
+      "Alice's public key",
+      "Bob's own private key",
+      "The shared symmetric key Alice posted publicly",
+      "The certificate authority's private key"
+    ],
+    answer: 1,
+    why: "Alice encrypted the message with Bob's public key, so ONLY Bob's private key can decrypt it. This one-way property is the whole point: confidentiality is assured because no one else possesses Bob's private key."
+  },
+  {
+    type: 'mcq',
+    q: "A vendor needs to encrypt a live, real-time audio feed with minimal latency, encrypting data continuously as it flows. Which cipher type is the BEST fit?",
+    options: [
+      "Block cipher with 256-bit blocks",
+      "Stream cipher",
+      "A hash function",
+      "An RSA cipher"
+    ],
+    answer: 1,
+    why: "Stream ciphers encrypt data bit by bit / byte at a time using a keystream generator and XOR, making them ideal for continuous, real-time streams like audio and video. Block ciphers process fixed-size chunks (padding the last one); hashes aren't encryption; RSA is far too slow for a live feed."
+  },
+  {
+    type: 'mcq',
+    q: "Why does a block cipher add padding to a short final chunk of data?",
+    options: [
+      "To increase the key length",
+      "To bring the final partial block up to the algorithm's fixed block size so it can be processed",
+      "To salt the ciphertext",
+      "To speed up decryption"
+    ],
+    answer: 1,
+    why: "Block ciphers operate on fixed-length blocks (typically 64, 128, or 256 bits). If the message doesn't fill the last block, padding is added before encryption so the block can be processed. It has nothing to do with key length, salting, or speed."
+  },
+  {
+    type: 'mcq',
+    q: "An application must select the hashing algorithm with the LOWEST practical collision risk from this list. Which should it choose?",
+    options: [
+      "MD5",
+      "SHA-1",
+      "SHA-256",
+      "RIPEMD-160"
+    ],
+    answer: 2,
+    why: "Collision risk shrinks as digest length grows: MD5 (128-bit) collisions are practical and demonstrated; SHA-1 (160-bit) is deprecated; SHA-256 gives a 256-bit digest space that makes collisions computationally infeasible for the foreseeable future. SHA-3 (224–512 bits, 120 rounds) is the even newer family."
+  },
+  {
+    type: 'mcq',
+    q: "To verify a received digital signature, the recipient uses:",
+    options: [
+      "The sender's public key to decrypt the signature digest, then compares it to a fresh hash of the message",
+      "The recipient's private key to decrypt the signature digest",
+      "The CA's private key to re-sign the message",
+      "The same symmetric key that encrypted the message"
+    ],
+    answer: 0,
+    why: "The signature is the message digest encrypted with the sender's PRIVATE key, so anyone can decrypt it with the sender's public key. Matching the decrypted digest against a locally computed hash proves integrity; the fact that only the sender's private key could have created it gives non-repudiation."
+  },
+  {
+    type: 'mcq',
+    q: "Which tool does the course name as automating the harvest of password hashes from Windows systems for pass-the-hash attacks?",
+    options: [
+      "John the Ripper",
+      "Mimikatz",
+      "Nmap",
+      "Wireshark"
+    ],
+    answer: 1,
+    why: "Mimikatz is the penetration tool cited for harvesting hashes and automating pass-the-hash attacks. Defenses: only trusted OSes on servers, proper domain trust configuration, fully patched workstations, MFA, and least privilege — one misconfigured or unpatched machine can expose the domain."
+  },
+  {
+    type: 'mcq',
+    q: "A hardening baseline locks user accounts after three incorrect password attempts. What is the PRIMARY security benefit of this setting?",
+    options: [
+      "It strengthens the hashing algorithm",
+      "It slows online password-guessing attacks by denying attackers unlimited attempts",
+      "It rotates the passwords automatically",
+      "It salts every stored password"
+    ],
+    answer: 1,
+    why: "Limiting failed login attempts (e.g., lockout after 3 tries) directly deters attackers who try to keep guessing a user's credentials. It's painful for forgetful users, but it drastically increases security against online brute force and dictionary attacks."
+  },
+  {
+    type: 'mcq',
+    q: "In the chain of trust, what anchors trust for nearly every commercially issued certificate?",
+    options: [
+      "The server administrator's signature",
+      "A root CA whose certificate is already embedded in major browsers and operating systems",
+      "The recipient's private key",
+      "A government-issued license"
+    ],
+    answer: 1,
+    why: "The Root of Trust is typically a large third-party provider (Verisign, DigiCert, Google, Amazon, Cloudflare) whose root certificate ships pre-installed in browsers and OSs. Every certificate chains up to that trusted root — which is why a compromised root CA compromises every certificate beneath it."
+  },
+  {
+    type: 'mcq',
+    q: "What is the main DISADVANTAGE of deploying one wildcard certificate across all of a company's subdomains?",
+    options: [
+      "It cannot encrypt traffic",
+      "If the certificate must be revoked (e.g., server compromise), every subdomain that shares it is affected",
+      "It only works with self-signed roots",
+      "It requires dual-sided authentication"
+    ],
+    answer: 1,
+    why: "Wildcard certificates make management easy and cheaper — one cert covers *.example.com. The tradeoff: a compromise that forces revocation breaks TLS on ALL subdomains at once. Reissuing is quick, but availability across every subdomain is impacted until you do."
+  },
+  {
+    type: 'mcq',
+    q: "How does OCSP stapling improve the TLS handshake?",
+    options: [
+      "It encrypts the OCSP query with the server's private key",
+      "The server pre-fetches its OCSP revocation record and includes it in the handshake, removing a real-time query to the CA",
+      "It pins the server's public key in the browser",
+      "It replaces the certificate chain with a single hash"
+    ],
+    answer: 1,
+    why: "Normally the browser must contact the CA at connection time to check revocation. With OCSP stapling (formerly the TLS Certificate Status Request extension), the certificate holder fetches its own OCSP record at intervals and staples it to the handshake — faster tunnel creation and one less live dependency on the CA."
+  },
+  {
+    type: 'mcq',
+    q: "An analyst suspects a harmless-looking image posted to social media carries a hidden payload. Which observation BEST supports the suspicion?",
+    options: [
+      "The image renders correctly in a browser",
+      "An identically sized copy of the image produces a different hash, and the carrier's file size changed after 're-encoding'",
+      "The image has a high resolution",
+      "The post contains hashtags"
+    ],
+    answer: 1,
+    why: "Steganography hides data inside ordinary files (e.g., subtly altering pixel colors) so the existence of the message stays concealed. The giveaway is technical: the carrier's contents changed — a different hash digest — and re-encoding often alters the file size. Visually the images look identical."
+  },
+  {
+    type: 'mcq',
+    q: "An organization is planning its post-quantum signature strategy following the NIST selections. Which algorithm does NIST recommend as the PRIMARY post-quantum digital-signature choice?",
+    options: [
+      "CRYSTALS-Kyber",
+      "CRYSTALS-Dilithium",
+      "FALCON only",
+      "SHA-512"
+    ],
+    answer: 1,
+    why: "From NIST's 2022 post-quantum selections: CRYSTALS-Kyber is for general encryption; CRYSTALS-Dilithium is the PRIMARY digital-signature algorithm, with FALCON and SPHINCS+ as alternates (SPHINCS+ is the hash-based option; the others are lattice-based). SHA-512 is a classical hash, not post-quantum."
+  },
+  // ---------- Multiple response ----------
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which of the following are SYMMETRIC BLOCK ciphers? (Select THREE.)",
+    options: [
+      "AES",
+      "Blowfish",
+      "Twofish",
+      "RC4",
+      "ECC",
+      "MD5"
+    ],
+    answer: [0, 1, 2],
+    why: "AES (128/192/256-bit keys), Blowfish (32–448-bit keys), and Twofish (128-bit blocks, up to 256-bit keys) are symmetric block ciphers — Blowfish and Twofish were released unpatented/open source. RC4 is a symmetric STREAM cipher, ECC is asymmetric, and MD5 is a hash — the classic category-confusion distractors."
+  },
+  {
+    type: 'multi',
+    pick: 4,
+    q: "Which techniques does the course recommend to increase hash security (especially for stored passwords)? (Select FOUR.)",
+    options: [
+      "Key stretching",
+      "Salting",
+      "Using a nonce",
+      "Limiting the number of failed login attempts",
+      "Shortening the digest to 128 bits",
+      "Publishing the hashes to a public ledger",
+      "Reusing the same salt for every user"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "The four hash-hardening techniques: key stretching (repeated hashing — used by WPA/WPA2/PGP), salting (random data per password — defeats rainbow tables), nonces (number used once — defeats replay), and account lockout limits (slow guessing). Short digests, public ledgers, and salt reuse all WEAKEN security."
+  },
+  {
+    type: 'multi',
+    pick: 4,
+    q: "Which of the following are real certificate types or features discussed in the course? (Select FOUR.)",
+    options: [
+      "Wildcard certificates",
+      "Self-signed certificates",
+      "Dual-sided certificates",
+      "SAN (Subject Alternate Name) field",
+      "Ephemeral watermark certificates",
+      "Quantum-locked certificates",
+      "BitLocker certificates"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "All real: wildcards cover *.domain subdomains; self-signed certs are vouched by the entity itself (browser warning — for test/closed systems); dual-sided certs authenticate BOTH server and client (2x processing, high-security only); and the SAN field lets one certificate cover different root domains. The last three options are invented."
+  },
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which statements about blockchain technology are TRUE per the course? (Select THREE.)",
+    options: [
+      "It is a decentralized peer-to-peer network",
+      "The ledger is immutable — recorded transactions cannot be altered",
+      "Smart contracts are self-executing code whose terms are written into the code",
+      "Every block is signed by a central certificate authority",
+      "It requires all data to be encrypted with AES-256",
+      "It is only usable for cryptocurrencies"
+    ],
+    answer: [0, 1, 2],
+    why: "Blockchain = decentralized P2P network + immutable public ledger (each block chains to the previous block's hash) + smart contracts (self-executing code, tamper-proof once deployed — popularized by Ethereum). Trust comes from the math, not a central CA; AES is not required; supply chain, voting, and property transfers are non-currency uses."
+  },
+  // ---------- Performance-based: matching ----------
+  {
+    type: 'match',
+    q: "PBQ — Match each hashing tool to its defining characteristic. Each characteristic may be used once; not all characteristics will be used.",
+    terms: ["MD5", "SHA-1", "SHA-256", "HMAC"],
+    defs: [
+      "Produces a 128-bit digest; collision-prone and unsuitable for security certificates",
+      "Produces a 160-bit digest; reduced collisions vs MD5 but being phased out",
+      "Member of the SHA-2 family producing a 256-bit digest — a modern integrity workhorse",
+      "Keyed hash that checks message integrity and provides authenticity, e.g., HMAC-SHA256",
+      "A reversible two-way encryption function",
+      "An asymmetric algorithm based on elliptic curves"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "Digest sizes are exam gold: MD5=128, SHA-1=160, SHA-256=256. HMAC is not a hash itself but a hash-based message authentication code layered on one (HMAC-MD5, HMAC-SHA1, HMAC-SHA256) to add authenticity. The distractors attack the 'one-way' and 'symmetric vs asymmetric' distinctions."
+  },
+  {
+    type: 'match',
+    q: "PBQ — Match each ECC variant to its purpose. Each purpose may be used once; not all purposes will be used.",
+    terms: ["ECDH", "ECDHE", "ECDSA"],
+    defs: [
+      "The elliptic-curve version of the Diffie-Hellman key exchange protocol",
+      "The ephemeral variant — uses a different key for each key-establishment process/session",
+      "The elliptic-curve digital signature algorithm used by the US government",
+      "A symmetric block cipher for mobile devices",
+      "A 128-bit hashing algorithm",
+      "A certificate revocation protocol"
+    ],
+    answer: [0, 1, 2],
+    why: "ECDH = ECC flavor of Diffie-Hellman key exchange. ECDHE = ephemeral — a fresh key per session (forward secrecy). ECDSA = ECC digital signatures, the US government choice. Mobile devices favor the whole ECC family because small keys demand little processing power."
+  },
+  // ---------- Performance-based: ordering ----------
+  {
+    type: 'order',
+    q: "PBQ — Order the hybrid HTTPS connection setup from the moment the browser has the server's public key. Click the steps in sequence.",
+    items: [
+      "The browser generates a long random string to serve as the shared secret (symmetric session key)",
+      "The browser encrypts that random secret using the server's PUBLIC key",
+      "The encrypted secret travels to the server, which decrypts it with its PRIVATE key",
+      "Both sides now hold the same shared secret and switch to a symmetric cipher (e.g., AES) for bulk data",
+      "The padlock appears — confidentiality via the symmetric tunnel, server identity authenticated via its unique private key"
+    ],
+    why: "The asymmetric half of HTTPS exists only to deliver the session key: generate random secret → encrypt with server's public key (only that private key can open it) → server decrypts → both sides switch to fast symmetric bulk encryption. The server's sole possession of its private key is what authenticates its identity."
+  },
+  {
+    type: 'order',
+    q: "PBQ — A company obtains a third-party certificate for a new web server. Order the issuance process. Click the steps in sequence.",
+    items: [
+      "Generate a key pair on the server; keep the private key on the server",
+      "Create a Certificate Signing Request (CSR) containing the public key and organization details",
+      "Submit the CSR to the Registration Authority, which collects and validates identifying information",
+      "The Certificate Authority validates the credentials and issues the signed certificate",
+      "Install the certificate on the server(s) and use it for secure communications"
+    ],
+    why: "Issuance flow: key pair generation (private key NEVER leaves the requester) → CSR with the public key plus org/domain/locality/country → RA validates identity and forwards → CA issues the signed certificate → install and operate. The CA also keeps a public copy of the server's public key for other users."
+  }
+];
+
+/* ============================================================
+   ENGINE — feedback mode
+   ============================================================ */
+let answers = [];
+let checked = [];
+let points = [];
+let current = 0;
+let elapsed = 0;
+let timerId = null;
+
+const TYPE_LABELS = {
+  mcq: 'Multiple Choice',
+  multi: 'Multiple Response',
+  match: 'Performance-Based · Matching',
+  order: 'Performance-Based · Ordering'
+};
+
+function fmtTime(s) {
+  const m = Math.floor(s / 60), r = s % 60;
+  return `${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`;
+}
+
+function beginExam() {
+  answers = EXAM.map(q => {
+    if (q.type === 'mcq') return null;
+    if (q.type === 'multi') return [];
+    if (q.type === 'match') return q.terms.map(() => null);
+    if (q.type === 'order') return [];
+    return null;
+  });
+  checked = EXAM.map(() => false);
+  points = EXAM.map(() => 0);
+  current = 0;
+  elapsed = 0;
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('exam-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Questions';
+  document.getElementById('fact-q').textContent = EXAM.length;
+  document.getElementById('fact-t').textContent = 'elapsed';
+  startTimer();
+  renderQuestion();
+  renderPalette();
+}
+
+function startTimer() {
+  clearInterval(timerId);
+  updateTimerDisplay();
+  timerId = setInterval(() => { elapsed++; updateTimerDisplay(); }, 1000);
+}
+
+function updateTimerDisplay() {
+  document.getElementById('timer').textContent = fmtTime(elapsed);
+}
+
+function isAnswered(i) { return checked[i]; }
+
+function isInputComplete(i) {
+  const q = EXAM[i], a = answers[i];
+  if (q.type === 'mcq') return a !== null;
+  if (q.type === 'multi') return a.length > 0;
+  if (q.type === 'match') return a.every(v => v !== null);
+  if (q.type === 'order') return a.length === q.items.length;
+  return false;
+}
+
+function updateLiveScore() {
+  const total = points.reduce((s, p) => s + p, 0);
+  document.getElementById('live-score').textContent = total.toFixed(2);
+}
+
+function renderQuestion() {
+  const q = EXAM[current];
+  const done = checked[current];
+  document.getElementById('exam-pos').textContent = `Question ${current + 1} of ${EXAM.length}`;
+  document.getElementById('q-type').textContent = TYPE_LABELS[q.type];
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('prev-btn').disabled = current === 0;
+  document.getElementById('next-btn').textContent = current === EXAM.length - 1 ? 'Last Question' : 'Next →';
+
+  const body = document.getElementById('q-body');
+  body.innerHTML = '';
+  if (q.type === 'mcq') renderMcq(q, body, done);
+  else if (q.type === 'multi') renderMulti(q, body, done);
+  else if (q.type === 'match') renderMatch(q, body, done);
+  else if (q.type === 'order') renderOrder(q, body, done);
+
+  const checkBtn = document.getElementById('check-btn');
+  const fb = document.getElementById('feedback');
+  if (done) {
+    checkBtn.classList.add('hidden');
+    showFeedback(q);
+  } else {
+    checkBtn.classList.remove('hidden');
+    checkBtn.disabled = !isInputComplete(current);
+    checkBtn.textContent = 'Check Answer';
+    fb.className = 'feedback';
+    fb.innerHTML = '';
+  }
+  updateLiveScore();
+  renderPalette();
+}
+
+function renderMcq(q, body, done) {
+  const letters = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    if (done) {
+      btn.disabled = true;
+      if (i === q.answer) btn.classList.add('correct');
+      else if (answers[current] === i) btn.classList.add('wrong');
+    } else {
+      if (answers[current] === i) btn.classList.add('selected');
+      btn.onclick = () => { answers[current] = i; renderQuestion(); };
+    }
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    body.appendChild(btn);
+  });
+}
+
+function renderMulti(q, body, done) {
+  const hint = document.createElement('div');
+  hint.className = 'pick-hint';
+  const names = { 2: 'TWO', 3: 'THREE', 4: 'FOUR' };
+  hint.textContent = `Select ${names[q.pick] || q.pick}.`;
+  body.appendChild(hint);
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    const chosen = answers[current].includes(i);
+    if (done) {
+      btn.disabled = true;
+      if (q.answer.includes(i)) btn.classList.add('correct');
+      else if (chosen) btn.classList.add('wrong');
+    } else {
+      if (chosen) btn.classList.add('selected');
+      btn.onclick = () => {
+        const sel = answers[current];
+        const pos = sel.indexOf(i);
+        if (pos >= 0) sel.splice(pos, 1);
+        else {
+          if (sel.length >= q.pick) sel.shift();
+          sel.push(i);
+        }
+        renderQuestion();
+      };
+    }
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    body.appendChild(btn);
+  });
+}
+
+function renderMatch(q, body, done) {
+  if (!q._defOrder) {
+    q._defOrder = q.defs.map((_, i) => i);
+    for (let i = q._defOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q._defOrder[i], q._defOrder[j]] = [q._defOrder[j], q._defOrder[i]];
+    }
+  }
+  q.terms.forEach((term, ti) => {
+    const row = document.createElement('div');
+    row.className = 'match-row';
+    const label = document.createElement('div');
+    label.className = 'match-term';
+    if (done) label.classList.add(answers[current][ti] === q.answer[ti] ? 'good' : 'bad');
+    label.textContent = term;
+    const arrow = document.createElement('span');
+    arrow.className = 'match-arrow';
+    arrow.textContent = '→';
+    const sel = document.createElement('select');
+    sel.className = 'match-select' + (answers[current][ti] !== null ? ' selected' : '');
+    if (done) sel.disabled = true;
+    const noneOpt = document.createElement('option');
+    noneOpt.value = '';
+    noneOpt.textContent = '— choose a description —';
+    sel.appendChild(noneOpt);
+    q._defOrder.forEach(di => {
+      const o = document.createElement('option');
+      o.value = di;
+      o.textContent = q.defs[di];
+      if (answers[current][ti] === di) o.selected = true;
+      sel.appendChild(o);
+    });
+    if (!done) {
+      sel.onchange = () => {
+        answers[current][ti] = sel.value === '' ? null : parseInt(sel.value, 10);
+        renderQuestion();
+      };
+    }
+    row.appendChild(label); row.appendChild(arrow); row.appendChild(sel);
+    body.appendChild(row);
+  });
+}
+
+function renderOrder(q, body, done) {
+  if (!q._itemOrder) {
+    q._itemOrder = q.items.map((_, i) => i);
+    for (let i = q._itemOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q._itemOrder[i], q._itemOrder[j]] = [q._itemOrder[j], q._itemOrder[i]];
+    }
+  }
+  const seqLabel = document.createElement('div');
+  seqLabel.className = 'order-seq-label';
+  seqLabel.textContent = 'Your answer (in order):';
+  body.appendChild(seqLabel);
+
+  const seq = document.createElement('div');
+  seq.className = 'order-seq';
+  if (answers[current].length === 0) {
+    seq.innerHTML = '<span class="placeholder">Click the items below in the correct sequence…</span>';
+  } else {
+    answers[current].forEach((itemIdx, pos) => {
+      const chip = document.createElement('span');
+      chip.className = 'order-item';
+      const num = document.createElement('span');
+      num.className = 'num';
+      num.textContent = pos + 1;
+      if (done) num.classList.add(itemIdx === pos ? 'good' : 'bad');
+      chip.appendChild(num);
+      chip.appendChild(document.createTextNode(q.items[itemIdx]));
+      if (!done) {
+        chip.onclick = () => { answers[current].splice(pos, 1); renderQuestion(); };
+        chip.title = 'Click to remove';
+      }
+      seq.appendChild(chip);
+    });
+  }
+  body.appendChild(seq);
+
+  if (!done && answers[current].length > 0) {
+    const reset = document.createElement('button');
+    reset.className = 'order-reset';
+    reset.textContent = '↺ Clear sequence';
+    reset.onclick = () => { answers[current] = []; renderQuestion(); };
+    body.appendChild(reset);
+  }
+
+  const poolLabel = document.createElement('div');
+  poolLabel.className = 'order-seq-label';
+  poolLabel.textContent = 'Available items:';
+  body.appendChild(poolLabel);
+
+  const pool = document.createElement('div');
+  pool.className = 'order-pool';
+  q._itemOrder.forEach(itemIdx => {
+    const used = answers[current].includes(itemIdx);
+    const chip = document.createElement('span');
+    chip.className = 'order-item' + (used ? ' used' : '');
+    chip.textContent = q.items[itemIdx];
+    if (!used && !done) {
+      chip.onclick = () => {
+        if (answers[current].length < q.items.length) {
+          answers[current].push(itemIdx);
+          renderQuestion();
+        }
+      };
+    }
+    pool.appendChild(chip);
+  });
+  body.appendChild(pool);
+}
+
+/* ---------- Grading & feedback ---------- */
+function gradeCurrent() {
+  const q = EXAM[current], a = answers[current];
+  if (q.type === 'mcq') return a === q.answer ? 1 : 0;
+  if (q.type === 'multi') {
+    const right = q.answer.slice().sort().join(',');
+    const mine = a.slice().sort().join(',');
+    return right === mine ? 1 : 0;
+  }
+  if (q.type === 'match') {
+    let c = 0;
+    a.forEach((v, i) => { if (v === q.answer[i]) c++; });
+    return c / q.terms.length;
+  }
+  if (q.type === 'order') {
+    if (a.length !== q.items.length) return 0;
+    let c = 0;
+    a.forEach((itemIdx, pos) => { if (itemIdx === pos) c++; });
+    return c / q.items.length;
+  }
+  return 0;
+}
+
+function checkAnswer() {
+  if (checked[current] || !isInputComplete(current)) return;
+  points[current] = gradeCurrent();
+  checked[current] = true;
+  renderQuestion();
+}
+
+function showFeedback(q) {
+  const pts = points[current];
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (pts === 1 ? 'ok' : pts > 0 ? 'part' : 'no');
+  const head = pts === 1 ? '✔ Correct!' : pts > 0 ? `◐ Partially correct — ${pts.toFixed(2)} / 1 point` : '✘ Incorrect';
+  fb.innerHTML = `<strong>${head}</strong>${q.why}`;
+}
+
+/* ---------- Navigation & palette ---------- */
+function renderPalette() {
+  const pal = document.getElementById('palette');
+  pal.innerHTML = '';
+  EXAM.forEach((q, i) => {
+    const b = document.createElement('button');
+    b.className = 'pal-btn' + (i === current ? ' current' : '') + (isAnswered(i) ? ' answered' : '');
+    b.textContent = i + 1;
+    b.onclick = () => gotoQuestion(i);
+    pal.appendChild(b);
+  });
+}
+
+function gotoQuestion(i) {
+  if (i < 0 || i >= EXAM.length) return;
+  current = i;
+  renderQuestion();
+}
+
+/* ---------- Results ---------- */
+function finishExam() {
+  const unchecked = checked.filter(c => !c).length;
+  let msg = `You've answered ${checked.filter(Boolean).length} of ${EXAM.length} questions.`;
+  if (unchecked > 0) msg += `\n\n${unchecked} question(s) haven't been checked yet — they score 0.`;
+  msg += '\n\nFinish and see your score report?';
+  if (!confirm(msg)) return;
+  showResults();
+}
+
+function showResults() {
+  clearInterval(timerId);
+  const total = points.reduce((s, p) => s + p, 0);
+  const pct = total / EXAM.length;
+  const scaled = Math.round(100 + 800 * pct);
+  const passed = scaled >= 750;
+
+  document.getElementById('exam-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('scaled-score').textContent = scaled;
+  const v = document.getElementById('verdict');
+  v.textContent = passed ? 'PASS ✔' : 'BELOW PASSING ✘';
+  v.className = 'verdict ' + (passed ? 'pass' : 'fail');
+  document.getElementById('raw-line').textContent =
+    `${total.toFixed(2)} of ${EXAM.length} points (${Math.round(pct * 100)}%) · Total time: ${fmtTime(elapsed)}`;
+
+  const fill = document.getElementById('scale-fill');
+  fill.style.width = '0%';
+  setTimeout(() => { fill.style.width = ((scaled - 100) / 800 * 100) + '%'; }, 60);
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Question Review</h2>';
+  EXAM.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = reviewItemHtml(q, answers[i], points[i], i);
+    review.appendChild(div);
+  });
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function reviewItemHtml(q, a, pts, i) {
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  let body = '';
+  if (!checked[i]) {
+    body = '<span class="bad">Not answered.</span>';
+  } else if (q.type === 'mcq') {
+    const ok = a === q.answer;
+    body = `Your answer: <span class="${ok ? 'ok' : 'bad'}">${letters[a]}. ${esc(q.options[a])}</span>` +
+      (ok ? '' : `<br>Correct answer: <span class="ok">${letters[q.answer]}. ${esc(q.options[q.answer])}</span>`);
+  } else if (q.type === 'multi') {
+    const ok = pts === 1;
+    const mine = a.map(x => letters[x] + '. ' + esc(q.options[x])).join('<br>') || '(none)';
+    const right = q.answer.map(x => letters[x] + '. ' + esc(q.options[x])).join('<br>');
+    body = `Your selections:<br><span class="${ok ? 'ok' : 'bad'}">${mine}</span>` +
+      (ok ? '' : `<br>Correct selections:<br><span class="ok">${right}</span>`);
+  } else if (q.type === 'match') {
+    body = q.terms.map((t, ti) => {
+      const ok = a[ti] === q.answer[ti];
+      const mine = a[ti] !== null ? q.defs[a[ti]] : '(none)';
+      const right = q.defs[q.answer[ti]];
+      return `<b>${esc(t)}</b> → <span class="${ok ? 'ok' : 'bad'}">${esc(mine)}</span>` +
+        (ok ? '' : ` &nbsp;(correct: <span class="ok">${esc(right)}</span>)`);
+    }).join('<br>');
+  } else if (q.type === 'order') {
+    const correctSeq = q.items.map((it, pos) => `${pos + 1}. ${esc(it)}`).join('<br>');
+    const mine = a.length
+      ? a.map((itemIdx, pos) => `${pos + 1}. ${esc(q.items[itemIdx])}${itemIdx === pos ? '' : ' ✗'}`).join('<br>')
+      : '(none)';
+    const okAll = pts === 1;
+    body = `Your sequence:<br><span class="${okAll ? 'ok' : 'bad'}">${mine}</span>` +
+      (okAll ? '' : `<br>Correct sequence:<br><span class="ok">${correctSeq}</span>`);
+  }
+  return `
+    <div class="qhead">
+      <span class="q"><b>Q${i + 1}.</b> ${esc(q.q)}</span>
+      <span class="pts">${pts.toFixed(2)} / 1 pt</span>
+    </div>
+    <div class="a">${body}<br><br>${esc(q.why)}</div>`;
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Questions' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"SY0-701-practice-exam-feedback-7.html",title:"SY0-701 Practice Exam 7 \u00b7 Instant Feedback (Section 08)"};</script><script src="analytics.js"></script>
+</body>
+</html>

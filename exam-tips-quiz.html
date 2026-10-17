@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam Tips Quiz · SY0-701 (Section 01)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 01</div>
+    <h1>Exam Tips — Practice Quiz</h1>
+    <p>24 questions on the instructor’s exam-taking playbook: no trick questions, distractor elimination, emphasis signals, the book-answer rule, CIA keyword associations, recognition over recitation, and the 30/60/90-day study plans. Pick an answer to see why.</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+// Quiz - Section 01 Exam Tips
+const QUESTIONS = [
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "According to the instructor, what is the most important thing to remember about SY0-701 exam questions?",
+  options: ["They are full of trick questions", "There are no trick questions — every question is precisely worded to match the course/textbook material", "They test workplace experience", "They require memorizing exact textbook wording"],
+  answer: 1,
+  why: "The instructor stresses: no trick questions. If a question seems tricky, you misread it — read it again and answer exactly what is asked." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "What should you do when a question seems confusing or tricky on the real exam?",
+  options: ["Guess quickly and move on", "Take the time to read the question multiple times until you understand exactly what is being asked", "Skip it permanently", "Assume all answers are wrong"],
+  answer: 1,
+  why: "Because questions are precisely worded (not tricky), confusion means misreading. Reading each stem multiple times is the instructor's top tactic." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "A 'distractor' or 'red herring' is:",
+  options: ["The correct answer", "An answer option written to distract you from the correct answer — usually at least one of the four options is one", "A question about fish", "The last option listed"],
+  answer: 1,
+  why: "Usually at least one of four options is a planted distractor. Identifying and eliminating it exponentially increases your chance of picking the correct answer." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "If a word in a question appears in bold, italics, or ALL UPPER CASE, you should:",
+  options: ["Ignore formatting — it is decorative", "Pay very close attention to it — the test writers marked it as important to the answer", "Assume the question is broken", "Pick the longest answer"],
+  answer: 1,
+  why: "Emphasis is a deliberate signal from the test writers. The emphasized word is critical to determining the correct answer." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "When your personal workplace experience conflicts with the course material on a question, you should:",
+  options: ["Answer from workplace experience — it is more practical", "Always select the book answer — the exam tests CompTIA terminology and frameworks, not your employer's habits", "Leave the question blank", "Choose both"],
+  answer: 1,
+  why: "Workplaces often use different terminology for the same concepts. The exam tests mastery of CompTIA's vocabulary — the book answer wins every time." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "Complete the association: Confidentiality → ___",
+  options: ["Hashing", "Encryption", "Redundancy", "Load balancing"],
+  answer: 1,
+  why: "The instructor's keyword trio: confidentiality always makes you think of encryption; integrity of hashing; availability of redundancy and resiliency." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "Complete the association: Integrity → ___",
+  options: ["Encryption", "Redundancy", "Hashing", "Access control"],
+  answer: 2,
+  why: "Integrity = hashing. If a question asks which control verifies data has not been altered, think hashing/digests." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "Complete the association: Availability → ___",
+  options: ["Redundancy and resiliency", "Encryption", "Hashing", "Digital signatures"],
+  answer: 0,
+  why: "Availability = redundancy and resiliency (and fault tolerance). This trio unlocks dozens of exam questions." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "Which question types appear on the SY0-701 exam?",
+  options: ["Fill-in-the-blank and essays", "Multiple choice and multiple selection only", "Oral interviews", "Lab practicals"],
+  answer: 1,
+  why: "Multiple-choice and multiple-response only. No fill-in-the-blank, no essays — you recognize answers, you never type them." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "Because the exam has no fill-in-the-blank questions, what level of memorization do you need?",
+  options: ["Word-for-word memorization of every definition", "The ability to RECOGNIZE terms and concepts from the answer choices", "Memorizing all command-line syntax", "Memorizing the exam objectives document"],
+  answer: 1,
+  why: "Certification exams test recognition, not recitation — the opposite of most school exams. Know concepts well enough to pick them out of a list." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "Regarding tools like Nmap, the exam expects you to know:",
+  options: ["Exact command syntax such as nmap -sS -T5", "What the tool is used for — Nmap is a network-mapping/reconnaissance tool for vulnerability assessments and penetration tests", "Its source code", "Its price"],
+  answer: 1,
+  why: "Everything is vendor-neutral: know what a tool is FOR, not how to operate it. If you can define the tool and its purpose, you have the right knowledge 99% of the time." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "The instructor's rule of thumb for tool questions is:",
+  options: ["Memorize every flag and switch", "If you can define the tool and what it is used for, you have the right level of knowledge 99% of the time", "Skip all tool questions", "Only study commercial tools"],
+  answer: 1,
+  why: "Define-and-purpose is the exam's knowledge bar for tools. Syntax and operation are explicitly NOT required." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "What is the recommended MAXIMUM timeframe for your exam target date?",
+  options: ["30 days", "60 days", "90 days", "12 months"],
+  answer: 2,
+  why: "Do not go beyond 90 days — students who study longer than ~60-90 days forget the early material by test day. Concentrated study wins." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "Why does the instructor warn against studying over 6-12 months?",
+  options: ["Exam fees increase monthly", "You will forget key information from the early lessons by the time you reach the end", "CompTIA bans long study", "There is not that much material"],
+  answer: 1,
+  why: "Retention decays. The same ~40 hours spread over a year means relearning the beginning; concentrated over 30-60 days it sticks." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "Roughly how many TOTAL study hours does the instructor estimate are needed to pass?",
+  options: ["10 hours", "40 hours", "100 hours", "500 hours"],
+  answer: 1,
+  why: "About 40 hours total. At 1-2 hours/day that is ~30 days; at 30-60 min/day, ~60 days." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "Backward planning means:",
+  options: ["Starting from the exam date and dividing lessons across the remaining days, plus buffer days for practice exams", "Studying in reverse order", "Taking the exam before studying", "Planning only after failing"],
+  answer: 0,
+  why: "Pick your date, count backward: total lessons ÷ days = daily pace, then add buffer for practice exams and final review." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "If you have 300 lessons and a 30-day target, approximately what daily pace should you plan — including practice-exam buffer?",
+  options: ["3 lessons/day", "10 lessons/day, plus 2-4 extra to bank practice-exam days", "50 lessons/day", "1 lesson per week"],
+  answer: 1,
+  why: "300 ÷ 30 = 10/day; add 2-4 more so you bank 1-2 days for practice exams before the real thing." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "The instructor's example 30-day plan structure is:",
+  options: ["All 30 days of content, then the exam the next day", "2 sections/day for 2 weeks, then a week of practice exams, then final review days before the exam", "One lesson per day only", "Cram everything the night before"],
+  answer: 1,
+  why: "Content sprint -> practice-exam week -> final review buffer -> exam. The buffer absorbs weak spots discovered in practice." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "How much daily study time supports a 30-day certification timeline?",
+  options: ["15 minutes", "1-2 focused hours per day", "8 hours", "Weekends only"],
+  answer: 1,
+  why: "1-2 hours/day -> ~30 days. Only 30-60 min/day available? Plan ~60 days. Consistency every day beats sporadic marathons." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "Students who use a written study plan, according to the instructor:",
+  options: ["Pass at the same rate as those without plans", "Pass certification exams at a much faster rate than those who study without a plan", "Are more likely to fail", "Never finish the course"],
+  answer: 1,
+  why: "Planned students pass faster — the plan forces the backward calculation, daily pace, and protected practice-exam days." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "When you see a question asking for the BEST control to protect data at rest from unauthorized disclosure, your first association should be:",
+  options: ["Hashing, because integrity matters most", "Encryption, because confidentiality is the concern being described", "Load balancing, because availability is key", "Backups, because resiliency solves everything"],
+  answer: 1,
+  why: "'Unauthorized disclosure' = confidentiality = encryption. Mapping the scenario's key word to the CIA triad, then to the association, is the instructor's core technique." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "Which is the BEST first move on a multiple-choice question where you are unsure of the answer?",
+  options: ["Pick option A immediately", "Identify and eliminate the planted distractor(s), then choose from what remains", "Close your eyes and point", "Always pick the longest option"],
+  answer: 1,
+  why: "Eliminating even one distractor exponentially improves your odds. Answer elimination is the core multiple-choice skill for this exam." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "The instructor provides both a 30-day and a 60-day study plan as downloadable PDFs. Who is the 60-day plan aimed at?",
+  options: ["Full-time students with no other commitments", "People working full-time jobs or with family commitments who can study 30-60 minutes daily", "People who want to study only on exam day", "People retaking the exam"],
+  answer: 1,
+  why: "Less daily time available -> longer timeline. The 60-day plan assumes ~30-60 focused minutes per day done consistently." },
+{ lesson: "Lesson 03 · Exam Tips",
+  q: "'Certification exams test recognition rather than recitation' means:",
+  options: ["You must recite definitions aloud at the test center", "You need to recognize the correct concept from answer choices — not reproduce it from memory", "Recognition is not needed", "Recitation earns bonus points"],
+  answer: 1,
+  why: "No essays or fill-in-the-blanks exist, so deep recall is unnecessary. Train by testing yourself with choices, not by re-reading notes." }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"exam-tips-quiz.html",title:"Exam Tips Quiz \u00b7 SY0-701 (Section 01)"};</script><script src="analytics.js"></script>
+</body>
+</html>

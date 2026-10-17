@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam Readiness Assessment Quiz · SY0-701 (Section 28)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 28</div>
+    <h1>Exam Readiness Assessment — Practice Quiz</h1>
+    <p>25 questions on readiness assessment strategy: official SY0-701 domain weights, honest self-testing conditions, interpreting scores by domain, and the final-week exam plan. Pick an answer to see why.</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+// Quiz - Section 28 Exam Readiness Assessment
+const QUESTIONS = [
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "What is the PRIMARY purpose of the course's readiness assessment?",
+  options: ["To award a certificate of completion",
+            "To evaluate your exam preparedness and identify areas for improvement before test day",
+            "To replace the need for full practice exams",
+            "To test your typing speed for the exam interface"],
+  answer: 1,
+  why: "The assessment is a targeted diagnostic: it highlights your current knowledge and identifies areas for improvement before you commit to a test date." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "Under what conditions should you take a readiness assessment to get an honest result?",
+  options: ["Open book with notes",
+            "Timed, closed-book, with no pausing — mimicking real exam conditions",
+            "Split across several days",
+            "Only after memorizing the answer key"],
+  answer: 1,
+  why: "An untimed, open-book score overstates readiness. Exam conditions produce a score you can actually trust as a go/no-go signal." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "Which SY0-701 domain carries the largest weight on the real exam?",
+  options: ["General Security Concepts",
+            "Security Architecture",
+            "Security Operations",
+            "Security Program Management and Oversight"],
+  answer: 2,
+  why: "Security Operations is 28% of the exam — the largest single domain. It covers monitoring, incident response, vulnerability management, and alerting." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "The Threats, Vulnerabilities, and Mitigations domain accounts for what percentage of the SY0-701 exam?",
+  options: ["12%", "18%", "22%", "28%"],
+  answer: 2,
+  why: "Domain 2.0 is 22%, second only to Security Operations (28%). Together these two domains are half the exam." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "Why is an overall readiness score of 78% potentially misleading?",
+  options: ["Scores above 75% are always rejected",
+            "It can hide a very weak domain — e.g., 50% in a domain worth 28% of the real exam",
+            "Percentages are not used on the SY0-701 exam",
+            "The assessment only measures speed"],
+  answer: 1,
+  why: "Domain balance matters as much as the total. A weak Security Operations result is far more damaging than the same weakness in a 12% domain." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "What is the commonly cited comfort threshold for scheduling the real exam, based on full practice exams under timed conditions?",
+  options: ["60%", "70%", "85%", "99%"],
+  answer: 2,
+  why: "Consistently scoring around 85% or better across multiple timed full practice exams is the standard signal that you're ready to book." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "A student scores 92% on a practice exam by memorizing the exact questions from one bank. Why is this a false positive?",
+  options: ["Memorization is against exam rules",
+            "Readiness means answering NOVEL questions on the concepts — recognition of memorized items doesn't transfer",
+            "Practice exams are easier than the real exam",
+            "92% is too high to be real"],
+  answer: 1,
+  why: "The real exam will ask differently-worded questions testing the same concepts. Memorized answers without conceptual understanding collapse under novelty." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "When in your study plan should the readiness assessment sit?",
+  options: ["Before studying anything",
+            "In the final week — after content review, alongside or just before full practice exams",
+            "After you have already scheduled and taken the real exam",
+            "Only in the first week"],
+  answer: 1,
+  why: "It belongs at the end: take it after content study, fix the gaps it reveals, then validate with full timed practice exams before the real test." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "Which of these is NOT part of confirming your exam-day readiness?",
+  options: ["Knowing the exam is multiple-choice and multiple-response, up to 90 minutes",
+            "Verifying ID requirements and test-center arrival time",
+            "Memorizing every CompTIA command-line tool syntax",
+            "Knowing the passing scaled score (750 of 900) and retake policy"],
+  answer: 2,
+  why: "The exam is vendor-neutral — you need to know what tools are for, not their syntax. The other items are real logistics you should confirm." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "How many attempts should you use to judge readiness from assessments?",
+  options: ["One attempt is definitive",
+            "The trend across 2–3 attempts under exam conditions",
+            "At least 20 attempts",
+            "Attempts don't matter — only the first score counts"],
+  answer: 1,
+  why: "A single result is a snapshot subject to luck and mood. The trend across repeated timed attempts is the reliable readiness signal." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "What should you do with every question you miss on the readiness assessment?",
+  options: ["Ignore it if your total score was high",
+            "Map it back to its domain and objective, then restudy that topic",
+            "Memorize the exact wording of the question",
+            "Report it as a bad question"],
+  answer: 1,
+  why: "The assessment's job is gap-finding. Each miss is a pointer to a domain/objective to restudy — that feedback loop is the whole point." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "General Security Concepts is what percentage of the SY0-701 exam?",
+  options: ["10%", "12%", "15%", "20%"],
+  answer: 1,
+  why: "Domain 1.0 is 12% — the smallest domain, but its topics (CIA triad, controls, zero trust) underpin questions across every other domain." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "Security Program Management and Oversight accounts for what share of the exam?",
+  options: ["15%", "18%", "20%", "25%"],
+  answer: 2,
+  why: "Domain 5.0 is 20% — governance, compliance, risk management, audits, and third-party/vendor risk." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "Why should you weight your restudy time by domain percentage?",
+  options: ["CompTIA requires it",
+            "A point recovered in a 28% domain helps more than a point in a 12% domain",
+            "Larger domains have easier questions",
+            "It makes the study plan look more professional"],
+  answer: 1,
+  why: "Time is limited; improving your weakest HIGH-WEIGHT domain yields the most exam points. Security Operations and Threats/Vulnerabilities are half the exam." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "Which two domains together make up exactly half of the SY0-701 exam?",
+  options: ["General Security Concepts + Security Architecture",
+            "Security Operations + Threats, Vulnerabilities, and Mitigations",
+            "Security Architecture + Program Management",
+            "General Security Concepts + Program Management"],
+  answer: 1,
+  why: "Security Operations (28%) + Threats, Vulnerabilities, and Mitigations (22%) = 50%. These two must be your strongest before test day." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "What does a readiness assessment add that a full practice exam does not?",
+  options: ["A longer testing experience",
+            "A quick, targeted diagnostic of specific weak areas before committing exam time",
+            "Official CompTIA scoring",
+            "A guaranteed pass prediction"],
+  answer: 1,
+  why: "The readiness assessment is short and targeted — built to find gaps fast. Full exams test stamina and pacing. Use both, they answer different questions." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "Before scheduling the exam, which retake consideration should you verify?",
+  options: ["CompTIA never allows retakes",
+            "CompTIA's retake policy includes a waiting period between attempts — check current terms so a bad day doesn't derail your plan",
+            "You must wait one full year to retake",
+            "Retakes are free automatically"],
+  answer: 1,
+  why: "Knowing the current retake terms (waiting period and cost) removes scheduling anxiety and lets you plan a fallback before you book." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "A readiness result shows 88% overall but 55% in Security Operations. What is the best response?",
+  options: ["Book the exam immediately — 88% is above threshold",
+            "Delay booking; restudy Security Operations first, then retest under conditions",
+            "Ignore the domain breakdown",
+            "Switch to a different certification"],
+  answer: 1,
+  why: "The weak 28% domain is exactly what the assessment exists to expose. Fix it first; the overall average hides a failing profile." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "How long is the SY0-701 exam?",
+  options: ["60 minutes", "90 minutes maximum", "3 hours", "6 hours"],
+  answer: 1,
+  why: "Up to 90 minutes, with multiple-choice and multiple-response questions. Pacing practice in full timed exams matters because of this constraint." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "What is the passing score for SY0-701?",
+  options: ["500 out of 800", "650 out of 900", "750 on a scale of 900", "100% of questions correct"],
+  answer: 2,
+  why: "CompTIA reports a scaled score from 100–900, and 750 is required to pass. You don't need perfection — you need roughly solid performance across all domains." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "Which of these is a sign you are NOT ready despite decent practice scores?",
+  options: ["You finish practice exams with time to spare",
+            "You can explain WHY each answer is right, not just which one",
+            "Your scores drop sharply on questions worded differently from your study bank",
+            "Your domain scores are balanced"],
+  answer: 2,
+  why: "Performance that collapses on novel wording means recognition without understanding — the real exam will expose it. Seek variety in question sources." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "What is the best use of the days BETWEEN the readiness assessment and the real exam?",
+  options: ["Cram new domains you never studied",
+            "Targeted repair of flagged weak areas, then 1–2 full timed practice exams, then rest",
+            "Stop studying entirely",
+            "Take 50 practice exams back to back"],
+  answer: 1,
+  why: "The final stretch is for gap repair and validation under conditions — not new content or burnout. Taper into the exam rested." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "Why does the course recommend against stretching exam preparation beyond 90 days?",
+  options: ["CompTIA expires study materials after 90 days",
+            "Early material fades from memory — concentrated study within ~60 days retains more",
+            "The exam fee increases after 90 days",
+            "There is no reason; longer is always better"],
+  answer: 1,
+  why: "Retention decays. Students who study over 6–12 months forget the early domains; ~40 concentrated hours within 30–60 days is the recommended pattern." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "Which statement about question types on the real SY0-701 exam is TRUE?",
+  options: ["It includes essays and fill-in-the-blank",
+            "It is multiple-choice plus multiple-response — you recognize answers rather than recalling them",
+            "It requires hands-on lab configuration",
+            "It is oral-only"],
+  answer: 1,
+  why: "No fill-in-the-blank or essays: recognition, not regurgitation. Practice should train answer-elimination and concept recognition." },
+{ lesson: "Lesson 263 · Access Your Readiness Assessment",
+  q: "Where does the readiness assessment fit relative to full-length practice exams in the final study week?",
+  options: ["After all practice exams, the night before the test",
+            "First — its results tell you what to repair, then full exams validate the repair",
+            "It replaces practice exams entirely",
+            "Only after passing the real exam"],
+  answer: 1,
+  why: "Sequence: readiness assessment (find gaps) → targeted restudy → full timed exams (validate + build pacing) → real exam." }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"exam-readiness-quiz.html",title:"Exam Readiness Assessment Quiz \u00b7 SY0-701 (Section 28)"};</script><script src="analytics.js"></script>
+</body>
+</html>

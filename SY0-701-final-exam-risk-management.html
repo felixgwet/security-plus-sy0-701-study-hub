@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SY0-701 Final Exam · Risk Management (Official Style · Harder)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #f85149;
+    --accent-dim: rgba(248,81,73,.14);
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+    --blue: #58a6ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 860px; }
+
+  /* ---------- Start / Result ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 36px;
+  }
+  .screen.center { text-align: center; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(248,81,73,.4);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 14px; }
+  .screen p { color: var(--muted); line-height: 1.65; margin-bottom: 10px; font-size: 15px; }
+  .exam-facts {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin: 22px 0 6px;
+  }
+  .fact {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .fact b { display: block; color: var(--text); font-size: 17px; margin-bottom: 2px; }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 32px;
+    cursor: pointer;
+    margin-top: 22px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    margin-left: 8px;
+  }
+  .btn.nav-btn { margin-top: 0; padding: 10px 24px; }
+  .score-big { font-size: 60px; font-weight: 700; margin: 10px 0 2px; }
+  .pass-line { color: var(--muted); font-size: 14px; margin-bottom: 4px; }
+  .verdict { font-size: 18px; font-weight: 600; margin: 8px 0 2px; }
+  .verdict.pass { color: var(--green); }
+  .verdict.fail { color: var(--red); }
+  .scale-track {
+    position: relative;
+    height: 10px;
+    background: var(--border);
+    border-radius: 5px;
+    margin: 26px auto 6px;
+    max-width: 560px;
+  }
+  .scale-pass-mark {
+    position: absolute; left: 81.25%; top: -5px; bottom: -5px;
+    width: 2px; background: var(--gold);
+  }
+  .scale-fill {
+    height: 100%;
+    border-radius: 5px;
+    background: linear-gradient(90deg, var(--red), var(--gold) 70%, var(--green));
+    width: 0%;
+    transition: width 1s ease;
+  }
+  .scale-labels {
+    display: flex; justify-content: space-between;
+    max-width: 560px; margin: 0 auto;
+    font-size: 12px; color: var(--muted);
+  }
+  .review { text-align: left; margin-top: 30px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .qhead { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  .review-item .pts { color: var(--muted); white-space: nowrap; }
+  .review-item .q { line-height: 1.5; margin-bottom: 6px; }
+  .review-item .a { color: var(--muted); line-height: 1.55; }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+
+  /* ---------- Exam layout ---------- */
+  .exam-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  .timer { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .timer.low { color: var(--red); }
+  .qtype-tag {
+    display: inline-block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid rgba(248,81,73,.35);
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin-bottom: 10px;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 26px 28px;
+  }
+  .q-text { font-size: 17px; line-height: 1.55; margin-bottom: 20px; }
+  .pick-hint { font-size: 13px; color: var(--gold); margin: -12px 0 16px; font-weight: 600; }
+
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 15px;
+    margin-bottom: 9px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    user-select: none;
+  }
+  .option:hover { border-color: var(--accent); }
+  .option.selected { border-color: var(--accent); background: var(--accent-dim); }
+  .option .letter { display: inline-block; width: 22px; font-weight: 700; color: var(--muted); }
+
+  /* matching */
+  .match-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .match-term {
+    min-width: 190px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .match-arrow { color: var(--muted); }
+  select.match-select {
+    flex: 1;
+    min-width: 220px;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  select.match-select.selected { border-color: var(--accent); }
+
+  /* ordering */
+  .order-pool { margin-bottom: 16px; }
+  .order-seq {
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    min-height: 54px;
+    margin-bottom: 16px;
+  }
+  .order-seq .placeholder { color: var(--muted); font-size: 13px; }
+  .order-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 14px;
+    margin: 4px 6px 4px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .order-item:hover { border-color: var(--accent); }
+  .order-item .num {
+    display: inline-block;
+    width: 20px; height: 20px;
+    line-height: 20px;
+    text-align: center;
+    background: var(--accent);
+    color: #0d1117;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .order-item.used { opacity: .35; pointer-events: none; }
+  .order-reset {
+    background: none; border: none; color: var(--blue);
+    font-size: 13px; cursor: pointer; margin-bottom: 8px;
+  }
+
+  /* exam footer */
+  .exam-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .flag-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .flag-btn.flagged { color: var(--gold); border-color: var(--gold); background: rgba(210,153,34,.1); }
+
+  /* palette */
+  .palette {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-top: 18px;
+  }
+  .palette h3 { font-size: 13px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
+  .pal-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pal-btn {
+    width: 34px; height: 34px;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    position: relative;
+  }
+  .pal-btn.current { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .pal-btn.answered::after {
+    content: '';
+    position: absolute;
+    right: 3px; top: 3px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+  .pal-btn.flagged::before {
+    content: '⚑';
+    position: absolute;
+    left: -4px; top: -8px;
+    font-size: 11px;
+    color: var(--gold);
+  }
+  .legend { display: flex; gap: 16px; margin-top: 10px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+  .legend span::before { content: '● '; }
+  .legend .l-ans::before { color: var(--green); }
+  .legend .l-flag::before { content: '⚑ '; color: var(--gold); }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen center">
+    <div class="badge">CompTIA Security+ SY0-701 · FINAL EXAM · Official Style</div>
+    <h1>Risk Management — Final Exam <span style="color:var(--accent)">(Harder)</span></h1>
+    <p><b style="color:var(--text)">This is the capstone for Section 09 — written to be slightly harder than the real SY0-701.</b> Longer scenario stems, tighter distractors, BEST/LEAST phrasing, and more multi-part performance-based questions. If you can pass this comfortably, the real exam's risk management questions should feel easy.</p>
+    <div class="exam-facts">
+      <div class="fact"><b id="fact-q">22</b>Questions</div>
+      <div class="fact"><b id="fact-t">33:00</b>Time limit</div>
+      <div class="fact"><b>750 / 900</b>Passing score</div>
+      <div class="fact"><b>No</b>Feedback until the end</div>
+    </div>
+    <p style="margin-top:16px">You can move freely between questions and ⚑ flag any for review. The clock auto-submits at 00:00 — just like the real thing.</p>
+    <button class="btn" onclick="beginExam()">Begin Final Exam</button>
+  </div>
+
+  <!-- EXAM -->
+  <div id="exam-screen" class="hidden">
+    <div class="exam-top">
+      <span id="exam-pos">Question 1 of 22</span>
+      <span class="timer" id="timer">33:00</span>
+    </div>
+    <div class="q-card">
+      <div class="qtype-tag" id="q-type"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-body"></div>
+      <div class="exam-footer">
+        <button class="btn ghost nav-btn" id="prev-btn" onclick="gotoQuestion(current-1)">← Previous</button>
+        <button class="flag-btn" id="flag-btn" onclick="toggleFlag()">⚑ Flag for review</button>
+        <button class="btn nav-btn" id="next-btn" onclick="gotoQuestion(current+1)">Next →</button>
+      </div>
+    </div>
+    <div class="palette">
+      <h3>Question Summary</h3>
+      <div class="pal-grid" id="palette"></div>
+      <div class="legend">
+        <span class="l-ans">Answered</span>
+        <span class="l-flag">Flagged</span>
+      </div>
+      <div style="margin-top:14px">
+        <button class="btn" style="margin-top:0" onclick="submitExam(false)">End Exam &amp; Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen center hidden">
+    <div class="badge">Final Exam Score Report</div>
+    <div class="score-big" id="scaled-score">—</div>
+    <div class="pass-line">Scale: 100 – 900 · Passing score: 750</div>
+    <div class="verdict" id="verdict"></div>
+    <p id="raw-line" style="margin-top:10px"></p>
+    <div class="scale-track">
+      <div class="scale-fill" id="scale-fill"></div>
+      <div class="scale-pass-mark"></div>
+    </div>
+    <div class="scale-labels"><span>100</span><span style="color:var(--gold)">750 ▲</span><span>900</span></div>
+    <div>
+      <button class="btn" onclick="beginExam()">Retake Final Exam</button>
+      <button class="btn ghost" onclick="toggleReview()" id="review-btn">Review Questions</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   FINAL EXAM — CompTIA Security+ SY0-701, Section 09 (HARDER)
+   Domain 2: Threats, Vulnerabilities & Mitigations (Obj 2.1 & 2.2)
+   + Domain 1: Deception technologies (Obj 1.2)
+   Written above real-exam difficulty: scenario-heavy stems,
+   best-answer phrasing, larger PBQs.
+   ============================================================ */
+const EXAM = [
+// ---------- Single-answer multiple choice ----------
+  {
+    type: 'mcq',
+    q: "A risk manager is drafting the annual plan and must schedule assessments for the year. Match the need to the WEAKEST frequency choice: which pairing is LEAST appropriate?",
+    options: [
+      "Regulatory-mandated quarterly reviews → recurring",
+      "Risk check before a one-off data-center migration → one-time",
+      "Real-time fraud detection dashboard → continuous",
+      "Routine operations with no events or projects → ad-hoc only, replacing the annual assessment"
+    ],
+    answer: 3,
+    why: "Ad-hoc assessments respond to specific events — they complement, never replace, baseline recurring assessments. Routine operations with no trigger event still warrant a scheduled (recurring) assessment; relying on ad-hoc alone means no assessment happens when nothing 'special' occurs — exactly when creeping risk accumulates."
+  },
+  {
+    type: 'mcq',
+    q: "A SaaS firm's database fails at 2 PM. The business can tolerate losing only 5 minutes of orders and must be selling again within 1 hour. An architect proposes backups every 30 minutes and a warm standby that restores in 90 minutes. What is the correct verdict?",
+    options: [
+      "Acceptable — both targets are met",
+      "The RPO is met but the RTO is violated — restore takes 90 minutes against a 60-minute maximum",
+      "The RTO is met but the RPO is violated — backups every 30 minutes exceed the 5-minute data-loss limit",
+      "Both the RTO and RPO are violated"
+    ],
+    answer: 3,
+    why: "RPO = 5 minutes max data loss, but 30-minute backups risk losing 30 minutes → VIOLATED. RTO = 1 hour max downtime, but the standby needs 90 minutes → VIOLATED. Tight RPOs demand frequent (often continuous/replicated) backups; tight RTOs demand hot or warm standby capable of faster recovery."
+  },
+  {
+    type: 'mcq',
+    q: "A factory robot fails on average every 8 months, and each repair averages 3 hours. Management wants to improve service continuity. Which improvement target is logically consistent with the metrics?",
+    options: [
+      "Raise the MTBF (fail less often) and lower the MTTR (repair faster)",
+      "Lower the MTBF and raise the MTTR",
+      "Raise both MTBF and MTTR",
+      "The metrics cannot guide continuity improvements"
+    ],
+    answer: 0,
+    why: "MTBF (8 months) measures reliability — higher means failures are rarer. MTTR (3 hours) measures maintainability — lower means faster repair. Continuity improves when failures happen less often (higher MTBF) AND are fixed faster (lower MTTR). Raising MTTR would mean slower repairs; lowering MTBF would mean more failures."
+  },
+  {
+    type: 'mcq',
+    q: "A risk workshop produces this entry: description clear, impact high, likelihood medium, outcome documented. Before the level can be set as high/medium/low, the facilitator insists on confirming two organizational characteristics. They are:",
+    options: [
+      "Risk owner and KRI",
+      "Risk tolerance and risk appetite",
+      "SLE and ALE",
+      "RTO and RPO"
+    ],
+    answer: 1,
+    why: "Before determining risk levels (high/medium/low) in the register, you must identify the organization's risk TOLERANCE (maximum acceptable risk) and risk APPETITE (expansionary/conservative/neutral posture). These calibrate where the level boundaries sit. Owners and KRIs are added to the register afterward; the other pairs are unrelated metrics."
+  },
+  {
+    type: 'mcq',
+    q: "An analyst computes: asset value $250,000; a breach would cause 60% damage; breaches of this type occur once every 5 years. The CFO asks for the expected yearly loss figure. It is:",
+    options: [
+      "$150,000",
+      "$250,000",
+      "$30,000",
+      "$50,000"
+    ],
+    answer: 2,
+    why: "EF = 60%. SLE = $250,000 × 0.60 = $150,000 per breach. ARO = 1/5 = 0.2 per year. ALE = SLE × ARO = $150,000 × 0.2 = $30,000 per year. The $150,000 option is the SLE trap — the question asked for the ANNUALIZED figure."
+  },
+  {
+    type: 'mcq',
+    q: "For that same risk (ALE $30,000), a security vendor proposes a control suite priced at $45,000/year that would cut the exposure factor from 60% to 20%. The BEST analysis-backed decision is:",
+    options: [
+      "Approve — reducing exposure is always worth it",
+      "Reject — the new ALE would be $10,000, saving only $20,000/year, which does not cover the $45,000 annual cost",
+      "Approve if the ARO also doubles",
+      "Defer to the risk owner without numbers"
+    ],
+    answer: 1,
+    why: "New SLE = $250,000 × 20% = $50,000; new ALE = $50,000 × 0.2 = $10,000. Savings = $30,000 − $10,000 = $20,000/year against a $45,000/year control — the mitigation costs more than twice what it saves. Quantitative analysis says reject it (or negotiate a cheaper control / price)."
+  },
+  {
+    type: 'mcq',
+    q: "A multinational suffers a data breach. Its cyber insurance pays out the full financial claim, yet the stock still drops 18% on the news. Which course concept does this outcome BEST illustrate?",
+    options: [
+      "Risk transference eliminates all consequences of a risk",
+      "Transference shifts the financial burden, but reputation risk remains with the original party",
+      "The insurer failed its mitigation duty",
+      "Risk acceptance would have been cheaper"
+    ],
+    answer: 1,
+    why: "Risk transference does NOT eliminate a risk — it shifts responsibility for the financial consequences to another party (the insurer, up to policy limits). Non-financial consequences like reputational damage and customer trust stay with the organization, exactly as this scenario shows."
+  },
+  {
+    type: 'mcq',
+    q: "A firm may process personal data without consent ONLY when a user is in imminent danger, per the regulation. Normally the consent rule binds the firm. This provision is BEST classified as:",
+    options: [
+      "An exemption",
+      "An exception",
+      "An indemnity clause",
+      "A key risk indicator"
+    ],
+    answer: 1,
+    why: "An EXCEPTION lets a party avoid a rule under specific circumstances while remaining subject to it generally — the firm follows the consent rule except in narrowly defined emergency conditions. An exemption would exclude it from the rule entirely. This distinction (exemption vs exception) is a favorite exam trap."
+  },
+  {
+    type: 'mcq',
+    q: "Two years ago a spam filter blocked 97% of phishing emails; testing now shows 71% as attackers evolved their techniques. The risk team formalizes this observation to justify filter updates. The measured 26-point decline is:",
+    options: [
+      "Residual risk",
+      "Control risk — the control became less effective over time",
+      "Inherent risk",
+      "Risk tolerance"
+    ],
+    answer: 1,
+    why: "Control risk quantifies how much LESS effective a security control has become over time — the course's analogy is signature antivirus degrading as hackers obfuscate code. Here the spam filter's effectiveness decayed. Residual risk is what remains after treatment; the 26-point decline measures the treatment's own erosion."
+  },
+  {
+    type: 'mcq',
+    q: "An organization defines risk appetite as neutral, yet its board keeps approving ventures far riskier than the stated posture. Which course recommendation addresses the mismatch?",
+    options: [
+      "Lower the risk tolerance to zero",
+      "Revisit and align the stated risk appetite with actual strategic behavior, since appetite guides how risks are categorized and prioritized",
+      "Switch all assessments to continuous",
+      "Accept every risk to match the board"
+    ],
+    answer: 1,
+    why: "Risk appetite reflects the organization's real approach to risk-taking and is meant to guide categorization and prioritization. If actual behavior contradicts the stated appetite, the appetite statement must be revisited so resources align with strategy — otherwise every risk level derived from it is miscalibrated. Tolerance ≠ appetite, and 'accept everything' abandons the process."
+  },
+  {
+    type: 'mcq',
+    q: "Which reporting format would BEST suit a monthly steering committee that needs to grasp the top risks at a glance without reading pages of detail?",
+    options: [
+      "A full technical vulnerability scan dump",
+      "A heat map risk matrix on a dashboard, with the detailed report available for those who want depth",
+      "Raw interview transcripts from risk identification",
+      "The unfiltered risk register export"
+    ],
+    answer: 1,
+    why: "Risk reporting should be tailored to the audience. Dashboards and heat maps give executives an at-a-glance view of the top risks; detailed reports serve those needing depth. Raw scan dumps, transcripts, and register exports are working documents — communication fails when the format ignores what the audience needs."
+  },
+  {
+    type: 'mcq',
+    q: "A risk owner accepts a medium-level risk and deploys a compensating control. Monitoring later shows the residual risk now exceeds the owner's tolerance. The correct course action is:",
+    options: [
+      "Nothing — accepted risks never change",
+      "Reassess and treat again (mitigate, transfer, or escalate), because monitoring exists to catch exactly this drift",
+      "Delete the risk from the register",
+      "Lower the tolerance so the risk fits"
+    ],
+    answer: 1,
+    why: "Monitoring tracks residual risk against tolerance over time. When residual risk drifts past tolerance — new threats, decaying controls, changed conditions — the loop returns to analysis and treatment. Rewriting tolerance to fit the risk inverts the logic, and deleting register entries destroys accountability."
+  },
+  // ---------- Multiple response ----------
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which statements about KRIs and risk owners are TRUE? (Select THREE.)",
+    options: [
+      "KRIs are predictive, forward-looking metrics tied to risk appetite",
+      "A sudden rise in a KRI prompts investigation before the risk escalates",
+      "The risk owner monitors the risk, implements mitigation, and updates the register",
+      "KRIs only make sense after an incident has occurred",
+      "A risk owner must be a C-level executive",
+      "The risk owner transfers all risks to insurers"
+    ],
+    answer: [0, 1, 2],
+    why: "KRIs = forward-looking early-warning barometers (e.g., rising loan defaults signal credit risk), tied to appetite so thresholds mean something. The risk owner is the accountable person/group — often a project manager — who monitors, mitigates, and updates the register. KRIs exist to act BEFORE incidents; owners need not be executives; transfer is a strategy, not an owner duty."
+  },
+  {
+    type: 'multi',
+    pick: 4,
+    q: "Which pairings of strategy to mechanism are CORRECT? (Select FOUR.)",
+    options: [
+      "Transference — insurance premium shifts financial loss to the insurer",
+      "Transference — contract indemnity clause makes the other party compensate for harm",
+      "Acceptance — exemption excludes the party from a rule entirely",
+      "Acceptance — exception avoids a rule under specific circumstances",
+      "Avoidance — reducing the impact if the risk occurs",
+      "Mitigation — eliminating the risk by cancelling the activity"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "All four transfer/acceptance pairings are correct: insurance and indemnity clauses transfer; exemptions and exceptions are the two acceptance mechanisms. The last two are inverted — reducing likelihood/impact is MITIGATION, while eliminating the risk by cancelling the activity is AVOIDANCE. CompTIA swaps these constantly."
+  },
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which quantitative risk statements are TRUE? (Select THREE.)",
+    options: [
+      "ALE = SLE × ARO",
+      "SLE = asset value × exposure factor",
+      "An exposure factor of 100% means total loss of the asset",
+      "A higher ARO means the event happens less often",
+      "ALE tells you the exact loss that will occur next year",
+      "Quantitative analysis cannot inform control purchasing decisions"
+    ],
+    answer: [0, 1, 2],
+    why: "The formula chain: SLE = AV × EF; ALE = SLE × ARO. EF runs 0–100%, with 100% = total loss. ARO is a per-year rate — HIGHER means MORE frequent. ALE is an EXPECTED (probabilistic) average, not a guaranteed exact figure, and cost-benefit control decisions are precisely its main use."
+  },
+  {
+    type: 'multi',
+    pick: 4,
+    q: "Which items belong to the risk MONITORING and REPORTING domain per the course? (Select FOUR.)",
+    options: [
+      "Residual risk — what remains after treatment",
+      "Control risk — a control becoming less effective over time",
+      "Risk reports tailored for stakeholder decision making",
+      "Regulatory compliance through regular risk reporting",
+      "The SLE formula",
+      "The exposure factor percentage",
+      "Assigning premiums for insurance policies"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "Monitoring covers residual and control risk plus new-risk identification and response-plan effectiveness; reporting delivers tailored risk information supporting decisions, stakeholder communication, and regulatory compliance. SLE and EF are quantitative ANALYSIS components; premium pricing is an insurance activity — all three are wrong-domain distractors."
+  },
+  // ---------- Performance-based: matching ----------
+  {
+    type: 'match',
+    q: "PBQ — Match each scenario to the BEST risk treatment strategy. Each strategy may be used once; not all strategies will be used.",
+    terms: [
+      "Pay a premium so an insurer covers breach costs",
+      "Drop the product line whose patent exposure is unacceptable",
+      "Add redundancy and monitoring to halve outage frequency",
+      "Log a trivial risk and react only if it ever materializes"
+    ],
+    defs: [
+      "Transference",
+      "Avoidance",
+      "Mitigation",
+      "Acceptance",
+      "Quantification",
+      "Identification"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "Insurance = transfer. Killing the risky product line = avoidance — the only strategy that ELIMINATES risk. Halving outage frequency with redundancy = mitigation (reduce likelihood/impact), the most common strategy. Logging and waiting = acceptance (cost to treat outweighs loss). Quantification and identification are process steps, not strategies."
+  },
+  {
+    type: 'match',
+    q: "PBQ — Match each risk register field to its content. Each content description may be used once; not all descriptions will be used.",
+    terms: ["Risk impact", "Risk likelihood", "Risk outcome", "Risk cost"],
+    defs: [
+      "The potential consequences if the risk occurs — cost, time, quality — rated low/medium/high",
+      "The chance the risk occurs, rated numerically (1–5, 1–10) or descriptively (rare to almost certain)",
+      "The overall result/effect of the risk on the project if it occurs, tied to impact and likelihood",
+      "The financial impact if the risk occurs, or the cost of mitigating it",
+      "The person accountable for managing the risk",
+      "A predictive early-warning metric tied to risk appetite"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "Impact = consequences (low/medium/high). Likelihood = probability on numeric or descriptive scales. Outcome = the overall effect if it occurs. Cost = financial exposure or mitigation spend. The distractors are the risk owner (accountability role) and KRIs (early-warning metrics) — both register elements, different fields."
+  },
+  {
+    type: 'match',
+    q: "PBQ — Match each statement to the analysis type it describes. Each type may be used once; not all types will be used.",
+    terms: [
+      "Rates risks high/medium/low using team judgment",
+      "Computes ALE to compare control costs",
+      "Produces a prioritized list without dollar figures"
+    ],
+    defs: [
+      "Qualitative risk analysis",
+      "Quantitative risk analysis",
+      "Qualitative risk analysis",
+      "Business impact analysis",
+      "Risk reporting",
+      "Risk monitoring"
+    ],
+    answer: [0, 1, 0],
+    why: "Descriptive high/medium/low ratings based on expertise = qualitative — statements 1 and 3 both describe it (subjective, prioritized, no money). Computing ALE for cost-benefit control decisions = quantitative. BIA evaluates disruption effects on business functions; reporting communicates; monitoring tracks — all adjacent steps, wrong categories here."
+  },
+  // ---------- Performance-based: ordering ----------
+  {
+    type: 'order',
+    q: "PBQ — A company evaluates a proposed $12,000/year backup appliance for a $100,000 asset. Order the quantitative decision flow. Click the steps in sequence.",
+    items: [
+      "Establish the exposure factor — the event would destroy 80% of the asset",
+      "Compute SLE = $100,000 × 80% = $80,000 per event",
+      "Set the ARO — the event historically occurs once every 4 years (0.25)",
+      "Compute ALE = $80,000 × 0.25 = $20,000 per year",
+      "Compare: the appliance costs $12,000/year against $20,000/year ALE — a defensible purchase"
+    ],
+    why: "EF → SLE → ARO → ALE → decision. The appliance ($12k) saves up to $20k of expected annual loss, so it passes the cost-benefit test — unlike controls costing more than the ALE they reduce. This chain is the single most testable calculation in the section."
+  },
+  {
+    type: 'order',
+    q: "PBQ — Order the events as a treated risk drifts out of bounds and the program responds. Click the events in sequence.",
+    items: [
+      "Monitoring shows the residual risk rising above the organization's tolerance",
+      "The change is logged and the risk is reassessed (likelihood and impact re-analyzed)",
+      "Treatment is adjusted — new mitigation, additional transfer, or a formal acceptance decision",
+      "The risk register is updated and stakeholders receive a revised risk report"
+    ],
+    why: "The monitoring loop: detect the drift → reassess → re-treat → update the register and report. Monitoring exists precisely to catch this; skipping straight to acceptance without reassessment, or updating the register without telling stakeholders, breaks the cycle the course describes."
+  },
+  {
+    type: 'order',
+    q: "PBQ — Order the descriptive likelihood scale from LEAST to MOST likely, as used in risk registers and qualitative analysis. Click the terms in sequence.",
+    items: [
+      "Rare",
+      "Unlikely",
+      "Possible",
+      "Likely",
+      "Almost certain"
+    ],
+    why: "The course's descriptive likelihood scale climbs: rare → unlikely → possible → likely → almost certain (numeric equivalents like 1–5 or 1–10 serve the same purpose). Impact is rated separately on low/medium/high — keep the two scales distinct when a question hands you mixed terms."
+  }
+];
+
+/* ============================================================
+   EXAM ENGINE
+   ============================================================ */
+const SECONDS_PER_QUESTION = 90;
+const totalTime = EXAM.length * SECONDS_PER_QUESTION;
+let answers = [];
+let flagged = [];
+let current = 0;
+let timeLeft = totalTime;
+let timerId = null;
+
+const TYPE_LABELS = {
+  mcq: 'Multiple Choice',
+  multi: 'Multiple Response',
+  match: 'Performance-Based · Matching',
+  order: 'Performance-Based · Ordering'
+};
+
+function fmtTime(s) {
+  const m = Math.floor(s / 60), r = s % 60;
+  return `${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`;
+}
+
+function beginExam() {
+  answers = EXAM.map(q => {
+    if (q.type === 'mcq') return null;
+    if (q.type === 'multi') return [];
+    if (q.type === 'match') return q.terms.map(() => null);
+    if (q.type === 'order') return [];
+    return null;
+  });
+  flagged = EXAM.map(() => false);
+  current = 0;
+  timeLeft = totalTime;
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('exam-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Questions';
+  document.getElementById('fact-q').textContent = EXAM.length;
+  document.getElementById('fact-t').textContent = fmtTime(totalTime);
+  startTimer();
+  renderQuestion();
+  renderPalette();
+}
+
+function startTimer() {
+  clearInterval(timerId);
+  updateTimerDisplay();
+  timerId = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) { clearInterval(timerId); submitExam(true); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timer');
+  el.textContent = fmtTime(Math.max(0, timeLeft));
+  el.classList.toggle('low', timeLeft <= 300);
+}
+
+function isAnswered(i) {
+  const a = answers[i], q = EXAM[i];
+  if (q.type === 'mcq') return a !== null;
+  if (q.type === 'multi') return a.length > 0;
+  if (q.type === 'match') return a.every(v => v !== null);
+  if (q.type === 'order') return a.length === q.items.length;
+  return false;
+}
+
+function renderQuestion() {
+  const q = EXAM[current];
+  document.getElementById('exam-pos').textContent = `Question ${current + 1} of ${EXAM.length}`;
+  document.getElementById('q-type').textContent = TYPE_LABELS[q.type];
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('prev-btn').disabled = current === 0;
+  document.getElementById('next-btn').textContent = current === EXAM.length - 1 ? 'Last Question' : 'Next →';
+  const fb = document.getElementById('flag-btn');
+  fb.classList.toggle('flagged', flagged[current]);
+  fb.textContent = flagged[current] ? '⚑ Flagged' : '⚑ Flag for review';
+
+  const body = document.getElementById('q-body');
+  body.innerHTML = '';
+
+  if (q.type === 'mcq') renderMcq(q, body);
+  else if (q.type === 'multi') renderMulti(q, body);
+  else if (q.type === 'match') renderMatch(q, body);
+  else if (q.type === 'order') renderOrder(q, body);
+
+  renderPalette();
+}
+
+function renderMcq(q, body) {
+  const letters = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option' + (answers[current] === i ? ' selected' : '');
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => {
+      answers[current] = i;
+      renderQuestion();
+    };
+    body.appendChild(btn);
+  });
+}
+
+function renderMulti(q, body) {
+  const hint = document.createElement('div');
+  hint.className = 'pick-hint';
+  const names = { 2: 'TWO', 3: 'THREE', 4: 'FOUR' };
+  hint.textContent = `Select ${names[q.pick] || q.pick}.`;
+  body.appendChild(hint);
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option' + (answers[current].includes(i) ? ' selected' : '');
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => {
+      const sel = answers[current];
+      const pos = sel.indexOf(i);
+      if (pos >= 0) sel.splice(pos, 1);
+      else {
+        if (sel.length >= q.pick) sel.shift(); // keep only 'pick' latest
+        sel.push(i);
+      }
+      renderQuestion();
+    };
+    body.appendChild(btn);
+  });
+}
+
+function renderMatch(q, body) {
+  // shuffle def indices once per question and cache on the question object
+  if (!q._defOrder) {
+    q._defOrder = q.defs.map((_, i) => i);
+    for (let i = q._defOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q._defOrder[i], q._defOrder[j]] = [q._defOrder[j], q._defOrder[i]];
+    }
+  }
+  q.terms.forEach((term, ti) => {
+    const row = document.createElement('div');
+    row.className = 'match-row';
+    const label = document.createElement('div');
+    label.className = 'match-term';
+    label.textContent = term;
+    const arrow = document.createElement('span');
+    arrow.className = 'match-arrow';
+    arrow.textContent = '→';
+    const sel = document.createElement('select');
+    sel.className = 'match-select' + (answers[current][ti] !== null ? ' selected' : '');
+    const noneOpt = document.createElement('option');
+    noneOpt.value = '';
+    noneOpt.textContent = '— choose a description —';
+    sel.appendChild(noneOpt);
+    q._defOrder.forEach(di => {
+      const o = document.createElement('option');
+      o.value = di;
+      o.textContent = q.defs[di];
+      if (answers[current][ti] === di) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.onchange = () => {
+      answers[current][ti] = sel.value === '' ? null : parseInt(sel.value, 10);
+      renderQuestion();
+    };
+    row.appendChild(label); row.appendChild(arrow); row.appendChild(sel);
+    body.appendChild(row);
+  });
+}
+
+function renderOrder(q, body) {
+  // shuffle item display order once per question
+  if (!q._itemOrder) {
+    q._itemOrder = q.items.map((_, i) => i);
+    for (let i = q._itemOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q._itemOrder[i], q._itemOrder[j]] = [q._itemOrder[j], q._itemOrder[i]];
+    }
+  }
+  const seqLabel = document.createElement('div');
+  seqLabel.style.cssText = 'font-size:13px;color:var(--muted);margin-bottom:6px';
+  seqLabel.textContent = 'Your answer (in order):';
+  body.appendChild(seqLabel);
+
+  const seq = document.createElement('div');
+  seq.className = 'order-seq';
+  if (answers[current].length === 0) {
+    seq.innerHTML = '<span class="placeholder">Click the items below in the correct sequence…</span>';
+  } else {
+    answers[current].forEach((itemIdx, pos) => {
+      const chip = document.createElement('span');
+      chip.className = 'order-item';
+      chip.innerHTML = `<span class="num">${pos + 1}</span>${q.items[itemIdx]}`;
+      chip.onclick = () => {
+        answers[current].splice(pos, 1);
+        renderQuestion();
+      };
+      chip.title = 'Click to remove';
+      seq.appendChild(chip);
+    });
+  }
+  body.appendChild(seq);
+
+  if (answers[current].length > 0) {
+    const reset = document.createElement('button');
+    reset.className = 'order-reset';
+    reset.textContent = '↺ Clear sequence';
+    reset.onclick = () => { answers[current] = []; renderQuestion(); };
+    body.appendChild(reset);
+  }
+
+  const poolLabel = document.createElement('div');
+  poolLabel.style.cssText = 'font-size:13px;color:var(--muted);margin-bottom:6px';
+  poolLabel.textContent = 'Available items:';
+  body.appendChild(poolLabel);
+
+  const pool = document.createElement('div');
+  pool.className = 'order-pool';
+  q._itemOrder.forEach(itemIdx => {
+    const used = answers[current].includes(itemIdx);
+    const chip = document.createElement('span');
+    chip.className = 'order-item' + (used ? ' used' : '');
+    chip.textContent = q.items[itemIdx];
+    if (!used) chip.onclick = () => {
+      if (answers[current].length < q.items.length) {
+        answers[current].push(itemIdx);
+        renderQuestion();
+      }
+    };
+    pool.appendChild(chip);
+  });
+  body.appendChild(pool);
+}
+
+function renderPalette() {
+  const pal = document.getElementById('palette');
+  pal.innerHTML = '';
+  EXAM.forEach((q, i) => {
+    const b = document.createElement('button');
+    b.className = 'pal-btn'
+      + (i === current ? ' current' : '')
+      + (isAnswered(i) ? ' answered' : '')
+      + (flagged[i] ? ' flagged' : '');
+    b.textContent = i + 1;
+    b.onclick = () => gotoQuestion(i);
+    pal.appendChild(b);
+  });
+}
+
+function gotoQuestion(i) {
+  if (i < 0 || i >= EXAM.length) return;
+  current = i;
+  renderQuestion();
+}
+
+function toggleFlag() {
+  flagged[current] = !flagged[current];
+  renderQuestion();
+}
+
+/* ---------- Grading ---------- */
+function gradeQuestion(q, a) {
+  if (q.type === 'mcq') {
+    return a === q.answer ? 1 : 0;
+  }
+  if (q.type === 'multi') {
+    // all-or-nothing: exactly the right set
+    const right = q.answer.slice().sort().join(',');
+    const mine = a.slice().sort().join(',');
+    return right === mine ? 1 : 0;
+  }
+  if (q.type === 'match') {
+    let c = 0;
+    a.forEach((v, i) => { if (v === q.answer[i]) c++; });
+    return c / q.terms.length;
+  }
+  if (q.type === 'order') {
+    if (a.length !== q.items.length) return 0;
+    let c = 0;
+    a.forEach((itemIdx, pos) => { if (itemIdx === pos) c++; });
+    return c / q.items.length;
+  }
+  return 0;
+}
+
+function submitExam(auto) {
+  const unanswered = answers.filter((a, i) => !isAnswered(i)).length;
+  if (!auto) {
+    const flaggedCount = flagged.filter(Boolean).length;
+    let msg = `You have answered ${EXAM.length - unanswered} of ${EXAM.length} questions.`;
+    if (unanswered > 0) msg += `\n\n${unanswered} question(s) are unanswered.`;
+    if (flaggedCount > 0) msg += `\n${flaggedCount} question(s) are flagged for review.`;
+    msg += '\n\nSubmit your exam?';
+    if (!confirm(msg)) return;
+  }
+  clearInterval(timerId);
+
+  let points = 0;
+  const details = EXAM.map((q, i) => {
+    const pts = gradeQuestion(q, answers[i]);
+    points += pts;
+    return { q, a: answers[i], pts };
+  });
+
+  const pct = points / EXAM.length;
+  const scaled = Math.round(100 + 800 * pct);
+  const passed = scaled >= 750;
+
+  document.getElementById('exam-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('scaled-score').textContent = scaled;
+  const v = document.getElementById('verdict');
+  v.textContent = passed ? 'PASS ✔' : 'BELOW PASSING ✘';
+  v.className = 'verdict ' + (passed ? 'pass' : 'fail');
+  document.getElementById('raw-line').textContent =
+    `${points.toFixed(2)} of ${EXAM.length} points (${Math.round(pct * 100)}%) · Time remaining: ${fmtTime(Math.max(0, timeLeft))}`;
+
+  const fill = document.getElementById('scale-fill');
+  fill.style.width = '0%';
+  setTimeout(() => { fill.style.width = ((scaled - 100) / 800 * 100) + '%'; }, 60);
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Question Review</h2>';
+  details.forEach((d, i) => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = reviewItemHtml(d, i);
+    review.appendChild(div);
+  });
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function reviewItemHtml(d, i) {
+  const { q, a, pts } = d;
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  let body = '';
+
+  if (q.type === 'mcq') {
+    const ok = a === q.answer;
+    body = `Your answer: <span class="${ok ? 'ok' : 'bad'}">${a !== null ? letters[a] + '. ' + esc(q.options[a]) : '(unanswered)'}</span>` +
+      (ok ? '' : `<br>Correct answer: <span class="ok">${letters[q.answer]}. ${esc(q.options[q.answer])}</span>`);
+  } else if (q.type === 'multi') {
+    const ok = pts === 1;
+    const mine = a.map(x => letters[x] + '. ' + esc(q.options[x])).join('<br>') || '(unanswered)';
+    const right = q.answer.map(x => letters[x] + '. ' + esc(q.options[x])).join('<br>');
+    body = `Your answer: <span class="${ok ? 'ok' : 'bad'}">${mine}</span>` +
+      (ok ? '' : `<br>Correct selections: <span class="ok">${right}</span>`);
+  } else if (q.type === 'match') {
+    body = q.terms.map((t, ti) => {
+      const ok = a[ti] === q.answer[ti];
+      const mine = a[ti] !== null ? q.defs[a[ti]] : '(none)';
+      const right = q.defs[q.answer[ti]];
+      return `<b>${esc(t)}</b> → <span class="${ok ? 'ok' : 'bad'}">${esc(mine)}</span>` +
+        (ok ? '' : ` &nbsp;(correct: <span class="ok">${esc(right)}</span>)`);
+    }).join('<br>');
+  } else if (q.type === 'order') {
+    const correctSeq = q.items.map((it, pos) => `${pos + 1}. ${esc(it)}`).join('<br>');
+    const mine = a.length
+      ? a.map((itemIdx, pos) => `${pos + 1}. ${esc(q.items[itemIdx])}${itemIdx === pos ? '' : ' ✗'}`).join('<br>')
+      : '(unanswered)';
+    const okAll = pts === 1;
+    body = `Your sequence:<br><span class="${okAll ? 'ok' : 'bad'}">${mine}</span>` +
+      (okAll ? '' : `<br>Correct sequence:<br><span class="ok">${correctSeq}</span>`);
+  }
+
+  return `
+    <div class="qhead">
+      <span class="q"><b>Q${i + 1}.</b> ${esc(q.q)}</span>
+      <span class="pts">${pts === 1 ? '1.0' : pts.toFixed(2)} / 1 pt</span>
+    </div>
+    <div class="a">${body}<br><br>${esc(q.why)}</div>`;
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Questions' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"SY0-701-final-exam-risk-management.html",title:"SY0-701 Final Exam \u00b7 Risk Management (Official Style \u00b7 Harder)"};</script><script src="analytics.js"></script>
+</body>
+</html>

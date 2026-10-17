@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Third-Party Vendor Risks Quiz · SY0-701 (Section 10)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 10</div>
+    <h1>Third-Party Vendor Risks — Practice Quiz</h1>
+    <p>47 questions across all 6 lessons (OBJ 2.2, 2.3 &amp; 5.3): third-party vendor risk fundamentals (vendors, suppliers, MSPs), supply chain risks across hardware, software and services (Trusted Foundry, counterfeit hardware, open-source vs proprietary), supply chain attacks (chip washing, rootkits, SolarWinds, the CHIPS Act), vendor assessment (penetration testing, right to audit, internal vs independent audits, supply chain analysis), vendor selection &amp; monitoring (due diligence, conflicts of interest, questionnaires, rules of engagement, performance reviews, feedback loops), and contracts &amp; agreements (SLA, MOA, MOU, MSA, SOW, NDA, BPA).</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    lesson: "Lesson 90 · Supply Chain Risks",
+    q: "A router is composed of hundreds of components sourced from various suppliers. What is the primary security concern with this?",
+    options: ["Each component can be a vulnerability if tampered with or from an untrustworthy source", "Routers cannot be patched once components are soldered", "Suppliers always install backdoors by default", "Components are impossible to inventory"],
+    answer: 0,
+    why: "Every component in a device is a potential vulnerability if it has been tampered with or comes from an untrustworthy supplier — which is why rigorous supply chain assessments are needed to trace hardware origins."
+  },
+  {
+    lesson: "Lesson 90 · Supply Chain Risks",
+    q: "Which program was implemented for entities with a minimal risk appetite, such as the Department of Defense, to ensure hardware authenticity and secure microprocessor manufacturing?",
+    options: ["Trusted Foundry", "CHIPS Act", "SolarWinds Orion", "Trusted Platform Module"],
+    answer: 0,
+    why: "The Trusted Foundry program ensures all hardware installed in low-risk-appetite networks (like the DoD's) is authentic and that microprocessors are manufactured securely against a known-good baseline."
+  },
+  {
+    lesson: "Lesson 90 · Supply Chain Risks",
+    q: "Why is purchasing hardware from secondary or aftermarket sources considered risky?",
+    options: ["Devices may be counterfeit or tampered with, containing malware or enabling unauthorized access", "Secondary hardware is always slower than retail hardware", "Aftermarket devices void all network warranties automatically", "Resellers never provide receipts"],
+    answer: 0,
+    why: "While budget-friendly, secondary/aftermarket sources carry a high risk of counterfeit or tampered devices whose code may include Trojans, allow remote access, or cause operational failures."
+  },
+  {
+    lesson: "Lesson 90 · Supply Chain Risks",
+    q: "Before installing purchased software on an enterprise network, what should be verified?",
+    options: ["It is properly licensed, authentic, free of known vulnerabilities, and scanned for malicious code", "It was developed in the same country as the organization", "It costs more than competing products", "It includes a built-in firewall"],
+    answer: 0,
+    why: "Software should be checked for proper licensing and authenticity, confirmed free of known vulnerabilities or bugs, and scanned with antivirus/anti-malware before installation."
+  },
+  {
+    lesson: "Lesson 90 · Supply Chain Risks",
+    q: "Why is assessing open-source software generally easier than assessing proprietary software?",
+    options: ["The entire source code can be reviewed", "Open-source software has no vulnerabilities", "Proprietary software cannot be scanned", "Open-source vendors always provide audits"],
+    answer: 0,
+    why: "With open-source software you can review the entire source code if needed. Proprietary software can't be source-reviewed, but you can still run antivirus scans and vulnerability assessments against it."
+  },
+  {
+    lesson: "Lesson 90 · Supply Chain Risks",
+    q: "Which supply chain risk question is MOST specific to a managed service provider (MSP) offering software as a service?",
+    options: ["Are the MSP's cybersecurity protocols robust enough to protect your data, and will they support incident response after a breach?", "Does the MSP manufacture its own processors?", "Is the MSP's packaging recyclable?", "Does the MSP offer same-day shipping?"],
+    answer: 0,
+    why: "With SaaS/MSPs you entrust your data to an external party, so the key risks are whether they can maintain confidentiality and integrity, and whether they'll cooperate in incident response and forensics."
+  },
+  {
+    lesson: "Lesson 90 · Supply Chain Risks",
+    q: "Which statement best captures the core principle of supply chain risk?",
+    options: ["You are only as strong as the weakest link in the supply chain", "Cost efficiency is the only factor in vendor selection", "Supply chain risk applies only to hardware", "Audits eliminate all supply chain risk"],
+    answer: 0,
+    why: "From hardware to services, every aspect of the supply chain must be assessed — an organization is only as strong as the weakest link in that chain."
+  },
+  {
+    lesson: "Lesson 90 · Supply Chain Risks",
+    q: "What should organizations conduct to trace the origins of hardware and determine the integrity of components in enterprise networks?",
+    options: ["Rigorous supply chain assessments", "Annual penetration tests only", "Marketing surveys", "Software license audits only"],
+    answer: 0,
+    why: "Rigorous supply chain assessments trace hardware origins and determine component integrity, because the origin of components defines the trustworthiness of the entire device."
+  },
+  {
+    lesson: "Lesson 90 · Supply Chain Risks",
+    q: "Beyond cost, what factors should drive vendor selection?",
+    options: ["Due diligence, historical performance, and a commitment to security", "The vendor's social media following", "The vendor's office location only", "The length of the vendor's contract template"],
+    answer: 0,
+    why: "Vendor selection is not just cost efficiency — it must factor in due diligence, historical performance, and the vendor's commitment to security."
+  },
+  {
+    lesson: "Lesson 90 · Supply Chain Risks",
+    q: "A counterfeit aftermarket switch contains modified code that gives an attacker persistent remote access. What category of supply chain risk is this?",
+    options: ["Hardware risk from secondary/aftermarket sources", "A software licensing violation", "An insider threat", "A social engineering attack"],
+    answer: 0,
+    why: "Counterfeit or tampered hardware from secondary/aftermarket sources can include Trojan malware or enable remote/unauthorized access — a hardware supply chain risk."
+  },
+  {
+    lesson: "Lesson 91 · Supply Chain Attacks",
+    q: "What is a supply chain attack?",
+    options: ["Targeting a weaker link in the supply chain to gain access to a primary target", "Attacking a primary target directly with brute force", "Physically stealing goods from a warehouse", "Attacking only software update servers"],
+    answer: 0,
+    why: "Instead of attacking a well-fortified entity directly, adversaries exploit vulnerabilities in suppliers and service providers to pave their way into the larger, more secure systems."
+  },
+  {
+    lesson: "Lesson 91 · Supply Chain Attacks",
+    q: "What is chip washing?",
+    options: ["Repackaging the contents of a microchip with a less expensive one or one containing embedded malware", "Cleaning microchips with solvents before installation", "Recycling old chips into new devices legitimately", "Encrypting chip firmware"],
+    answer: 0,
+    why: "Chip washing involves repackaging a microchip's contents with a cheaper chip or one with embedded malware — the device may simply fail, or worse, provide an always-on backdoor."
+  },
+  {
+    lesson: "Lesson 91 · Supply Chain Attacks",
+    q: "What is the WORST-case outcome of installing a device with a counterfeit chip inside it?",
+    options: ["The chip provides an always-on backdoor into your network", "The device is slightly slower than expected", "The device's warranty is void", "The device fails a cosmetic inspection"],
+    answer: 0,
+    why: "At best a counterfeit chip causes malfunctions and network failures; at worst it contains malicious functionality that turns your own network hardware into an always-on backdoor."
+  },
+  {
+    lesson: "Lesson 91 · Supply Chain Attacks",
+    q: "Which concern arises because a significant portion of technology manufacturing happens overseas?",
+    options: ["Deliberate embedding of rootkits by suppliers, providing backdoor access once devices are active", "Hardware becomes incompatible with US power outlets", "Devices cannot be shipped internationally", "Overseas manufacturing always improves quality"],
+    answer: 0,
+    why: "A worrying trend is suppliers deliberately embedding rootkits within devices — pre-installed malware tools providing backdoor network access once the devices are active."
+  },
+  {
+    lesson: "Lesson 91 · Supply Chain Attacks",
+    q: "In the 2021 SolarWinds incident, how did attackers compromise thousands of organizations?",
+    options: ["They infiltrated the SolarWinds Orion software update system and used it to distribute malware", "They brute-forced every customer's admin password", "They physically replaced routers at each customer site", "They bribed employees at each victim organization"],
+    answer: 0,
+    why: "Cybercriminals infiltrated SolarWinds' Orion update system and distributed their malware through it to the company's wide range of clients, including governments worldwide."
+  },
+  {
+    lesson: "Lesson 91 · Supply Chain Attacks",
+    q: "What was the strategic lesson of the SolarWinds attack?",
+    options: ["Attackers can use indirect avenues to bypass even robust defenses like those of the Department of Defense", "Only small companies are vulnerable to supply chain attacks", "Antivirus software would have stopped it", "Government networks are never targeted"],
+    answer: 0,
+    why: "SolarWinds showed how adversaries exploit indirect avenues — a trusted software update — to bypass even the most robust security defenses."
+  },
+  {
+    lesson: "Lesson 91 · Supply Chain Attacks",
+    q: "Which of these is NOT one of the four recommended ways to safeguard against supply chain attacks?",
+    options: ["Vendor due diligence", "Regular monitoring and audits", "Education and collaboration", "Relying solely on vendor reputation"],
+    answer: 3,
+    why: "The four mitigations are vendor due diligence, regular monitoring and audits, education and collaboration, and contractual safeguards — reputation alone is not a safeguard."
+  },
+  {
+    lesson: "Lesson 91 · Supply Chain Attacks",
+    q: "What does the CHIPS Act of 2022 provide approximately $39 billion for?",
+    options: ["Subsidies for semiconductor manufacturing on US soil", "Foreign aid to chip-producing nations", "Cybersecurity training for banks", "Grants for software startups"],
+    answer: 0,
+    why: "The CHIPS and Science Act provides roughly $280B total, including $39B in subsidies for US chip manufacturing, a 25% investment tax credit, and $13B for research and workforce training."
+  },
+  {
+    lesson: "Lesson 91 · Supply Chain Attacks",
+    q: "What was the primary goal of the CHIPS Act?",
+    options: ["Minimize supply chain risk by reducing US reliance on foreign-made semiconductors", "Ban the import of all foreign semiconductors", "Subsidize smartphone purchases for consumers", "Regulate social media companies"],
+    answer: 0,
+    why: "The CHIPS Act was designed to minimize supply chain risk by reducing reliance on foreign-made semiconductors and strengthening the domestic supply chain."
+  },
+  {
+    lesson: "Lesson 91 · Supply Chain Attacks",
+    q: "How do contractual safeguards help defend against supply chain attacks?",
+    options: ["They require vendors to adhere to stipulated security standards with legal repercussions if they fail", "They guarantee vendors will never be breached", "They replace the need for monitoring", "They lower hardware prices"],
+    answer: 0,
+    why: "Contracts should include cybersecurity clauses ensuring vendors adhere to stipulated security standards, with legal repercussions if they don't meet the requirements."
+  },
+  {
+    lesson: "Lesson 92 · Vendor Assessment",
+    q: "A company provides processors, memory, and hard drives to a computer manufacturer. What type of third-party entity is this?",
+    options: ["Supplier", "Vendor", "MSP", "Auditor"],
+    answer: 0,
+    why: "Suppliers are involved in the production and delivery of products or parts of products — one provides processors, another memory, and so on."
+  },
+  {
+    lesson: "Lesson 92 · Vendor Assessment",
+    q: "Which entity would be classified as a managed service provider (MSP)?",
+    options: ["A cloud provider like AWS hired to manage your data infrastructure", "A company that sells shrink-wrapped software licenses", "A manufacturer of laptop chassis", "An industry regulator"],
+    answer: 0,
+    why: "MSPs are hired to manage IT services on behalf of your company — cloud providers like AWS or Google Cloud managing vast data infrastructures are classic examples."
+  },
+  {
+    lesson: "Lesson 92 · Vendor Assessment",
+    q: "What is the purpose of penetration testing a supplier's software?",
+    options: ["To simulate a real cyberattack and find exploitable vulnerabilities before they become your risk", "To measure the software's download speed", "To verify the software's license key", "To translate the software's documentation"],
+    answer: 0,
+    why: "Penetration testing the software means attempting to find and exploit vulnerabilities just like an actual attacker would — validating that the vendor takes security seriously, since their risk becomes your risk."
+  },
+  {
+    lesson: "Lesson 92 · Vendor Assessment",
+    q: "What does a right to audit clause in a vendor contract grant your organization?",
+    options: ["The right to evaluate the vendor's internal processes and verify compliance with agreed standards", "The right to a discount on future orders", "The right to the vendor's source code", "The right to hire the vendor's staff"],
+    answer: 0,
+    why: "The right to audit clause grants the right to evaluate the vendor's internal processes and ensure compliance — e.g., periodically inspecting data handling, storage, and protection practices."
+  },
+  {
+    lesson: "Lesson 92 · Vendor Assessment",
+    q: "What is an internal audit in the context of vendor assessment?",
+    options: ["The vendor's self-assessment of its own practices against standards or requirements", "An audit your organization conducts of its own employees", "A government inspection of the vendor's tax records", "An audit performed by a competitor"],
+    answer: 0,
+    why: "An internal audit is the vendor's self-assessment, evaluating their own practices against industry standards or organizational requirements — evidence of consistent internal audits signals commitment to security."
+  },
+  {
+    lesson: "Lesson 92 · Vendor Assessment",
+    q: "Why might an independent assessment be needed even when a vendor presents evidence of internal audits?",
+    options: ["Internal audits may lack rigor; a neutral third party validates compliance objectively", "Internal audits are always fraudulent", "Independent assessments are always cheaper", "Regulations ban internal audits"],
+    answer: 0,
+    why: "Internal audits are commendable but sometimes insufficient due to lacking rigor — independent assessments by third parties with no stake (e.g., ISO) provide neutral validation."
+  },
+  {
+    lesson: "Lesson 92 · Vendor Assessment",
+    q: "What does a supply chain analysis focus on?",
+    options: ["Every link in the vendor's own supply chain — assessing security and reliability of each source", "Only the vendor's financial statements", "Only the final shipping leg of delivery", "The vendor's marketing claims"],
+    answer: 0,
+    why: "A supply chain analysis dives deep into the vendor's entire supply chain, assessing each link's security and reliability — e.g., scrutinizing source locations for counterfeit or tampered parts risk."
+  },
+  {
+    lesson: "Lesson 92 · Vendor Assessment",
+    q: "What is the guiding philosophy behind contract reviews, penetration tests, and audits of vendors?",
+    options: ["Trust but verify", "Zero trust means zero vendors", "Security through obscurity", "Assume breach is impossible"],
+    answer: 0,
+    why: "The right to audit isn't about a lack of trust but a method to ensure transparency — in cybersecurity, we always want to trust but verify."
+  },
+  {
+    lesson: "Lesson 93 · Vendor Selection & Monitoring",
+    q: "What does due diligence in vendor selection involve?",
+    options: ["Vetting financial stability, operational history, client testimonials, and on-the-ground practices", "Checking only the vendor's certification logo", "Comparing prices on a spreadsheet", "Reviewing the vendor's website design"],
+    answer: 0,
+    why: "Due diligence is a rigorous evaluation beyond surface-level credentials — it vets financial stability, operational history, client testimonials, and even on-the-ground practices."
+  },
+  {
+    lesson: "Lesson 93 · Vendor Selection & Monitoring",
+    q: "A key decision maker has a personal tie to a vendor under consideration. What is this called, and how should it be handled?",
+    options: ["A conflict of interest — require disclosure or exclude the conflicted party from the decision", "A competitive advantage — encourage the relationship", "A performance review — ignore it", "A feedback loop — document it and move on"],
+    answer: 0,
+    why: "A conflict of interest arises when personal or financial relationships could cloud judgment; organizations should require disclosures or exclude conflicted parties from vendor selection."
+  },
+  {
+    lesson: "Lesson 93 · Vendor Selection & Monitoring",
+    q: "What is the main purpose of a vendor questionnaire?",
+    options: ["To compare vendors on a standardized set of criteria for fair, informed decisions", "To collect vendor email addresses for marketing", "To replace the need for a contract", "To rank vendors by company size"],
+    answer: 0,
+    why: "Vendor questionnaires collect detailed responses (redundancy, security protocols, uptime, disaster recovery) enabling standardized comparison and fair, informed decision-making."
+  },
+  {
+    lesson: "Lesson 93 · Vendor Selection & Monitoring",
+    q: "What do rules of engagement define in vendor selection?",
+    options: ["The terms of interaction — communication protocols, data sharing policies, negotiation boundaries", "The final contract price", "The vendor's hiring practices", "The technical architecture of the product"],
+    answer: 0,
+    why: "Rules of engagement are the guidelines dictating the terms of interaction with potential vendors, covering communication protocols, data sharing policies, and negotiation boundaries."
+  },
+  {
+    lesson: "Lesson 93 · Vendor Selection & Monitoring",
+    q: "After selecting a vendor, what does ongoing monitoring primarily rely on?",
+    options: ["Performance reviews against the contract's standards and objectives", "Annual holiday greetings", "The vendor's self-reported revenue", "Waiting for a breach to occur"],
+    answer: 0,
+    why: "Monitoring uses performance reviews — periodic evaluations of vendor deliverables against the agreed-upon standards and objectives outlined in the contract."
+  },
+  {
+    lesson: "Lesson 93 · Vendor Selection & Monitoring",
+    q: "What are feedback loops in vendor monitoring?",
+    options: ["Two-way communication channels where the organization and vendor share feedback with each other", "Automated email reminders about overdue invoices", "One-way satisfaction surveys sent to customers", "Loopback network interfaces"],
+    answer: 0,
+    why: "Feedback loops are two-way communication channels where both sides share input — the org comments on product quality while the vendor offers procurement insights, enabling collaborative growth."
+  },
+  {
+    lesson: "Lesson 94 · Contracts & Agreements",
+    q: "Which agreement defines the standard of service a client can expect, with penalties for deviation?",
+    options: ["Service Level Agreement (SLA)", "Memorandum of Understanding (MOU)", "Non-disclosure Agreement (NDA)", "Business Partnership Agreement (BPA)"],
+    answer: 0,
+    why: "An SLA defines the standard of service — e.g., server downtime not exceeding two hours per month — and deviations result in penalties paid by the service provider."
+  },
+  {
+    lesson: "Lesson 94 · Contracts & Agreements",
+    q: "Which agreement is more formal and outlines specific responsibilities and roles of the parties?",
+    options: ["Memorandum of Agreement (MOA)", "Memorandum of Understanding (MOU)", "Non-disclosure Agreement (NDA)", "Statement of Work (SOW)"],
+    answer: 0,
+    why: "An MOA is the formal document spelling out who is responsible for what; an MOU is less binding and more a declaration of mutual intent."
+  },
+  {
+    lesson: "Lesson 94 · Contracts & Agreements",
+    q: "Two organizations want to express intent to explore a future partnership without binding details. Which document fits?",
+    options: ["Memorandum of Understanding (MOU)", "Memorandum of Agreement (MOA)", "Master Service Agreement (MSA)", "Statement of Work (SOW)"],
+    answer: 0,
+    why: "An MOU expresses intent to explore a partnership and lays out broad strokes without exact details — it's less binding than an MOA."
+  },
+  {
+    lesson: "Lesson 94 · Contracts & Agreements",
+    q: "What is the role of a Master Service Agreement (MSA)?",
+    options: ["A blanket agreement covering general terms across multiple transactions, supplemented by work orders or SOWs", "A one-time contract for a single project", "A confidentiality pledge between competitors", "A profit-sharing agreement for a joint venture"],
+    answer: 0,
+    why: "An MSA acts as a blanket agreement covering general terms across multiple transactions, so parties don't draft a new contract per project — individual work orders or SOWs supplement it."
+  },
+  {
+    lesson: "Lesson 94 · Contracts & Agreements",
+    q: "What does a Statement of Work (SOW) specify?",
+    options: ["Details for a particular project: deliverables, timeline, and milestones", "The profit-sharing split between two firms", "A vendor's overall security posture", "Mutual intent to explore future business"],
+    answer: 0,
+    why: "The SOW (sometimes Scope of Work) specifies project details — deliverables, timeline, milestones — while the MSA holds the broad payment terms and confidentiality clauses."
+  },
+  {
+    lesson: "Lesson 94 · Contracts & Agreements",
+    q: "A startup shares proprietary technology details with a potential investor before any deal exists. Which agreement protects that information?",
+    options: ["Non-disclosure Agreement (NDA)", "Service Level Agreement (SLA)", "Memorandum of Agreement (MOA)", "Master Service Agreement (MSA)"],
+    answer: 0,
+    why: "An NDA is a commitment to privacy ensuring sensitive information shared during negotiations remains confidential — even if the investor passes on the opportunity."
+  },
+  {
+    lesson: "Lesson 94 · Contracts & Agreements",
+    q: "Which agreement covers profit sharing, decision-making structures, and exit strategies — and is also known as a Joint Venture agreement?",
+    options: ["Business Partnership Agreement (BPA)", "Memorandum of Understanding (MOU)", "Statement of Work (SOW)", "Service Level Agreement (SLA)"],
+    answer: 0,
+    why: "A BPA goes beyond a basic contract when two entities pool resources — outlining the partnership nature, profit sharing, decision-making, exit strategies, and IP ownership; it's also called a JV agreement."
+  },
+  {
+    lesson: "Lesson 89 · Third-party Vendor Risks Overview",
+    q: "Third-party vendor risk can affect which of the following?",
+    options: ["Integrity, data security, and overall business continuity", "Only the purchasing department's budget", "Only marketing timelines", "Nothing — vendors cannot affect your organization"],
+    answer: 0,
+    why: "Integrating external partners opens avenues for threats and vulnerabilities that can affect the organization's integrity, data security, and overall business continuity."
+  },
+  {
+    lesson: "Lesson 89 · Third-party Vendor Risks Overview",
+    q: "Which objectives does this section map to on the SY0-701 exam?",
+    options: ["OBJ 2.2 (threat vectors/attack surfaces), OBJ 2.3 (vulnerabilities), and OBJ 5.3 (third-party risk processes)", "OBJ 1.1 and OBJ 3.4 only", "OBJ 4.2 and OBJ 4.3 only", "No exam objectives — vendor risk is not tested"],
+    answer: 0,
+    why: "Third-party vendor risk spans Domain 2 (OBJ 2.2 threat vectors/attack surfaces, OBJ 2.3 vulnerabilities) and Domain 5 (OBJ 5.3 third-party risk assessment and management processes)."
+  },
+  {
+    lesson: "Lesson 89 · Third-party Vendor Risks Overview",
+    q: "Which of these is an example of a third-party vendor risk?",
+    options: ["An MSP with access to sensitive data but lacking rigorous cybersecurity protocols", "An employee forgetting their own password", "A power outage at your headquarters", "A typo on the company website"],
+    answer: 0,
+    why: "Third-party vendor risk includes a service provider like an MSP having access to sensitive data while lacking rigorous cybersecurity protocols, as well as hardware vulnerabilities and software backdoors."
+  },
+  {
+    lesson: "Lesson 91 · Supply Chain Attacks",
+    q: "What does collaboration with industry groups provide in the fight against supply chain attacks?",
+    options: ["A more holistic view and a joint defense strategy", "Guaranteed immunity from attacks", "Lower vendor prices", "Faster product shipping"],
+    answer: 0,
+    why: "Education and collaboration keep the broader ecosystem informed about the latest threats and best practices, providing a holistic view and joint defense strategy."
+  },
+  {
+    lesson: "Lesson 93 · Vendor Selection & Monitoring",
+    q: "Why is vendor monitoring still necessary after a vendor passes selection?",
+    options: ["Businesses evolve, market dynamics shift, and vendors change — monitoring confirms continued alignment", "It satisfies accounting requirements only", "It eliminates the need for contracts", "It is only required for foreign vendors"],
+    answer: 0,
+    why: "Over time businesses evolve and vendors undergo changes; monitoring is the mechanism ensuring your chosen vendor still aligns with your organizational needs and standards."
+  },
+  {
+    lesson: "Lesson 92 · Vendor Assessment",
+    q: "A data center housing critical information is evaluated against global benchmarks by ISO. What type of assessment is this?",
+    options: ["Independent assessment", "Internal audit", "Penetration test", "Performance review"],
+    answer: 0,
+    why: "An independent body like ISO assessing a data center's practices against its global standards is an independent assessment — third-party validation by a neutral entity."
+  }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"third-party-vendor-risks-quiz.html",title:"Third-Party Vendor Risks Quiz \u00b7 SY0-701 (Section 10)"};</script><script src="analytics.js"></script>
+</body>
+</html>

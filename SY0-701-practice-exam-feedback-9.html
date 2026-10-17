@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SY0-701 Practice Exam 9 · Instant Feedback (Section 10)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #3fb950;
+    --accent-dim: rgba(63,185,80,.12);
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+    --blue: #58a6ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 860px; }
+
+  /* ---------- Start / Result ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 36px;
+  }
+  .center { text-align: center; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(63,185,80,.4);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 14px; }
+  .screen p { color: var(--muted); line-height: 1.65; margin-bottom: 10px; font-size: 15px; }
+  .exam-facts { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin: 22px 0 6px; }
+  .fact {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .fact b { display: block; color: var(--text); font-size: 17px; margin-bottom: 2px; }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 32px;
+    cursor: pointer;
+    margin-top: 22px;
+    transition: filter .15s;
+  }
+  .btn:hover:not(:disabled) { filter: brightness(1.12); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); margin-left: 8px; }
+  .btn.nav-btn { margin-top: 0; padding: 10px 24px; }
+  .score-big { font-size: 60px; font-weight: 700; margin: 10px 0 2px; }
+  .pass-line { color: var(--muted); font-size: 14px; margin-bottom: 4px; }
+  .verdict { font-size: 18px; font-weight: 600; margin: 8px 0 2px; }
+  .verdict.pass { color: var(--green); }
+  .verdict.fail { color: var(--red); }
+  .scale-track {
+    position: relative; height: 10px; background: var(--border);
+    border-radius: 5px; margin: 26px auto 6px; max-width: 560px;
+  }
+  .scale-pass-mark { position: absolute; left: 81.25%; top: -5px; bottom: -5px; width: 2px; background: var(--gold); }
+  .scale-fill {
+    height: 100%; border-radius: 5px; width: 0%;
+    background: linear-gradient(90deg, var(--red), var(--gold) 70%, var(--green));
+    transition: width 1s ease;
+  }
+  .scale-labels { display: flex; justify-content: space-between; max-width: 560px; margin: 0 auto; font-size: 12px; color: var(--muted); }
+  .review { text-align: left; margin-top: 30px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; font-size: 14px; }
+  .review-item .qhead { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  .review-item .pts { color: var(--muted); white-space: nowrap; }
+  .review-item .q { line-height: 1.5; margin-bottom: 6px; }
+  .review-item .a { color: var(--muted); line-height: 1.55; }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+
+  /* ---------- Question screen ---------- */
+  .exam-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 14px; color: var(--muted); }
+  .qtype-tag {
+    display: inline-block; font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--accent); background: var(--accent-dim);
+    border: 1px solid rgba(63,185,80,.35); border-radius: 4px; padding: 2px 8px; margin-bottom: 10px;
+  }
+  .q-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 26px 28px; }
+  .q-text { font-size: 17px; line-height: 1.55; margin-bottom: 20px; }
+  .pick-hint { font-size: 13px; color: var(--gold); margin: -12px 0 16px; font-weight: 600; }
+
+  .option {
+    display: block; width: 100%; text-align: left;
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; font-size: 15px; margin-bottom: 9px;
+    cursor: pointer; transition: border-color .15s, background .15s; user-select: none;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.selected { border-color: var(--accent); background: var(--accent-dim); }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter { display: inline-block; width: 22px; font-weight: 700; color: var(--muted); }
+
+  .match-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .match-term {
+    min-width: 190px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; font-size: 14px; font-weight: 600;
+  }
+  .match-term.good { border-color: var(--green); background: rgba(63,185,80,.1); }
+  .match-term.bad { border-color: var(--red); background: rgba(248,81,73,.1); }
+  .match-arrow { color: var(--muted); }
+  select.match-select {
+    flex: 1; min-width: 220px; background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 14px;
+  }
+  select.match-select.selected { border-color: var(--accent); }
+  select.match-select:disabled { opacity: .85; }
+
+  .order-seq-label { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .order-seq { border: 1px dashed var(--border); border-radius: 8px; padding: 12px; min-height: 54px; margin-bottom: 16px; }
+  .order-seq .placeholder { color: var(--muted); font-size: 13px; }
+  .order-item {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 9px 14px; font-size: 14px; margin: 4px 6px 4px 0; cursor: pointer; user-select: none;
+  }
+  .order-item:hover:not(.used) { border-color: var(--accent); }
+  .order-item .num {
+    display: inline-block; width: 20px; height: 20px; line-height: 20px; text-align: center;
+    background: var(--accent); color: #0d1117; border-radius: 50%; font-size: 12px; font-weight: 700;
+  }
+  .order-item .num.good { background: var(--green); }
+  .order-item .num.bad { background: var(--red); }
+  .order-item.used { opacity: .35; pointer-events: none; }
+  .order-reset { background: none; border: none; color: var(--blue); font-size: 13px; cursor: pointer; margin-bottom: 8px; }
+
+  .feedback {
+    display: none; margin-top: 18px; border-radius: 8px; padding: 14px 16px;
+    font-size: 14px; line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback.part { background: rgba(210,153,34,.08); border: 1px solid rgba(210,153,34,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+
+  .check-btn { margin-top: 6px; width: 100%; }
+  .exam-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; gap: 10px; flex-wrap: wrap; }
+
+  .palette { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-top: 18px; }
+  .palette h3 { font-size: 13px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
+  .pal-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pal-btn {
+    width: 34px; height: 34px; background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px; font-size: 13px; cursor: pointer; position: relative;
+  }
+  .pal-btn.current { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .pal-btn.answered::after {
+    content: ''; position: absolute; right: 3px; top: 3px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  }
+  .legend { display: flex; gap: 16px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+  .legend span::before { content: '● '; }
+  .legend .l-ans::before { color: var(--green); }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen center">
+    <div class="badge">CompTIA Security+ SY0-701 · Feedback Mode</div>
+    <h1>Practice Exam 8 — Instant Feedback</h1>
+    <p><b style="color:var(--text)">Same exam-paper question styles as the simulator</b> — single-answer multiple choice, multiple-response, and performance-based matching &amp; ordering tasks — but in study mode: after each answer you immediately see whether you're right, your points, and an explanation. A completely new question set on Risk Management.</p>
+    <div class="exam-facts">
+      <div class="fact"><b id="fact-q">20</b>All-new questions</div>
+      <div class="fact"><b id="fact-t">—</b>Timer</div>
+      <div class="fact"><b>750 / 900</b>Passing score</div>
+      <div class="fact"><b>Instant</b>Feedback</div>
+    </div>
+    <p style="margin-top:16px">The clock counts up (no pressure) and records your total time. Answer every question, then get a full CompTIA-style score report with review.</p>
+    <button class="btn" onclick="beginExam()">Start Practice Exam</button>
+  </div>
+
+  <!-- EXAM -->
+  <div id="exam-screen" class="hidden">
+    <div class="exam-top">
+      <span id="exam-pos">Question 1 of 20</span>
+      <span>Score: <b id="live-score">0.00</b> / 20 &nbsp;·&nbsp; ⏱ <span id="timer">00:00</span></span>
+    </div>
+    <div class="q-card">
+      <div class="qtype-tag" id="q-type"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-body"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn check-btn" id="check-btn" onclick="checkAnswer()">Check Answer</button>
+      <div class="exam-footer">
+        <button class="btn ghost nav-btn" id="prev-btn" onclick="gotoQuestion(current-1)">← Previous</button>
+        <button class="btn nav-btn" id="next-btn" onclick="gotoQuestion(current+1)">Next →</button>
+      </div>
+    </div>
+    <div class="palette">
+      <h3>Question Summary</h3>
+      <div class="pal-grid" id="palette"></div>
+      <div class="legend"><span class="l-ans">Answered</span></div>
+      <div style="margin-top:14px">
+        <button class="btn" style="margin-top:0" onclick="finishExam()">Finish &amp; See Score Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen center hidden">
+    <div class="badge">Exam Score Report</div>
+    <div class="score-big" id="scaled-score">—</div>
+    <div class="pass-line">Scale: 100 – 900 · Passing score: 750</div>
+    <div class="verdict" id="verdict"></div>
+    <p id="raw-line" style="margin-top:10px"></p>
+    <div class="scale-track">
+      <div class="scale-fill" id="scale-fill"></div>
+      <div class="scale-pass-mark"></div>
+    </div>
+    <div class="scale-labels"><span>100</span><span style="color:var(--gold)">750 ▲</span><span>900</span></div>
+    <div>
+      <button class="btn" onclick="beginExam()">Retake Exam</button>
+      <button class="btn ghost" onclick="toggleReview()" id="review-btn">Review Questions</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   PRACTICE EXAM (FEEDBACK MODE) — SY0-701 Section 10 content
+   Domain 5: Risk Management Process (Obj 5.2)
+   All-new question set — distinct from the quiz & simulator.
+   ============================================================ */
+const EXAM = [
+  // ---------- Single-answer multiple choice ----------
+  {
+    type: 'mcq',
+    q: "An auditor tells a CISO: 'Your security is only as good as the least secure company you depend on.' Which principle is the auditor stating?",
+    options: [
+      "The weakest link principle of supply chains",
+      "Defense in depth",
+      "Security through obscurity",
+      "Least privilege"
+    ],
+    answer: 0,
+    why: "In supply chain risk, an organization is only as strong as the weakest link in its supply chain — one compromised supplier can reverberate across every business that depends on it."
+  },
+  {
+    type: 'mcq',
+    q: "Throughout the 2000s and 2010s, counterfeit versions of which vendor's routers and switches were commonly sold on the secondary market as a supply chain attack?",
+    options: [
+      "Cisco",
+      "SolarWinds",
+      "Oracle",
+      "Google"
+    ],
+    answer: 0,
+    why: "Cisco routers and switches were frequent targets of counterfeit supply chain attacks on the secondary market during the 2000s–2010s — old chips were chip-washed into devices that looked genuine."
+  },
+  {
+    type: 'mcq',
+    q: "A threat actor pre-installs malware inside devices during manufacturing overseas. Once the devices activate on the customer's network, the malware grants covert access. What are these pre-installed tools called?",
+    options: [
+      "Rootkits",
+      "Cookies",
+      "Patch kits",
+      "Load balancers"
+    ],
+    answer: 0,
+    why: "A worrying trend is suppliers deliberately embedding rootkits within devices — pre-installed malware providing backdoor access to networks once the devices are active."
+  },
+  {
+    type: 'mcq',
+    q: "Before rolling out third-party software, an admin runs the installer through the company's antivirus/anti-malware solution. What is this step checking for?",
+    options: [
+      "That the software is free of malicious code",
+      "That the software license is cheapest",
+      "That the vendor has a local office",
+      "That the software interface is translated"
+    ],
+    answer: 0,
+    why: "Purchased software should be checked for proper licensing and authenticity, confirmed free of known vulnerabilities, and scanned with antivirus/anti-malware to ensure it's free of malicious code."
+  },
+  {
+    type: 'mcq',
+    q: "Which type of organization is the Trusted Foundry program primarily designed to serve?",
+    options: [
+      "Entities with a minimal risk appetite, such as the Department of Defense",
+      "Small retail shops with no data",
+      "Social media influencers",
+      "Public libraries only"
+    ],
+    answer: 0,
+    why: "The Trusted Foundry program serves entities with a minimal risk appetite — the Department of Defense is the textbook example — ensuring hardware authenticity and secure microprocessor manufacturing."
+  },
+  {
+    type: 'mcq',
+    q: "An organization evaluating SaaS providers asks: 'If we suffer a breach, will this provider give us the support and cooperation needed for full incident response and forensics?' Which risk dimension is being evaluated?",
+    options: [
+      "The provider's ability to support incident response and forensic investigation",
+      "The provider's marketing budget",
+      "The provider's office location",
+      "The provider's hiring velocity"
+    ],
+    answer: 0,
+    why: "With service providers/MSPs, key risk questions are whether your data's confidentiality and integrity will be maintained, whether their security protocols are robust, and whether they'd support full-scale incident response and forensics after a breach."
+  },
+  {
+    type: 'mcq',
+    q: "What is the overall purpose of a vendor assessment?",
+    options: [
+      "To evaluate the security, reliability, and performance of external entities the organization relies on",
+      "To negotiate the lowest possible price",
+      "To market the organization's own products",
+      "To replace the organization's internal audit team"
+    ],
+    answer: 0,
+    why: "A vendor assessment evaluates the security, reliability, and performance of external entities you rely on — a weak link in one vendor can create widespread vulnerabilities and data breaches across multiple businesses."
+  },
+  {
+    type: 'mcq',
+    q: "While performing due diligence on an 'eco-friendly packaging' vendor, which of the following goes beyond checking the certification and matches the course's guidance?",
+    options: [
+      "Understanding their waste management practices, material sourcing policies, and overall environmental impact",
+      "Counting the vendor's social media followers",
+      "Checking only the price per unit",
+      "Reviewing the vendor's logo"
+    ],
+    answer: 0,
+    why: "Due diligence goes beyond surface-level credentials: for eco-friendly packaging you'd examine waste management practices, material sourcing policies, and overall environmental impact — the on-the-ground reality behind the certification."
+  },
+  {
+    type: 'mcq',
+    q: "Why do organizations use vendor questionnaires when comparing cloud providers?",
+    options: [
+      "To compare all vendors on a standardized set of criteria for a fair, informed decision",
+      "To collect email addresses for newsletters",
+      "To avoid ever signing a contract",
+      "To rank providers by the length of their answers"
+    ],
+    answer: 0,
+    why: "Questionnaires gather detailed responses (redundancy, security protocols, uptime guarantees, disaster recovery plans) that enable standardized comparison across vendors and a fair, informed selection process."
+  },
+  {
+    type: 'mcq',
+    q: "An organization tells its vendor what it thinks of the vendor's product quality, and the vendor suggests improvements to the organization's procurement process. What monitoring mechanism is at work?",
+    options: [
+      "Feedback loops",
+      "Chip washing",
+      "Rules of engagement",
+      "An MOA"
+    ],
+    answer: 0,
+    why: "Feedback loops are two-way communication channels where both the organization and vendor share feedback — they lead to collaborative growth and refinement when maintained effectively."
+  },
+  {
+    type: 'mcq',
+    q: "A recurring client wants to avoid drafting a new contract for every project with the same service provider. Which agreement should anchor the relationship?",
+    options: [
+      "Master Service Agreement (MSA)",
+      "Non-disclosure Agreement (NDA)",
+      "Service Level Agreement (SLA)",
+      "Business Partnership Agreement (BPA)"
+    ],
+    answer: 0,
+    why: "An MSA is a blanket agreement covering general terms across multiple transactions; individual work orders or Statements of Work supplement it per project. NDAs, SLAs, and BPAs serve different purposes."
+  },
+  {
+    type: 'mcq',
+    q: "A startup must reveal proprietary technology details to a potential investor during talks, even though no deal may happen. Which agreement keeps those details from reaching competitors?",
+    options: [
+      "Non-disclosure Agreement (NDA)",
+      "Statement of Work (SOW)",
+      "Memorandum of Agreement (MOA)",
+      "Service Level Agreement (SLA)"
+    ],
+    answer: 0,
+    why: "An NDA is a commitment to privacy ensuring sensitive information shared during negotiations remains confidential — even if the investor passes on the opportunity, the technology details can't reach competitors."
+  },
+  // ---------- Multiple response ----------
+  {
+    type: 'multi',
+    pick: 4,
+    q: "Which of the following are supply chain risk sources spanning hardware, software, and services, as described in the course? (Select FOUR.)",
+    options: [
+      "Hardware components tampered with or from untrustworthy vendors",
+      "Counterfeit or tampered devices from secondary market sources",
+      "Software that is unlicensed, inauthentic, or full of known vulnerabilities",
+      "An MSP with weak cybersecurity protocols holding access to your data",
+      "A strong enterprise password policy",
+      "A fully patched operating system",
+      "Encrypted backups stored offline"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "The course's three risk lanes: hardware (tampered components, counterfeit aftermarket devices), software (unlicensed/inauthentic/vulnerable code needing AV scans), and services (MSPs/SaaS with weak protocols and your data in their hands). Strong passwords, patching, and backups are defensive strengths, not vendor risks."
+  },
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which elements instill confidence in a vendor's security posture during an assessment? (Select THREE.)",
+    options: [
+      "Evidence of consistent, comprehensive internal audits",
+      "A right to audit clause allowing you to inspect their practices",
+      "Validation from an independent third-party assessment",
+      "A flashy vendor marketing brochure",
+      "Being the cheapest option on the market",
+      "A long history of never answering security questions"
+    ],
+    answer: [0, 1, 2],
+    why: "Confidence comes from evidence: the vendor's own internal audit discipline, your contractual right to audit (trust but verify), and neutral independent assessment. Brochures, low prices, and evasiveness prove nothing about security."
+  },
+  {
+    type: 'multi',
+    pick: 4,
+    q: "According to the course, which checks should be performed on software before it is used in the enterprise network? (Select FOUR.)",
+    options: [
+      "Confirm it is properly licensed",
+      "Confirm it is authentic",
+      "Confirm it is free of known vulnerabilities or bugs",
+      "Scan it with antivirus/anti-malware",
+      "Confirm the installer file is the largest available",
+      "Confirm it was advertised on television",
+      "Confirm the vendor's stock price is rising"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "Software checks per the course: properly licensed, authentic, free of known vulnerabilities/bugs, and scanned with antivirus/anti-malware. Open source additionally allows full source-code review. File size, advertising, and stock price are irrelevant."
+  },
+  {
+    type: 'multi',
+    pick: 2,
+    q: "Which statements about rules of engagement in vendor selection are true? (Select TWO.)",
+    options: [
+      "They dictate the terms of interaction between the organization and potential vendors",
+      "They cover communication protocols, data sharing policies, and negotiation boundaries",
+      "They replace the need for contracts after selection",
+      "They apply only to penetration testers",
+      "They forbid asking vendors any technical questions"
+    ],
+    answer: [0, 1],
+    why: "Rules of engagement are guidelines for interacting with potential vendors — communication protocols, data-sharing policies, negotiation boundaries (e.g., rejecting unsolicited proposals). They guide selection; they neither replace contracts nor restrict technical evaluation."
+  },
+  // ---------- Performance-based: matching ----------
+  {
+    type: 'match',
+    q: "PBQ — Match each supply chain attack technique to its description. Each description may be used once; not all descriptions will be used.",
+    terms: ["Chip washing", "Update-system compromise", "Counterfeit secondary-market hardware", "Embedded rootkit"],
+    defs: [
+      "Repackaging a microchip's contents with a cheaper or malware-bearing chip",
+      "Infiltrating a vendor's software update mechanism to reach all of its customers",
+      "Fake devices sold through secondary or aftermarket sources that may contain Trojans",
+      "Pre-installed malware providing backdoor access once the device is active",
+      "Tricking a user into revealing their password by email",
+      "Flooding a server with traffic to exhaust its resources"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "Chip washing = repackaged chip contents. The SolarWinds pattern = compromised update system distributing malware broadly. Counterfeit secondary-market hardware = tampered devices with possible Trojans/backdoors. Embedded rootkits = pre-installed backdoor malware. Phishing and DDoS are unrelated attacks."
+  },
+  {
+    type: 'match',
+    q: "PBQ — Match each vendor-selection concept to its description. Each description may be used once; not all descriptions will be used.",
+    terms: ["Due diligence", "Conflict of interest", "Vendor questionnaire", "Rules of engagement"],
+    defs: [
+      "Rigorous evaluation of financial stability, operational history, testimonials, and on-the-ground practices",
+      "Personal or financial relationships that could bias the vendor-selection judgment",
+      "Comprehensive document vendors complete so they can be compared on standardized criteria",
+      "Guidelines covering communication protocols, data sharing, and negotiation boundaries",
+      "Periodic scoring of vendor deliverables against contract objectives",
+      "Two-way channel where organization and vendor share feedback"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "Due diligence = deep vetting beyond credentials. Conflict of interest = relationships clouding judgment (disclose or exclude). Questionnaire = standardized comparison data. Rules of engagement = terms of interaction. The distractors are monitoring concepts: performance review and feedback loop."
+  },
+  // ---------- Performance-based: ordering ----------
+  {
+    type: 'order',
+    q: "PBQ — Order the vendor assessment flow described in the course, from first engagement to deepest validation. Click the steps in sequence.",
+    items: [
+      "Penetration test the supplier's systems like a real attacker would",
+      "Review the contract and verify a right to audit clause is included",
+      "Collect evidence of the vendor's internal audits of its own practices",
+      "Bring in an independent third party, such as ISO, for a neutral assessment",
+      "Perform a supply chain analysis of every link behind the vendor"
+    ],
+    why: "The course's assessment sequence: simulated attacks to find exploitable weaknesses, contractual verification rights, then the evidence ladder — the vendor's self-assessment, neutral third-party validation, and finally the deep dive into the vendor's own supply chain, because vendor security includes every link behind them."
+  },
+  {
+    type: 'order',
+    q: "PBQ — Order the vendor monitoring cycle after selection, as described in the course. Click the steps in sequence.",
+    items: [
+      "Onboard the selected vendor into organizational operations",
+      "Conduct periodic performance reviews against the contract's standards and objectives",
+      "Maintain two-way feedback loops so both sides can share input",
+      "Adapt and refine the relationship as the organization and vendor evolve"
+    ],
+    why: "Selection is not the end: onboard the vendor, measure deliverables against contract objectives in performance reviews, keep two-way feedback loops open for mutual input, and keep nurturing and adapting the relationship over time — vendors and market dynamics change."
+  }
+];
+
+/* ============================================================
+   ENGINE — feedback mode
+   ============================================================ */
+let answers = [];
+let checked = [];
+let points = [];
+let current = 0;
+let elapsed = 0;
+let timerId = null;
+
+const TYPE_LABELS = {
+  mcq: 'Multiple Choice',
+  multi: 'Multiple Response',
+  match: 'Performance-Based · Matching',
+  order: 'Performance-Based · Ordering'
+};
+
+function fmtTime(s) {
+  const m = Math.floor(s / 60), r = s % 60;
+  return `${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`;
+}
+
+function beginExam() {
+  answers = EXAM.map(q => {
+    if (q.type === 'mcq') return null;
+    if (q.type === 'multi') return [];
+    if (q.type === 'match') return q.terms.map(() => null);
+    if (q.type === 'order') return [];
+    return null;
+  });
+  checked = EXAM.map(() => false);
+  points = EXAM.map(() => 0);
+  current = 0;
+  elapsed = 0;
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('exam-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Questions';
+  document.getElementById('fact-q').textContent = EXAM.length;
+  document.getElementById('fact-t').textContent = 'elapsed';
+  startTimer();
+  renderQuestion();
+  renderPalette();
+}
+
+function startTimer() {
+  clearInterval(timerId);
+  updateTimerDisplay();
+  timerId = setInterval(() => { elapsed++; updateTimerDisplay(); }, 1000);
+}
+
+function updateTimerDisplay() {
+  document.getElementById('timer').textContent = fmtTime(elapsed);
+}
+
+function isAnswered(i) { return checked[i]; }
+
+function isInputComplete(i) {
+  const q = EXAM[i], a = answers[i];
+  if (q.type === 'mcq') return a !== null;
+  if (q.type === 'multi') return a.length > 0;
+  if (q.type === 'match') return a.every(v => v !== null);
+  if (q.type === 'order') return a.length === q.items.length;
+  return false;
+}
+
+function updateLiveScore() {
+  const total = points.reduce((s, p) => s + p, 0);
+  document.getElementById('live-score').textContent = total.toFixed(2);
+}
+
+function renderQuestion() {
+  const q = EXAM[current];
+  const done = checked[current];
+  document.getElementById('exam-pos').textContent = `Question ${current + 1} of ${EXAM.length}`;
+  document.getElementById('q-type').textContent = TYPE_LABELS[q.type];
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('prev-btn').disabled = current === 0;
+  document.getElementById('next-btn').textContent = current === EXAM.length - 1 ? 'Last Question' : 'Next →';
+
+  const body = document.getElementById('q-body');
+  body.innerHTML = '';
+  if (q.type === 'mcq') renderMcq(q, body, done);
+  else if (q.type === 'multi') renderMulti(q, body, done);
+  else if (q.type === 'match') renderMatch(q, body, done);
+  else if (q.type === 'order') renderOrder(q, body, done);
+
+  const checkBtn = document.getElementById('check-btn');
+  const fb = document.getElementById('feedback');
+  if (done) {
+    checkBtn.classList.add('hidden');
+    showFeedback(q);
+  } else {
+    checkBtn.classList.remove('hidden');
+    checkBtn.disabled = !isInputComplete(current);
+    checkBtn.textContent = 'Check Answer';
+    fb.className = 'feedback';
+    fb.innerHTML = '';
+  }
+  updateLiveScore();
+  renderPalette();
+}
+
+function renderMcq(q, body, done) {
+  const letters = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    if (done) {
+      btn.disabled = true;
+      if (i === q.answer) btn.classList.add('correct');
+      else if (answers[current] === i) btn.classList.add('wrong');
+    } else {
+      if (answers[current] === i) btn.classList.add('selected');
+      btn.onclick = () => { answers[current] = i; renderQuestion(); };
+    }
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    body.appendChild(btn);
+  });
+}
+
+function renderMulti(q, body, done) {
+  const hint = document.createElement('div');
+  hint.className = 'pick-hint';
+  const names = { 2: 'TWO', 3: 'THREE', 4: 'FOUR' };
+  hint.textContent = `Select ${names[q.pick] || q.pick}.`;
+  body.appendChild(hint);
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    const chosen = answers[current].includes(i);
+    if (done) {
+      btn.disabled = true;
+      if (q.answer.includes(i)) btn.classList.add('correct');
+      else if (chosen) btn.classList.add('wrong');
+    } else {
+      if (chosen) btn.classList.add('selected');
+      btn.onclick = () => {
+        const sel = answers[current];
+        const pos = sel.indexOf(i);
+        if (pos >= 0) sel.splice(pos, 1);
+        else {
+          if (sel.length >= q.pick) sel.shift();
+          sel.push(i);
+        }
+        renderQuestion();
+      };
+    }
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    body.appendChild(btn);
+  });
+}
+
+function renderMatch(q, body, done) {
+  if (!q._defOrder) {
+    q._defOrder = q.defs.map((_, i) => i);
+    for (let i = q._defOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q._defOrder[i], q._defOrder[j]] = [q._defOrder[j], q._defOrder[i]];
+    }
+  }
+  q.terms.forEach((term, ti) => {
+    const row = document.createElement('div');
+    row.className = 'match-row';
+    const label = document.createElement('div');
+    label.className = 'match-term';
+    if (done) label.classList.add(answers[current][ti] === q.answer[ti] ? 'good' : 'bad');
+    label.textContent = term;
+    const arrow = document.createElement('span');
+    arrow.className = 'match-arrow';
+    arrow.textContent = '→';
+    const sel = document.createElement('select');
+    sel.className = 'match-select' + (answers[current][ti] !== null ? ' selected' : '');
+    if (done) sel.disabled = true;
+    const noneOpt = document.createElement('option');
+    noneOpt.value = '';
+    noneOpt.textContent = '— choose a description —';
+    sel.appendChild(noneOpt);
+    q._defOrder.forEach(di => {
+      const o = document.createElement('option');
+      o.value = di;
+      o.textContent = q.defs[di];
+      if (answers[current][ti] === di) o.selected = true;
+      sel.appendChild(o);
+    });
+    if (!done) {
+      sel.onchange = () => {
+        answers[current][ti] = sel.value === '' ? null : parseInt(sel.value, 10);
+        renderQuestion();
+      };
+    }
+    row.appendChild(label); row.appendChild(arrow); row.appendChild(sel);
+    body.appendChild(row);
+  });
+}
+
+function renderOrder(q, body, done) {
+  if (!q._itemOrder) {
+    q._itemOrder = q.items.map((_, i) => i);
+    for (let i = q._itemOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q._itemOrder[i], q._itemOrder[j]] = [q._itemOrder[j], q._itemOrder[i]];
+    }
+  }
+  const seqLabel = document.createElement('div');
+  seqLabel.className = 'order-seq-label';
+  seqLabel.textContent = 'Your answer (in order):';
+  body.appendChild(seqLabel);
+
+  const seq = document.createElement('div');
+  seq.className = 'order-seq';
+  if (answers[current].length === 0) {
+    seq.innerHTML = '<span class="placeholder">Click the items below in the correct sequence…</span>';
+  } else {
+    answers[current].forEach((itemIdx, pos) => {
+      const chip = document.createElement('span');
+      chip.className = 'order-item';
+      const num = document.createElement('span');
+      num.className = 'num';
+      num.textContent = pos + 1;
+      if (done) num.classList.add(itemIdx === pos ? 'good' : 'bad');
+      chip.appendChild(num);
+      chip.appendChild(document.createTextNode(q.items[itemIdx]));
+      if (!done) {
+        chip.onclick = () => { answers[current].splice(pos, 1); renderQuestion(); };
+        chip.title = 'Click to remove';
+      }
+      seq.appendChild(chip);
+    });
+  }
+  body.appendChild(seq);
+
+  if (!done && answers[current].length > 0) {
+    const reset = document.createElement('button');
+    reset.className = 'order-reset';
+    reset.textContent = '↺ Clear sequence';
+    reset.onclick = () => { answers[current] = []; renderQuestion(); };
+    body.appendChild(reset);
+  }
+
+  const poolLabel = document.createElement('div');
+  poolLabel.className = 'order-seq-label';
+  poolLabel.textContent = 'Available items:';
+  body.appendChild(poolLabel);
+
+  const pool = document.createElement('div');
+  pool.className = 'order-pool';
+  q._itemOrder.forEach(itemIdx => {
+    const used = answers[current].includes(itemIdx);
+    const chip = document.createElement('span');
+    chip.className = 'order-item' + (used ? ' used' : '');
+    chip.textContent = q.items[itemIdx];
+    if (!used && !done) {
+      chip.onclick = () => {
+        if (answers[current].length < q.items.length) {
+          answers[current].push(itemIdx);
+          renderQuestion();
+        }
+      };
+    }
+    pool.appendChild(chip);
+  });
+  body.appendChild(pool);
+}
+
+/* ---------- Grading & feedback ---------- */
+function gradeCurrent() {
+  const q = EXAM[current], a = answers[current];
+  if (q.type === 'mcq') return a === q.answer ? 1 : 0;
+  if (q.type === 'multi') {
+    const right = q.answer.slice().sort().join(',');
+    const mine = a.slice().sort().join(',');
+    return right === mine ? 1 : 0;
+  }
+  if (q.type === 'match') {
+    let c = 0;
+    a.forEach((v, i) => { if (v === q.answer[i]) c++; });
+    return c / q.terms.length;
+  }
+  if (q.type === 'order') {
+    if (a.length !== q.items.length) return 0;
+    let c = 0;
+    a.forEach((itemIdx, pos) => { if (itemIdx === pos) c++; });
+    return c / q.items.length;
+  }
+  return 0;
+}
+
+function checkAnswer() {
+  if (checked[current] || !isInputComplete(current)) return;
+  points[current] = gradeCurrent();
+  checked[current] = true;
+  renderQuestion();
+}
+
+function showFeedback(q) {
+  const pts = points[current];
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (pts === 1 ? 'ok' : pts > 0 ? 'part' : 'no');
+  const head = pts === 1 ? '✔ Correct!' : pts > 0 ? `◐ Partially correct — ${pts.toFixed(2)} / 1 point` : '✘ Incorrect';
+  fb.innerHTML = `<strong>${head}</strong>${q.why}`;
+}
+
+/* ---------- Navigation & palette ---------- */
+function renderPalette() {
+  const pal = document.getElementById('palette');
+  pal.innerHTML = '';
+  EXAM.forEach((q, i) => {
+    const b = document.createElement('button');
+    b.className = 'pal-btn' + (i === current ? ' current' : '') + (isAnswered(i) ? ' answered' : '');
+    b.textContent = i + 1;
+    b.onclick = () => gotoQuestion(i);
+    pal.appendChild(b);
+  });
+}
+
+function gotoQuestion(i) {
+  if (i < 0 || i >= EXAM.length) return;
+  current = i;
+  renderQuestion();
+}
+
+/* ---------- Results ---------- */
+function finishExam() {
+  const unchecked = checked.filter(c => !c).length;
+  let msg = `You've answered ${checked.filter(Boolean).length} of ${EXAM.length} questions.`;
+  if (unchecked > 0) msg += `\n\n${unchecked} question(s) haven't been checked yet — they score 0.`;
+  msg += '\n\nFinish and see your score report?';
+  if (!confirm(msg)) return;
+  showResults();
+}
+
+function showResults() {
+  clearInterval(timerId);
+  const total = points.reduce((s, p) => s + p, 0);
+  const pct = total / EXAM.length;
+  const scaled = Math.round(100 + 800 * pct);
+  const passed = scaled >= 750;
+
+  document.getElementById('exam-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('scaled-score').textContent = scaled;
+  const v = document.getElementById('verdict');
+  v.textContent = passed ? 'PASS ✔' : 'BELOW PASSING ✘';
+  v.className = 'verdict ' + (passed ? 'pass' : 'fail');
+  document.getElementById('raw-line').textContent =
+    `${total.toFixed(2)} of ${EXAM.length} points (${Math.round(pct * 100)}%) · Total time: ${fmtTime(elapsed)}`;
+
+  const fill = document.getElementById('scale-fill');
+  fill.style.width = '0%';
+  setTimeout(() => { fill.style.width = ((scaled - 100) / 800 * 100) + '%'; }, 60);
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Question Review</h2>';
+  EXAM.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = reviewItemHtml(q, answers[i], points[i], i);
+    review.appendChild(div);
+  });
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function reviewItemHtml(q, a, pts, i) {
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  let body = '';
+  if (!checked[i]) {
+    body = '<span class="bad">Not answered.</span>';
+  } else if (q.type === 'mcq') {
+    const ok = a === q.answer;
+    body = `Your answer: <span class="${ok ? 'ok' : 'bad'}">${letters[a]}. ${esc(q.options[a])}</span>` +
+      (ok ? '' : `<br>Correct answer: <span class="ok">${letters[q.answer]}. ${esc(q.options[q.answer])}</span>`);
+  } else if (q.type === 'multi') {
+    const ok = pts === 1;
+    const mine = a.map(x => letters[x] + '. ' + esc(q.options[x])).join('<br>') || '(none)';
+    const right = q.answer.map(x => letters[x] + '. ' + esc(q.options[x])).join('<br>');
+    body = `Your selections:<br><span class="${ok ? 'ok' : 'bad'}">${mine}</span>` +
+      (ok ? '' : `<br>Correct selections:<br><span class="ok">${right}</span>`);
+  } else if (q.type === 'match') {
+    body = q.terms.map((t, ti) => {
+      const ok = a[ti] === q.answer[ti];
+      const mine = a[ti] !== null ? q.defs[a[ti]] : '(none)';
+      const right = q.defs[q.answer[ti]];
+      return `<b>${esc(t)}</b> → <span class="${ok ? 'ok' : 'bad'}">${esc(mine)}</span>` +
+        (ok ? '' : ` &nbsp;(correct: <span class="ok">${esc(right)}</span>)`);
+    }).join('<br>');
+  } else if (q.type === 'order') {
+    const correctSeq = q.items.map((it, pos) => `${pos + 1}. ${esc(it)}`).join('<br>');
+    const mine = a.length
+      ? a.map((itemIdx, pos) => `${pos + 1}. ${esc(q.items[itemIdx])}${itemIdx === pos ? '' : ' ✗'}`).join('<br>')
+      : '(none)';
+    const okAll = pts === 1;
+    body = `Your sequence:<br><span class="${okAll ? 'ok' : 'bad'}">${mine}</span>` +
+      (okAll ? '' : `<br>Correct sequence:<br><span class="ok">${correctSeq}</span>`);
+  }
+  return `
+    <div class="qhead">
+      <span class="q"><b>Q${i + 1}.</b> ${esc(q.q)}</span>
+      <span class="pts">${pts.toFixed(2)} / 1 pt</span>
+    </div>
+    <div class="a">${body}<br><br>${esc(q.why)}</div>`;
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Questions' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"SY0-701-practice-exam-feedback-9.html",title:"SY0-701 Practice Exam 9 \u00b7 Instant Feedback (Section 10)"};</script><script src="analytics.js"></script>
+</body>
+</html>

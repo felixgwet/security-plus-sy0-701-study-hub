@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Physical Security Quiz · SY0-701 (Section 04)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 04</div>
+    <h1>Physical Security — Practice Quiz</h1>
+    <p>40 questions across all 8 lessons: fences &amp; bollards, brute force attacks, surveillance, bypassing security controls, access control vestibules, piggybacking vs. tailgating, door locks &amp; biometrics, and access badge cloning.</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  // ---- Lesson 28 · Section Intro & Core Vocabulary ----
+  {
+    lesson: "Lesson 28 · Physical Security Intro",
+    q: "What is a bollard?",
+    options: [
+      "A buried mesh barrier that prevents digging under a fence",
+      "A short, sturdy vertical post used to control vehicle access",
+      "A double-door entry system with electronically controlled doors",
+      "A sensor that detects warm bodies in low-light conditions"
+    ],
+    answer: 1,
+    why: "Bollards are short, sturdy vertical posts (steel or concrete) that control vehicle access — keeping cars and vehicle-borne threats away from a building. Buried mesh is a fence defense, the double-door system is an access control vestibule, and the warm-body sensor is infrared."
+  },
+  {
+    lesson: "Lesson 28 · Physical Security Intro",
+    q: "In physical security terms, what does 'brute force' mean?",
+    options: [
+      "Trying every possible key or code combination until one works",
+      "Forcible entry: breaking in, tampering with security devices, confronting guards, or ramming barriers",
+      "Overwhelming a server with traffic until it fails",
+      "Cloning an access badge with a handheld reader"
+    ],
+    answer: 1,
+    why: "Physical brute force means forcible entry — breaking down doors or cutting glass, tampering with security devices, confronting security personnel, and ramming barriers with vehicles. Trying every combination is the digital/crypto meaning of brute force, and badge cloning is a separate attack."
+  },
+  {
+    lesson: "Lesson 28 · Physical Security Intro",
+    q: "What is an access control vestibule?",
+    options: [
+      "A single reinforced door with a deadbolt and metal frame",
+      "A double-door system where only one door can be open at a time",
+      "A fenced walkway leading to a building entrance",
+      "A guard station with PTZ camera controls"
+    ],
+    answer: 1,
+    why: "An access control vestibule is a double-door system, electronically controlled so only one door opens at a time. A person who fails verification is held in the intermediate space between the untrusted outside and the trusted inside until security personnel intervene."
+  },
+  {
+    lesson: "Lesson 28 · Physical Security Intro",
+    q: "An authorized employee intentionally badges in a delivery driver carrying boxes who has no authorization. What is this called?",
+    options: [
+      "Tailgating",
+      "Piggybacking",
+      "Badge cloning",
+      "Shoulder surfing"
+    ],
+    answer: 1,
+    why: "Piggybacking involves two people, with the authorized one intentionally allowing the unauthorized person in — usually after social engineering (the delivery-driver-with-boxes ruse is the course's classic example). Tailgating is following someone WITHOUT their knowledge or consent."
+  },
+  {
+    lesson: "Lesson 28 · Physical Security Intro",
+    q: "An unauthorized person slips through a turnstile immediately behind an employee who badge-swiped, without the employee noticing. What is this?",
+    options: [
+      "Piggybacking",
+      "Tailgating",
+      "Impersonation",
+      "Eavesdropping"
+    ],
+    answer: 1,
+    why: "Tailgating is the covert, opportunistic act of closely following an authorized person through a checkpoint without their knowledge or consent — the turnstile scenario is the course's example. Piggybacking requires the authorized person's complicity or negligence."
+  },
+  // ---- Lesson 29 · Fencing & Bollards ----
+  {
+    lesson: "Lesson 29 · Fencing and Bollards",
+    q: "Which of the following is NOT one of the three purposes of fencing?",
+    options: [
+      "Acting as a visual deterrent and marking a boundary",
+      "Serving as a physical barrier that must be climbed, cut, or dug under",
+      "Delaying intruders to allow time for detection and response",
+      "Dissipating the energy of a ramming vehicle"
+    ],
+    answer: 3,
+    why: "Fencing deters, blocks, and delays PEOPLE. Absorbing or dissipating vehicle impact energy is the job of bollards and reinforced barriers — the vehicular-threat counterpart to fencing."
+  },
+  {
+    lesson: "Lesson 29 · Fencing and Bollards",
+    q: "To defend a fence against someone CLIMBING it, which countermeasures does the course recommend?",
+    options: [
+      "Buried mesh and an underground fence portion",
+      "A taller fence, electrification, or barbed wire",
+      "More robust fence materials plus monitoring",
+      "Bollards spaced along the fence line"
+    ],
+    answer: 1,
+    why: "Climbing is countered by making the climb harder or painful: taller fences, electrification, barbed wire. Robust materials + monitoring answer CUTTING; buried mesh answers DIGGING; bollards address vehicles, not climbers."
+  },
+  {
+    lesson: "Lesson 29 · Fencing and Bollards",
+    q: "Which fence countermeasure pair correctly matches 'cutting' and 'digging under'?",
+    options: [
+      "Cutting → buried mesh; digging → barbed wire",
+      "Cutting → robust materials and monitoring; digging → an underground fence portion or buried mesh",
+      "Cutting → electrification; digging → taller fence",
+      "Cutting → motion-activated lighting; digging → pressure sensors"
+    ],
+    answer: 1,
+    why: "Cutting is defeated with robust materials and monitoring; digging under is defeated by extending the fence underground or burying mesh. Taller/electrified/barbed-top fences are the anti-climbing measures."
+  },
+  {
+    lesson: "Lesson 29 · Fencing and Bollards",
+    q: "Why did bollards become widespread after 9/11?",
+    options: [
+      "To mark parking spaces in government lots",
+      "As an anti-terrorism measure keeping vehicle bombs outside a building's blast radius",
+      "To slow pedestrians approaching secure entrances",
+      "To replace fencing at military installations"
+    ],
+    answer: 1,
+    why: "Post-9/11, bollards were deployed as anti-terrorism measures: by keeping vehicles (and vehicle-borne IEDs) away from buildings, any blast stays outside the blast radius. They also stop ram raiding of storefronts."
+  },
+  {
+    lesson: "Lesson 29 · Fencing and Bollards",
+    q: "What does the ASTM F2656-07 rating 'M30 P1' tell you about a bollard?",
+    options: [
+      "It stops a 15,000-lb vehicle traveling 30 mph with less than 1 meter of penetration",
+      "It withstands 30 minutes of direct flame exposure",
+      "It is 30 inches tall and rated for pedestrian traffic",
+      "It stops a 30,000-lb vehicle at 15 mph"
+    ],
+    answer: 0,
+    why: "M30 P1 means the bollard stops a 15,000-lb vehicle at 30 mph with P1-level penetration — less than 1 meter past the barrier. Bollards address the primary threat of direct vehicle impact."
+  },
+  // ---- Lesson 30 · Brute Force ----
+  {
+    lesson: "Lesson 30 · Brute Force Attacks",
+    q: "In its digital sense, how many combinations must an attacker try to guarantee cracking a 4-digit PIN by brute force?",
+    options: [
+      "1,000",
+      "10,000",
+      "100,000",
+      "1,000,000"
+    ],
+    answer: 1,
+    why: "A 4-digit PIN ranges 0000–9999, which is 10,000 possible combinations. Brute force in the cyber sense means trying every possibility until one works."
+  },
+  {
+    lesson: "Lesson 30 · Brute Force Attacks",
+    q: "Which set completely covers the course's four forms of PHYSICAL brute force?",
+    options: [
+      "Phishing, pretexting, baiting, quid pro quo",
+      "Forcible entry, tampering with security devices, confronting security personnel, ramming barriers with vehicles",
+      "Cloning, skimming, jamming, spoofing",
+      "Eavesdropping, tailgating, piggybacking, dumpster diving"
+    ],
+    answer: 1,
+    why: "The four physical brute-force forms: forcible entry (including glass cutting), tampering with security devices, confronting security personnel, and ramming barriers with vehicles. The other lists are social-engineering, wireless-fraud, and intrusion techniques respectively."
+  },
+  {
+    lesson: "Lesson 30 · Brute Force Attacks",
+    q: "According to the course, what is the weakest point of a door?",
+    options: [
+      "The hinges",
+      "The lock",
+      "The door frame",
+      "The peephole"
+    ],
+    answer: 1,
+    why: "The lock is the door's weakest point. Defenses therefore focus on high-strength doors, deadbolts, metal frames, and solid-core construction to resist forcible entry."
+  },
+  {
+    lesson: "Lesson 30 · Brute Force Attacks",
+    q: "An intruder throws a heavy rug over the barbed wire topping a fence and climbs over. Which brute-force form is this?",
+    options: [
+      "Ramming",
+      "Tampering with security devices",
+      "Climbing/cutting the fence — a form of forcible entry",
+      "Confronting security personnel"
+    ],
+    answer: 2,
+    why: "Fences can be climbed, cut, or rammed — the rug-over-barbed-wire trick is a forcible-entry technique against the fence itself. Nothing was rammed and no guard was confronted, and the barbed wire wasn't disabled in advance, so it isn't tampering with security devices."
+  },
+  {
+    lesson: "Lesson 30 · Brute Force Attacks",
+    q: "Which defenses does the course recommend against forcible entry through glass?",
+    options: [
+      "Tinted windows and blackout curtains",
+      "Reinforced or laminated windows",
+      "Alarm stickers and dummy cameras",
+      "Frosted glass and window locks"
+    ],
+    answer: 1,
+    why: "Glass cutting is a forcible-entry technique, and the defense is reinforced or laminated windows that resist cutting and breaking. For doors: high-strength construction, deadbolts, metal frames, solid cores."
+  },
+  // ---- Lesson 31 · Surveillance ----
+  {
+    lesson: "Lesson 31 · Surveillance",
+    q: "Which of the four surveillance categories is described as the most flexible and adaptable?",
+    options: [
+      "Video surveillance",
+      "Security guards",
+      "Lighting",
+      "Sensors"
+    ],
+    answer: 1,
+    why: "Security guards are the most flexible and adaptable control — they can detect unusual behavior, make judgment calls, respond immediately, and act as a visual deterrent. Cameras, lights, and sensors all do fixed jobs."
+  },
+  {
+    lesson: "Lesson 31 · Surveillance",
+    q: "What does PTZ stand for in camera systems, and where are PTZ cameras typically operated?",
+    options: [
+      "Pressure-Trip Zone — automated doorways",
+      "Pan-Tilt-Zoom — from a central guard-operated monitoring station",
+      "Point-Track-Zoom — retail anti-theft tags",
+      "Passive-Trigger-Zonal — lighting control rooms"
+    ],
+    answer: 1,
+    why: "PTZ = Pan-Tilt-Zoom. These cameras can be remotely aimed and zoomed, and are typically operated by guards at a central monitoring station covering entrances/exits of critical infrastructure."
+  },
+  {
+    lesson: "Lesson 31 · Surveillance",
+    q: "What is the main trade-off of WIRELESS surveillance cameras compared with wired ones?",
+    options: [
+      "They are harder to install but cannot be jammed",
+      "They are easier to install but susceptible to jamming and interference",
+      "They record in higher resolution than wired cameras",
+      "They do not require a monitoring station"
+    ],
+    answer: 1,
+    why: "Wireless cameras are easier to install (no cabling run), but their signals can be jammed or interfered with — the classic convenience-vs-security trade-off. Wired cameras are cabled directly to the monitoring station."
+  },
+  {
+    lesson: "Lesson 31 · Surveillance",
+    q: "Which sensor works by echolocation — emitting sound waves and measuring their reflection, like a bat?",
+    options: [
+      "Infrared",
+      "Pressure",
+      "Microwave",
+      "Ultrasonic"
+    ],
+    answer: 3,
+    why: "Ultrasonic sensors use echolocation (the course's bat analogy) and are common in automated doors and indoor spaces. Infrared senses heat, pressure senses weight, and microwave emits pulses that measure reflection over large areas."
+  },
+  {
+    lesson: "Lesson 31 · Surveillance",
+    q: "A warehouse needs motion sensing across a very large open area, but managers are warned about false alarms. Which sensor fits, and what is the caveat?",
+    options: [
+      "Pressure sensors — they wear out quickly under heavy loads",
+      "Microwave sensors — they cover large areas but are prone to false alarms at high sensitivity",
+      "Ultrasonic sensors — they cannot detect slow movement",
+      "Infrared sensors — they only work in total darkness"
+    ],
+    answer: 1,
+    why: "Microwave sensors emit pulses and measure reflection, covering large areas — but at high sensitivity they produce false alarms. Infrared actually excels in low light; pressure needs contact/weight; ultrasonic is best indoors."
+  },
+  // ---- Lesson 32 · Bypassing Security Controls ----
+  {
+    lesson: "Lesson 32 · Bypassing Security Controls",
+    q: "A night-shift camera review shows a lens covered in spray paint and foam, with stickers taped around the housing. Which bypass category is this?",
+    options: [
+      "Interfering with electromagnetics",
+      "Visual obstruction",
+      "Attacking the physical environment",
+      "Physical tampering"
+    ],
+    answer: 1,
+    why: "Spray paint, foam, and stickers/tape over a lens are textbook visual obstruction (balloons and umbrellas over a lens are the other course examples). It only becomes 'physical tampering' if wires are cut or the device is damaged."
+  },
+  {
+    lesson: "Lesson 32 · Bypassing Security Controls",
+    q: "How can an attacker blind an INFRARED motion sensor?",
+    options: [
+      "Aim a laser pointer at its lens",
+      "Heat up the room so the sensor can no longer distinguish body heat",
+      "Play loud music near it",
+      "Cut its power cable"
+    ],
+    answer: 1,
+    why: "Infrared sensors detect warm bodies, so raising the room's temperature masks a person's heat signature. Lasers blind cameras visually; loud music interferes with acoustics; cutting the cable is physical tampering."
+  },
+  {
+    lesson: "Lesson 32 · Bypassing Security Controls",
+    q: "Which countermeasure protects wireless systems against both jamming and eavesdropping?",
+    options: [
+      "Brighter lighting around the facility",
+      "Encrypted frequency hopping",
+      "Laminated glass on exterior windows",
+      "A backup generator"
+    ],
+    answer: 1,
+    why: "Encrypted frequency hopping defeats attempts to jam or eavesdrop on wireless communications by constantly changing frequencies and encrypting the traffic. The other options address visibility, forcible entry, and power loss respectively."
+  },
+  {
+    lesson: "Lesson 32 · Bypassing Security Controls",
+    q: "An attacker unplugs a camera's power cable and later sabotages an outdoor transformer. Which two bypass categories are involved?",
+    options: [
+      "Visual obstruction and acoustic interference",
+      "Attacking the physical environment and physical tampering",
+      "Electromagnetic interference and blinding",
+      "Tailgating and piggybacking"
+    ],
+    answer: 1,
+    why: "Killing the power supply — unplugging devices, tampering with power boxes, sabotaging transformers — is attacking the physical environment; crude wire-cutting up close is physical tampering. Both are defeated by UPS/backup power and tamper alarms."
+  },
+  {
+    lesson: "Lesson 32 · Bypassing Security Controls",
+    q: "Which defense set does the course pair with the bypass methods in this lesson?",
+    options: [
+      "Tamper alarms, UPS/backup power, and encrypted frequency hopping",
+      "Deadbolts, cipher locks, and bollards",
+      "Facial recognition, retina scans, and PIN pads",
+      "Shielded wallets, MFA, and access-log audits"
+    ],
+    answer: 0,
+    why: "The lesson's countermeasures are tamper alarms (detect obstruction/tampering), UPS and backup power (defeat power-supply attacks), and encrypted frequency hopping (defeat wireless jamming/eavesdropping). The other sets are physical-barrier, biometric, and badge-cloning defenses."
+  },
+  // ---- Lesson 33 · Access Control Vestibules ----
+  {
+    lesson: "Lesson 33 · Access Control Vestibules",
+    q: "Why does a single-person-sized access control vestibule help prevent piggybacking and tailgating?",
+    options: [
+      "It weighs each person to detect two bodies",
+      "There is simply not enough room for two people to pass together",
+      "It photographs every face for facial recognition",
+      "It jams wireless badge signals so only one badge works at a time"
+    ],
+    answer: 1,
+    why: "Many vestibules are only large enough for one person, so a second person physically cannot slip in with or behind an authorized user. It's a space design control, not a weighing, imaging, or jamming control."
+  },
+  {
+    lesson: "Lesson 33 · Access Control Vestibules",
+    q: "A visitor enters the outer door of a vestibule, which locks behind them. Their badge check fails. What happens next?",
+    options: [
+      "The inner door opens on a timer so they can be escorted",
+      "They remain trapped in the vestibule until security personnel intervene",
+      "Both doors unlock to let them leave immediately",
+      "An alarm sounds and the doors electrify"
+    ],
+    answer: 1,
+    why: "A failed verification leaves the person stuck in the intermediate space between untrusted outside and trusted inside until security decides to let them in or send them back out the outer door. That's the whole point of only one door opening at a time."
+  },
+  {
+    lesson: "Lesson 33 · Access Control Vestibules",
+    q: "Besides acting as a visual deterrent, what two checkpoint roles do security guards serve at vestibules?",
+    options: [
+      "Programming badges and repairing readers",
+      "Verification assistance (e.g., badge system down, visitors) and immediate response to breaches",
+      "Cleaning the vestibule and replacing locks",
+      "Monitoring firewall logs and patching cameras"
+    ],
+    answer: 1,
+    why: "Guards verify identity when electronic badging fails or visitors arrive (issuing temporary badges per policy), and provide immediate response — confronting an intruder or initiating emergency protocols. The human element backs up the technology."
+  },
+  {
+    lesson: "Lesson 33 · Access Control Vestibules",
+    q: "Every time an employee badges through a checkpoint, the action is logged. What is the primary security value of this?",
+    options: [
+      "It speeds up the badge reader's response time",
+      "It creates an audit trail that can be reviewed if a security breach occurs",
+      "It encrypts the badge data for cloning protection",
+      "It disables lost badges automatically"
+    ],
+    answer: 1,
+    why: "Badge-use logging builds an audit trail — who passed which checkpoint and when — that investigators can review after a breach. It's also the same log that later catches cloned-badge 'impossible travel' usage."
+  },
+  {
+    lesson: "Lesson 33 · Access Control Vestibules",
+    q: "Which statement correctly distinguishes piggybacking from tailgating?",
+    options: [
+      "Piggybacking is covert; tailgating requires the victim's consent",
+      "Piggybacking involves complicity or negligence by an authorized person; tailgating happens without the authorized person's knowledge or consent",
+      "They are two words for the same social-engineering technique",
+      "Piggybacking only happens at turnstiles; tailgating only at mantraps"
+    ],
+    answer: 1,
+    why: "Piggybacking = the authorized person intentionally (or negligently) lets the attacker in — typically via social engineering. Tailgating = opportunistically following an authorized person through a checkpoint without their knowledge or consent. The victim's complicity is the dividing line."
+  },
+  // ---- Lesson 34 · Door Locks ----
+  {
+    lesson: "Lesson 34 · Door Locks",
+    q: "Why does the course say all perimeter defenses become useless at some point? When is that point?",
+    options: [
+      "When fences rust — after about ten years",
+      "The moment somebody has entered the building and can roam the halls",
+      "When guards change shifts at night",
+      "When cameras reach the end of their storage cycle"
+    ],
+    answer: 1,
+    why: "Fences, bollards, cameras, and lobby guards all protect the boundary. Once a person is inside and walking the halls, interior protections — above all door locks on server rooms, network closets, and offices — are what protect sensitive data."
+  },
+  {
+    lesson: "Lesson 34 · Door Locks",
+    q: "Which two tools does a lock picker use to defeat a basic pin-and-tumbler padlock in about 15 seconds?",
+    options: [
+      "A bump key and a screwdriver",
+      "A lock pick and a tension wrench",
+      "A drill and a bolt cutter",
+      "A magnet and a shim"
+    ],
+    answer: 1,
+    why: "The course demo uses a lock pick (single tooth to move pins up and down) plus a tension wrench applying constant turning pressure. Basic padlocks use a pin-and-tumbler system that is easy to defeat this way."
+  },
+  {
+    lesson: "Lesson 34 · Door Locks",
+    q: "What is a cipher lock?",
+    options: [
+      "An electronic lock that unlocks via Wi-Fi",
+      "A mechanical locking mechanism with numbered push buttons requiring the correct combination",
+      "A lock that uses a rotating cipher disk like a safe",
+      "A biometric lock using fingerprint templates"
+    ],
+    answer: 1,
+    why: "A cipher lock is an older mechanical lock: numbered push buttons, correct combination required. Cipher locks are used on server rooms, network closets, and other high-security areas; they cost more than office locks but give higher protection."
+  },
+  {
+    lesson: "Lesson 34 · Door Locks",
+    q: "In biometrics, the False Acceptance Rate (FAR) is the rate at which the system:",
+    options: [
+      "Denies a user who should have been allowed access",
+      "Accepts a user who should NOT have been granted access",
+      "Fails to enroll a new user's fingerprint",
+      "Locks out after three failed attempts"
+    ],
+    answer: 1,
+    why: "FAR = the system authenticates someone as valid even though they should not be granted access — a security failure. (Denying an authorized user is the False Rejection Rate, a usability failure.) Ideally FAR goes to zero as sensitivity rises — but that raises FRR."
+  },
+  {
+    lesson: "Lesson 34 · Door Locks",
+    q: "What does the Crossover Error Rate (CER) measure, and what should a buyer look for?",
+    options: [
+      "The point where FAR equals FRR — a lower CER means a better biometric system",
+      "The maximum number of fingerprints the system can store — higher is better",
+      "The speed of a single scan — lower is better",
+      "The percentage of power the lock saves — higher is better"
+    ],
+    answer: 0,
+    why: "The CER (aka Equal Error Rate) is where False Acceptance and False Rejection Rates intersect. It's the standard effectiveness measure for biometric systems — the lower the CER, the better the balance of security and convenience."
+  },
+  // ---- Lesson 35 · Access Badge Cloning ----
+  {
+    lesson: "Lesson 35 · Access Badge Cloning",
+    q: "Place the access badge cloning attack in the course's correct order of steps.",
+    options: [
+      "Writing, scanning, extraction, using",
+      "Scanning, data extraction, writing to a new card or device, using the clone",
+      "Extraction, scanning, using, writing",
+      "Scanning, using, extraction, writing"
+    ],
+    answer: 1,
+    why: "The four steps: (1) scan/read the badge with a handheld RFID/NFC reader, (2) extract the identifier/credentials from the capture, (3) write them to a blank card or device, (4) use the clone, which behaves exactly like the original."
+  },
+  {
+    lesson: "Lesson 35 · Access Badge Cloning",
+    q: "Which cloning ranges does the course give for NFC and RFID badges (with a normal reader)?",
+    options: [
+      "NFC 1–2 inches; RFID 2–10 inches",
+      "NFC 2–10 feet; RFID 1–2 feet",
+      "NFC 10–20 inches; RFID 20–30 inches",
+      "Both up to 50 feet with any reader"
+    ],
+    answer: 0,
+    why: "Attackers must get close: about 1–2 inches for NFC and 2–10 inches for RFID. A stronger antenna can roughly double those ranges, but the attacker still needs proximity — which is why shielded wallets work as a defense."
+  },
+  {
+    lesson: "Lesson 35 · Access Badge Cloning",
+    q: "In the course demonstration, which device reads a 125 kHz RFID tag, stores the code, and then either emulates the badge or writes it to a blank tag?",
+    options: [
+      "A software-defined radio laptop",
+      "The Flipper Zero",
+      "A NFC-enabled smartphone with a stock wallet app",
+      "A rubber ducky USB keystroke injector"
+    ],
+    answer: 1,
+    why: "The Flipper Zero is the course's cloning tool of choice: compact, stores many scanned codes, reads 125 kHz RFID, then either emulates the badge at the reader or writes the code to a blank RFID tag."
+  },
+  {
+    lesson: "Lesson 35 · Access Badge Cloning",
+    q: "Which defense makes a cloned badge useless even after a perfect copy has been made?",
+    options: [
+      "Shielded wallets and sleeves",
+      "Multifactor authentication — the badge plus a PIN, password, or biometric",
+      "Monitoring and auditing access logs",
+      "User education and awareness training"
+    ],
+    answer: 1,
+    why: "MFA is the control that neutralizes an already-cloned badge: the attacker still needs the second factor (e.g., the victim's 8-digit PIN). Shielding prevents cloning, and log audits detect cloning — but only MFA defeats the clone at the door."
+  },
+  {
+    lesson: "Lesson 35 · Access Badge Cloning",
+    q: "A badge is used to enter the office at 9:04 a.m., but the badge owner is verified to be at a conference across the country. Which control should have flagged this, and what does it indicate?",
+    options: [
+      "A pressure sensor mat — two people stepped on it at once",
+      "Access-log monitoring and auditing — impossible usage indicating a cloned badge",
+      "A tamper alarm — the reader was forced open",
+      "An ultrasonic sensor — the clone echoes incorrectly"
+    ],
+    answer: 1,
+    why: "Regular review of access logs catches anomalies like 'impossible travel' — the badge being used while the owner is elsewhere — a strong indicator of cloning. It's the detective control; MFA and shielding are the preventive ones."
+  }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"physical-security-quiz.html",title:"Physical Security Quiz \u00b7 SY0-701 (Section 04)"};</script><script src="analytics.js"></script>
+</body>
+</html>

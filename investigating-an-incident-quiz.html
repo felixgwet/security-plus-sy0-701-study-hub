@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Investigating an Incident Quiz · SY0-701 (Section 25)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 25</div>
+    <h1>Investigating an Incident — Practice Quiz</h1>
+    <p>43 questions across the investigation lessons — reading dashboards, automated reports, vulnerability scans, packet captures, firewall/WAF logs, application/endpoint/OS logs, IPS/IDS logs, network logs, and metadata. Pick an answer to see why.</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+{ lesson: "235 - Investigating an Incident", q: "A web server log shows a query string: laptops'; DROP TABLE users; --. This indicates:", options: ["A port scan", "An SQL injection attack", "A SYN flood", "ARP spoofing"], answer: 1, why: "The apostrophe closes the string and DROP TABLE is injected SQL — classic SQL injection." },
+{ lesson: "235 - Investigating an Incident", q: "The BEST mitigation for the SQL injection seen in web server logs is:", options: ["A web application firewall performing input sanitization between users and the database", "Disabling DNS", "MAC filtering", "Longer passwords"], answer: 0, why: "A WAF detects and blocks SQLi patterns and sanitizes input before it reaches the database." },
+{ lesson: "236 - Investigating with Data", q: "A SIEM analyst notices failed authentication attempts trending upward. This trend may indicate:", options: ["Patching success", "A brute-force attack in progress", "A DNS misconfiguration", "Backup completion"], answer: 1, why: "Rising failed logins across the SIEM are a classic brute-force indicator." },
+{ lesson: "236 - Investigating with Data", q: "For SIEM correlation across systems, timestamps should be normalized to:", options: ["Each device's local zone", "UTC (Universal Time)", "GMT+8", "The CEO's time zone"], answer: 1, why: "Mixed time zones destroy correlation; standardize on UTC." },
+{ lesson: "236 - Investigating with Data", q: "Overly high SIEM sensor sensitivity risks:", options: ["Too little data", "Overloading the SIEM with processing, bandwidth, and storage costs", "Automatic patching", "Faster alerts"], answer: 1, why: "Logging everything floods the SIEM — tune sensitivity to balance visibility and cost." },
+{ lesson: "236 - Investigating with Data", q: "Which log collection tool is cross-platform (Linux, Unix, AND Windows) and open source?", options: ["Rsyslog", "Syslog-ng", "NXLog", "Journald"], answer: 2, why: "Rsyslog and Syslog-ng are Linux/Unix-only; NXLog runs on Windows too." },
+{ lesson: "236 - Investigating with Data", q: "On a Linux system, which command queries and displays logs from the journald logging service?", options: ["journalctl", "netstat", "tcpdump", "grep -i"], answer: 0, why: "journalctl is the command-line utility for journald (systemd's logging service)." },
+{ lesson: "236 - Investigating with Data", q: "NetFlow differs from full packet capture in that NetFlow:", options: ["Captures packet payloads", "Summarizes traffic metadata (origin, destination, volume) without contents", "Only works on switches", "Is an open-source tool"], answer: 1, why: "NetFlow records metadata/summaries — it can't show which file crossed the wire." },
+{ lesson: "236 - Investigating with Data", q: "sFlow reduces monitoring data size by:", options: ["Capturing every packet", "Sampling — capturing one out of every N packets (e.g. 1 of 100)", "Compressing payloads", "Disabling logging"], answer: 1, why: "sFlow = Sampled Flow — statistically samples packets for monitoring." },
+{ lesson: "236 - Investigating with Data", q: "IPFIX is most directly associated with:", options: ["Disk imaging", "Exporting IP flow information for measurement, accounting, and billing", "Email filtering", "Password cracking"], answer: 1, why: "IPFIX (IP Flow Information Export) standardizes flow export — e.g. billing per GB used." },
+{ lesson: "236 - Investigating with Data", q: "Metadata is best defined as:", options: ["Encrypted file contents", "Data about data — e.g. call times, numbers, and durations without conversation content", "A type of firewall", "Deleted files"], answer: 1, why: "Metadata describes other data: who, when, how long — not the content itself." },
+{ lesson: "237 - Dashboards", q: "On a Splunk security dashboard, 'endpoint notables' jumping from ~100 to ~1000 in an hour suggests:", options: ["A reporting error", "Endpoints may be under attack and warrant drill-down investigation", "Successful patching", "Bandwidth savings"], answer: 1, why: "Trend spikes against baseline signal incidents — click to drill into the affected hosts." },
+{ lesson: "237 - Dashboards", q: "Dashboard urgency levels, from lowest to highest, include:", options: ["Unknown, informational, low, medium, high, critical", "Critical, high, medium, low", "Red, yellow, green", "Bronze, silver, gold"], answer: 0, why: "Unknown → informational → low → medium → high → critical; goal = drive criticals to zero." },
+{ lesson: "238 - Automated Reports", q: "In the EDR report, a critical alert at 4:53 a.m. showed rapid file access matching known ransomware footprints. Automated playbook actions included:", options: ["Suspending the user account, isolating the host, and initiating backups", "Sending a memo", "Ignoring off-hours activity", "Deleting all logs"], answer: 0, why: "Automated response: suspend user, kick host off network/isolate, and start backup procedures." },
+{ lesson: "238 - Automated Reports", q: "20+ failed admin logins in under 5 minutes on the domain controller from an INTERNAL IP suggests:", options: ["A DNS outage", "An insider threat or a host already compromised via phishing/social engineering", "Routine maintenance", "A printer error"], answer: 1, why: "Internal-originated DC attacks mean the attacker is inside the perimeter." },
+{ lesson: "238 - Automated Reports", q: "An informational alert shows FileZilla installed with a hash not matching a known-safe version. The BEST first step is to:", options: ["Reimage the whole network", "Verify with the user whether they installed it (policy violation vs. compromised account)", "Ignore informational alerts", "Disable the firewall"], answer: 1, why: "User confirmation distinguishes an acceptable-use violation from account compromise." },
+{ lesson: "239 - Vulnerability Scans", q: "A scan flags a Linux server as missing Microsoft hotfix MS21-087. The analyst should:", options: ["Install the hotfix", "Treat it as a likely false positive and validate manually", "Reinstall Linux", "Block port 80"], answer: 1, why: "Platform-mismatched findings are classic false positives — validate before remediating." },
+{ lesson: "239 - Vulnerability Scans", q: "An unauthenticated RDP remote code execution flaw on desktops versus an authenticated RCE on the Exchange Server — which did the course call more severe per-host, and why?", options: ["Exchange — higher CVSS because email impacts the whole organization", "RDP — unauthenticated means anyone can exploit it, no credentials needed", "Neither matters", "They are identical"], answer: 1, why: "Unauthenticated attacks are reachable by anyone; the Exchange CVE still scored higher due to organization-wide impact." },
+{ lesson: "239 - Vulnerability Scans", q: "When no patch or upgrade exists for a vulnerable Apache Druid server, the report recommends:", options: ["Compensating controls or other mitigations", "Waiting indefinitely", "Publishing the CVE", "Disabling the scanner"], answer: 0, why: "When remediation isn't possible (no update or platform can't run it), use compensating controls." },
+{ lesson: "239 - Vulnerability Scans", q: "Log4Shell (CVE-2021-44228) remediation per the course:", options: ["Update Log4j to version 2.15.0 or higher", "Disable TLS", "Change DNS servers", "Buy more bandwidth"], answer: 0, why: "Log4Shell is the Apache Log4j RCE; 2.15.0+ closes it." },
+{ lesson: "239 - Vulnerability Scans", q: "The Exchange Server critical finding matters far less if:", options: ["It is being decommissioned tomorrow", "The CEO uses email", "It has a sticker on it", "The scan ran at night"], answer: 0, why: "Organizational context changes priority — imminent decommissioning makes the CVE moot." },
+{ lesson: "239 - Vulnerability Scans", q: "CVE details (impact, exploitation, mitigations) can be looked up at:", options: ["cve.org", "dns.google", "speedtest.net", "github.com only"], answer: 0, why: "cve.org (MITRE's CVE site) holds full vulnerability records." },
+{ lesson: "240 - Packet Captures", q: "A capture shows one source sending SYNs to destination ports 80, 23, 22, 21, 443 in sequence. This is:", options: ["A SYN flood", "An Nmap port scan", "ARP spoofing", "DNS resolution"], answer: 1, why: "Sequential SYN probes across many ports from one host = port scan reconnaissance." },
+{ lesson: "240 - Packet Captures", q: "Thousands of SYN packets from ONE source with no SYN-ACK or ACK replies completing the handshake indicate:", options: ["Normal browsing", "A SYN flood denial-of-service attack (half-open connections)", "A completed download", "Video streaming"], answer: 1, why: "Incomplete three-way handshakes exhaust server resources = SYN flood DoS." },
+{ lesson: "240 - Packet Captures", q: "3,500 packets in ~1.75 seconds hitting ONE destination from MANY different source IPs (192.168.1.101, .102, .103...) indicates:", options: ["A single-user port scan", "A distributed denial-of-service (DDoS) attack", "Routine backups", "Email delivery"], answer: 1, why: "Many sources hammering one victim = DDoS, typically from a botnet." },
+{ lesson: "240 - Packet Captures", q: "Why must you record when a packet capture started?", options: ["To satisfy licensing", "Packet timestamps are elapsed-time offsets, so the start time lets you correlate with SIEM logs", "To compress the file", "To encrypt the capture"], answer: 1, why: "Elapsed-time timestamps only become meaningful when anchored to the real start time." },
+{ lesson: "241 - Firewall Logs", q: "A firewall log shows one external IP stepping through destination ports 22, 80, 443, 8080 — all blocked. This is:", options: ["A port scan blocked by the firewall", "Successful web browsing", "A DHCP lease", "A DNS zone transfer"], answer: 0, why: "One source probing multiple closed services = external port scan; the firewall did its job." },
+{ lesson: "241 - Firewall Logs", q: "In WAF logs, HTTP status 403 means:", options: ["OK", "Forbidden — the server understood but refused the request (blocked)", "Server not found", "Redirect"], answer: 1, why: "200 = OK; 403 = Forbidden — here, the WAF refusing a malicious request." },
+{ lesson: "241 - Firewall Logs", q: "A WAF log URI contains: /search?q=' DROP TABLE users --. This is:", options: ["A harmless search", "A destructive SQL injection attempt (blocked, we hope)", "A CSS error", "A firmware update"], answer: 1, why: "DROP TABLE is a destructive SQL command — classic SQLi signature." },
+{ lesson: "241 - Firewall Logs", q: "A URI containing a WAIT FOR DELAY pattern indicates:", options: ["A time-based blind SQL injection", "A CSS fix", "An FTP upload", "A DNS query"], answer: 0, why: "Forced delays let attackers infer database responses blindly — time-based SQLi." },
+{ lesson: "242 - Application Logs", q: "In the word-processor application log, which file was malicious?", options: ["AnnualReport.docx", "Q3-Financials.docx — its macro matched known malware and was quarantined", "MeetingNotes.docx", "Budget_Planning.xlsx"], answer: 1, why: "Events 5400–5403 and 5409 all flag Q3-Financials.docx's macro." },
+{ lesson: "242 - Application Logs", q: "The sequence 'macro execution attempt blocked → macro security alert → scan matches known malware → file quarantined' shows:", options: ["A printer jam", "Defense-in-depth catching a malicious macro before execution", "A failed update", "User training"], answer: 1, why: "Layered controls detected, warned, identified, and isolated the malicious document." },
+{ lesson: "243 - Endpoint Logs", q: "In the endpoint log, setup.exe was a 'stage one dropper,' meaning it:", options: ["Is the final payload", "Downloads the larger stage-two payload containing the real malicious code", "Is antivirus software", "Cleans the registry"], answer: 1, why: "Stage 1 droppers fetch and launch the real payload (update.bin in the example)." },
+{ lesson: "243 - Endpoint Logs", q: "The clearest sign of data exfiltration in the endpoint log chain was:", options: ["Browser launch", "Unusual outbound traffic following the malicious process and registry changes", "A screensaver", "A template load"], answer: 1, why: "malproc.exe beaconing data out after disabling AV and modifying the registry = exfiltration." },
+{ lesson: "244 - OS-specific Security Logs", q: "Smart-card PIN attempts of 123456, 123457, 123458 every two seconds indicate:", options: ["A dictionary attack", "A brute-force attack", " shoulder surfing only", "A BIOS update"], answer: 1, why: "Sequential incrementing guesses = brute force; random-looking guesses also fit." },
+{ lesson: "244 - OS-specific Security Logs", q: "Login attempts using puppy, baseball, cupcake, and loved indicate:", options: ["A brute-force attack", "A dictionary attack", "A SYN flood", "ARP poisoning"], answer: 1, why: "Common dictionary words (even leetspeak variants like b@seball) = dictionary attack." },
+{ lesson: "245 - IPS IDS Logs", q: "A log showing a 'blocking' action tells you this device is a(n):", options: ["IDS", "IPS", "Firewall log only", "SIEM dashboard"], answer: 1, why: "Only an IPS (prevention) blocks inline; IDS only detects and alerts." },
+{ lesson: "245 - IPS IDS Logs", q: "Among six HIGH events, the top investigation priority is the one that was:", options: ["Blocked", "Alerted (not blocked) — data exfiltration that may have succeeded", "Informational", "From localhost"], answer: 1, why: "Blocked highs were mitigated; the alerted exfiltration got through — find out what was taken." },
+{ lesson: "246 - Network Logs", q: "A router log shows repeated ARP replies mapping IP 192.168.1.10 to two DIFFERENT MAC addresses within seconds. This indicates:", options: ["Normal operation", "Possible ARP spoofing (MAC flipping)", "DNS success", "A completed backup"], answer: 1, why: "One IP claiming multiple MACs rapidly = someone spoofing ARP responses." },
+{ lesson: "246 - Network Logs", q: "Outbound traffic to 8.8.8.8 over UDP port 53 in a router log is:", options: ["Suspicious", "Normal DNS queries to Google's public DNS", "Ransomware", "Telnet"], answer: 1, why: "8.8.8.8:53/UDP is Google's DNS — routine name resolution." },
+{ lesson: "247 - Metadata", q: "The most common way to block a known-malicious file network-wide using metadata is by its:", options: ["File name", "MD5/SHA-256 checksum (digital fingerprint)", "File size", "Icon"], answer: 1, why: "Hashes uniquely identify the file (including its malware) regardless of name changes." },
+{ lesson: "247 - Metadata", q: "A file named invoice.pdf whose true internal type is an executable is suspicious due to:", options: ["Its color", "An extension/type mismatch — .pdf hiding an .exe", "Its owner", "Its file size alone"], answer: 1, why: "Windows trusts extensions; Linux/Mac inspect content bytes — a mismatch screams malware." },
+{ lesson: "247 - Metadata", q: "Malware running from C:\TEMP\ rather than a user's Documents folder is:", options: ["Standard practice", "A suspicious indicator often seen in malware behavior", "Required by Windows", "A compliance control"], answer: 1, why: "Temp-directory execution is a common malware indicator supporting IoC analysis." }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"investigating-an-incident-quiz.html",title:"Investigating an Incident Quiz \u00b7 SY0-701 (Section 25)"};</script><script src="analytics.js"></script>
+</body>
+</html>

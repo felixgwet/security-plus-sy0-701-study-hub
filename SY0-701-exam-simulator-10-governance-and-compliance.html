@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SY0-701 Exam Simulator 10 · Governance and Compliance (Section 11)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #f0883e;
+    --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+    --blue: #58a6ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 860px; }
+
+  /* ---------- Start / Result ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 36px;
+  }
+  .screen.center { text-align: center; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(240,136,62,.4);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 14px; }
+  .screen p { color: var(--muted); line-height: 1.65; margin-bottom: 10px; font-size: 15px; }
+  .exam-facts {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin: 22px 0 6px;
+  }
+  .fact {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .fact b { display: block; color: var(--text); font-size: 17px; margin-bottom: 2px; }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 32px;
+    cursor: pointer;
+    margin-top: 22px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    margin-left: 8px;
+  }
+  .btn.nav-btn { margin-top: 0; padding: 10px 24px; }
+  .score-big { font-size: 60px; font-weight: 700; margin: 10px 0 2px; }
+  .pass-line { color: var(--muted); font-size: 14px; margin-bottom: 4px; }
+  .verdict { font-size: 18px; font-weight: 600; margin: 8px 0 2px; }
+  .verdict.pass { color: var(--green); }
+  .verdict.fail { color: var(--red); }
+  .scale-track {
+    position: relative;
+    height: 10px;
+    background: var(--border);
+    border-radius: 5px;
+    margin: 26px auto 6px;
+    max-width: 560px;
+  }
+  .scale-pass-mark {
+    position: absolute; left: 81.25%; top: -5px; bottom: -5px;
+    width: 2px; background: var(--gold);
+  }
+  .scale-fill {
+    height: 100%;
+    border-radius: 5px;
+    background: linear-gradient(90deg, var(--red), var(--gold) 70%, var(--green));
+    width: 0%;
+    transition: width 1s ease;
+  }
+  .scale-labels {
+    display: flex; justify-content: space-between;
+    max-width: 560px; margin: 0 auto;
+    font-size: 12px; color: var(--muted);
+  }
+  .review { text-align: left; margin-top: 30px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .qhead { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  .review-item .pts { color: var(--muted); white-space: nowrap; }
+  .review-item .q { line-height: 1.5; margin-bottom: 6px; }
+  .review-item .a { color: var(--muted); line-height: 1.55; }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+
+  /* ---------- Exam layout ---------- */
+  .exam-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  .timer { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .timer.low { color: var(--red); }
+  .qtype-tag {
+    display: inline-block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid rgba(240,136,62,.35);
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin-bottom: 10px;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 26px 28px;
+  }
+  .q-text { font-size: 17px; line-height: 1.55; margin-bottom: 20px; }
+  .pick-hint { font-size: 13px; color: var(--gold); margin: -12px 0 16px; font-weight: 600; }
+
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 15px;
+    margin-bottom: 9px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    user-select: none;
+  }
+  .option:hover { border-color: var(--accent); }
+  .option.selected { border-color: var(--accent); background: var(--accent-dim); }
+  .option .letter { display: inline-block; width: 22px; font-weight: 700; color: var(--muted); }
+
+  /* matching */
+  .match-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .match-term {
+    min-width: 190px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .match-arrow { color: var(--muted); }
+  select.match-select {
+    flex: 1;
+    min-width: 220px;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  select.match-select.selected { border-color: var(--accent); }
+
+  /* ordering */
+  .order-pool { margin-bottom: 16px; }
+  .order-seq {
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    min-height: 54px;
+    margin-bottom: 16px;
+  }
+  .order-seq .placeholder { color: var(--muted); font-size: 13px; }
+  .order-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 14px;
+    margin: 4px 6px 4px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .order-item:hover { border-color: var(--accent); }
+  .order-item .num {
+    display: inline-block;
+    width: 20px; height: 20px;
+    line-height: 20px;
+    text-align: center;
+    background: var(--accent);
+    color: #0d1117;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .order-item.used { opacity: .35; pointer-events: none; }
+  .order-reset {
+    background: none; border: none; color: var(--blue);
+    font-size: 13px; cursor: pointer; margin-bottom: 8px;
+  }
+
+  /* exam footer */
+  .exam-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .flag-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .flag-btn.flagged { color: var(--gold); border-color: var(--gold); background: rgba(210,153,34,.1); }
+
+  /* palette */
+  .palette {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-top: 18px;
+  }
+  .palette h3 { font-size: 13px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
+  .pal-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pal-btn {
+    width: 34px; height: 34px;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    position: relative;
+  }
+  .pal-btn.current { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .pal-btn.answered::after {
+    content: '';
+    position: absolute;
+    right: 3px; top: 3px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+  .pal-btn.flagged::before {
+    content: '⚑';
+    position: absolute;
+    left: -4px; top: -8px;
+    font-size: 11px;
+    color: var(--gold);
+  }
+  .legend { display: flex; gap: 16px; margin-top: 10px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+  .legend span::before { content: '● '; }
+  .legend .l-ans::before { color: var(--green); }
+  .legend .l-flag::before { content: '⚑ '; color: var(--gold); }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen center">
+    <div class="badge">CompTIA Security+ SY0-701 · Exam Simulation Mode</div>
+    <h1>Security+ Exam Simulator 10 — Governance and Compliance</h1>
+    <p><b style="color:var(--text)">This mimics real exam conditions, unlike the practice quiz.</b> A completely new question set covering the five-step risk management lifecycle, the four risk assessment frequencies (ad-hoc, recurring, one-time, continuous), risk identification and the business impact analysis, the RTO / RPO / MTTR / MTBF metrics, the risk register with KRIs and risk owners, risk appetite vs tolerance, qualitative vs quantitative analysis with SLE / EF / ARO / ALE calculations, the four treatment strategies (transfer, accept, avoid, mitigate), and risk monitoring & reporting with residual and control risk. Question styles match CompTIA: single-answer MCQ, multiple-response, and performance-based matching &amp; ordering.</p>
+    <div class="exam-facts">
+      <div class="fact"><b id="fact-q">20</b>Questions</div>
+      <div class="fact"><b id="fact-t">30:00</b>Time limit</div>
+      <div class="fact"><b>750 / 900</b>Passing score</div>
+      <div class="fact"><b>No</b>Feedback until the end</div>
+    </div>
+    <p style="margin-top:16px">You can move freely between questions and ⚑ flag any for review. The clock auto-submits at 00:00 — just like the real thing.</p>
+    <button class="btn" onclick="beginExam()">Begin Exam</button>
+  </div>
+
+  <!-- EXAM -->
+  <div id="exam-screen" class="hidden">
+    <div class="exam-top">
+      <span id="exam-pos">Question 1 of 20</span>
+      <span class="timer" id="timer">30:00</span>
+    </div>
+    <div class="q-card">
+      <div class="qtype-tag" id="q-type"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-body"></div>
+      <div class="exam-footer">
+        <button class="btn ghost nav-btn" id="prev-btn" onclick="gotoQuestion(current-1)">← Previous</button>
+        <button class="flag-btn" id="flag-btn" onclick="toggleFlag()">⚑ Flag for review</button>
+        <button class="btn nav-btn" id="next-btn" onclick="gotoQuestion(current+1)">Next →</button>
+      </div>
+    </div>
+    <div class="palette">
+      <h3>Question Summary</h3>
+      <div class="pal-grid" id="palette"></div>
+      <div class="legend">
+        <span class="l-ans">Answered</span>
+        <span class="l-flag">Flagged</span>
+      </div>
+      <div style="margin-top:14px">
+        <button class="btn" style="margin-top:0" onclick="submitExam(false)">End Exam &amp; Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen center hidden">
+    <div class="badge">Exam Score Report</div>
+    <div class="score-big" id="scaled-score">—</div>
+    <div class="pass-line">Scale: 100 – 900 · Passing score: 750</div>
+    <div class="verdict" id="verdict"></div>
+    <p id="raw-line" style="margin-top:10px"></p>
+    <div class="scale-track">
+      <div class="scale-fill" id="scale-fill"></div>
+      <div class="scale-pass-mark"></div>
+    </div>
+    <div class="scale-labels"><span>100</span><span style="color:var(--gold)">750 ▲</span><span>900</span></div>
+    <div>
+      <button class="btn" onclick="beginExam()">Retake Exam</button>
+      <button class="btn ghost" onclick="toggleReview()" id="review-btn">Review Questions</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   EXAM CONTENT — CompTIA Security+ SY0-701, Section 11
+   Domain 5: Risk Management Process (Obj 5.2)
+   All-new question set — distinct from the quiz & feedback exam.
+   ============================================================ */
+const EXAM = [
+  // ---------- Single-answer multiple choice ----------
+  {
+    type: 'mcq',
+    q: "A new CISO finds the organization has policies and standards, but nothing documents the actual steps administrators follow for daily backups and account creation. Which governance element is missing?",
+    options: [
+      "Procedures — the step-by-step instructions for specific tasks",
+      "Guidelines — recommended approaches",
+      "A board of directors",
+      "External compliance reporting"
+    ],
+    answer: 0,
+    why: "Procedures are the detailed step-by-step instructions that ensure consistency and compliance with policies and standards. Policies set high-level intent, standards set mandatory rules, and procedures operationalize both — backups and account provisioning are classic procedures."
+  },
+  {
+    type: 'mcq',
+    q: "An organization drafts a document outlining its commitment to protecting customer data and its intentions regarding ethical conduct. It sets no specific technical rules. Which document type is this?",
+    options: [
+      "A policy",
+      "A standard",
+      "A procedure",
+      "A playbook"
+    ],
+    answer: 0,
+    why: "Policies are high-level guidelines outlining an organization's commitments and intentions (data protection, ethical conduct). The specific mandatory rules that flow from it would be standards, and the step-by-step tasks would be procedures."
+  },
+  {
+    type: 'mcq',
+    q: "A multinational adopts a remote-work model after a cultural shift in its industry, and updates its policies, secure-access procedures, and IT systems accordingly. Which governance activity does the update represent?",
+    options: [
+      "Revision of the governance framework in response to cultural change",
+      "External compliance reporting",
+      "Attestation",
+      "Loss of license"
+    ],
+    answer: 0,
+    why: "Governance must adapt to three change drivers: technology, regulations, and industry culture. Updating the framework (policies, procedures, systems) after identifying gaps is revision — remote work here is the cultural driver."
+  },
+  {
+    type: 'mcq',
+    q: "Which pairing of access control model and characteristic is correct?",
+    options: [
+      "MAC uses labels or classifications and is common in government/military settings",
+      "DAC assigns access strictly by job role",
+      "RBAC lets each resource owner decide access at their discretion",
+      "MAC is designed for small family businesses"
+    ],
+    answer: 0,
+    why: "MAC = Mandatory Access Control, using labels/classifications (government/military). DAC = owner discretion. RBAC = role-based assignment. Swapping these characteristics is a standard exam trap."
+  },
+  {
+    type: 'mcq',
+    q: "To prevent any single administrator from having complete control over the payroll system, a company splits configuration, approval, and audit rights across three people. Which standard principle is this?",
+    options: [
+      "Separation of duties",
+      "Least privilege",
+      "Need to know",
+      "Job rotation"
+    ],
+    answer: 0,
+    why: "Separation of duties prevents any single individual from having complete control over a critical process or system, reducing insider-threat risk. Least privilege limits each person's access to the minimum needed — related, but the splitting of control described here is separation of duties."
+  },
+  {
+    type: 'mcq',
+    q: "An admin must deploy a major software update to production servers. Per the change management procedure, what should happen BEFORE the change goes live?",
+    options: [
+      "The change should be tested, a rollback plan prepared, and deployment scheduled in a maintenance window",
+      "The change should be deployed immediately and documented later",
+      "The change board should be bypassed to save time",
+      "All backups should be deleted to make room"
+    ],
+    answer: 0,
+    why: "Significant changes should be tested first; every change needs a backup/rollback plan; and potentially disruptive changes are scheduled in a designated maintenance window. The procedure then continues with staged implementation and a post-change review."
+  },
+  {
+    type: 'mcq',
+    q: "A SOC analyst grabs the documented checklist that specifies exactly how to detect, triage, and respond to a ransomware outbreak. What is this checklist called?",
+    options: [
+      "A playbook",
+      "A policy",
+      "An MOU",
+      "A governance charter"
+    ],
+    answer: 0,
+    why: "A playbook is a checklist of actions to perform to detect and respond to a specific type of incident — a step-by-step guide ensuring consistency and speed regardless of who performs the tasks."
+  },
+  {
+    type: 'mcq',
+    q: "A European retailer stores customer data of EU citizens. A separate California office serves state residents. Which TWO regulatory frameworks must it navigate, and at what levels?",
+    options: [
+      "GDPR at the global level and CCPA at the regional level",
+      "HIPAA at the local level and ADA at the national level",
+      "CCPA at the global level and GDPR at the regional level",
+      "FDA at the national level and FTC at the local level"
+    ],
+    answer: 0,
+    why: "GDPR is a global consideration — it binds any company processing EU citizens' data regardless of where the company is based. CCPA is a regional (state) consideration granting Californians rights to know, delete, and opt out of sale of their data."
+  },
+  {
+    type: 'mcq',
+    q: "Before expanding overseas, a firm researches the target country's business regulations; it then trains its staff on those regulations and hires a local legal advisor. Which pair labels these two activities correctly?",
+    options: [
+      "Due diligence, then due care",
+      "Due care, then due diligence",
+      "Attestation, then acknowledgement",
+      "Monitoring, then revision"
+    ],
+    answer: 0,
+    why: "Researching the laws to IDENTIFY compliance risks = due diligence (the exhaustive review). The mitigation steps that follow — training employees, hiring local legal advice = due care. Reversing them is the classic exam trap."
+  },
+  {
+    type: 'mcq',
+    q: "After building a new application, the lead developer signs a formal statement that all required data-security protocols were followed during development. What is this signed statement?",
+    options: [
+      "Attestation — a formal declaration that processes and controls are compliant",
+      "Acknowledgement — acceptance of requirements",
+      "Due care",
+      "Internal monitoring"
+    ],
+    answer: 0,
+    why: "Attestation is a formal declaration by a responsible party that processes and controls ARE compliant. Acknowledgement is the separate act of recognizing/accepting the requirements (signing the compliance agreement)."
+  },
+  {
+    type: 'mcq',
+    q: "Under GDPR, regulators may fine a company up to €20 million or 4% of annual global turnover — whichever is higher. Which consequence category do such penalties belong to?",
+    options: [
+      "Fines — monetary penalties imposed by regulatory bodies",
+      "Sanctions",
+      "Contractual impacts",
+      "Reputational damage"
+    ],
+    answer: 0,
+    why: "Fines are monetary penalties imposed by regulatory bodies for non-compliance — GDPR's €20M/4% ceiling is the headline example, with British Airways' £183M penalty (2019, 500,000 customers affected) as the real-world case."
+  },
+  {
+    type: 'mcq',
+    q: "A healthcare provider deploys a system that automatically flags any unauthorized access to patient records so HIPAA violations can be caught immediately. Which compliance trend does this demonstrate?",
+    options: [
+      "Automation — real-time compliance monitoring with streamlined accuracy",
+      "Attestation",
+      "Sanctions",
+      "Decentralized governance"
+    ],
+    answer: 0,
+    why: "Automated compliance systems streamline data collection, improve accuracy, and provide real-time monitoring — like auto-flagging unauthorized patient-record access (HIPAA) or auto-generating money-laundering transaction reports for banks."
+  },
+  // ---------- Multiple response ----------
+  {
+    type: 'multi',
+    pick: 4,
+    q: "Which of the following are genuine policy types from the course? (Select FOUR.)",
+    options: [
+      "Acceptable use policy",
+      "Business continuity policy",
+      "Incident response policy",
+      "Change management policy",
+      "Lunch menu policy",
+      "Office plant watering policy",
+      "Parking allocation policy"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "The course's seven policy areas: AUP, information security, business continuity, disaster recovery, incident response, SDLC, and change management. Cafeteria, plant, and parking policies are invented distractors."
+  },
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which statements about governance structures are correct? (Select THREE.)",
+    options: [
+      "Boards of directors are elected by shareholders",
+      "Committees are board subgroups with specific focus areas, such as audit or cybersecurity",
+      "Government entities like the FTC establish laws organizations must comply with",
+      "Centralized structures distribute authority throughout the organization",
+      "Decentralized structures concentrate all authority at the top"
+    ],
+    answer: [0, 1, 2],
+    why: "Boards are shareholder-elected; committees (audit, governance, cybersecurity) are focused subgroups; government entities (FTC) set binding rules. The last two options are reversed — centralized concentrates authority at the top, decentralized distributes it."
+  },
+  {
+    type: 'multi',
+    pick: 4,
+    q: "Which items are elements of password standards per the course? (Select FOUR.)",
+    options: [
+      "Minimum length of 8 to 12 characters",
+      "Mix of uppercase, lowercase, numbers, and special characters",
+      "Regular changes, typically every 60 to 90 days",
+      "Hashing and salting to protect stored passwords",
+      "Writing passwords on sticky notes under the keyboard",
+      "Reusing the same password across all systems",
+      "Sharing passwords with trusted colleagues"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "Password standards: 8–12+ character minimums, character-mix complexity, 60–90 day rotation with reuse prohibited, and hashing/salting so a compromised password database still doesn't expose passwords. The other options are exactly what standards exist to prevent."
+  },
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which consequences of non-compliance are listed in the course, with correct examples? (Select THREE.)",
+    options: [
+      "Fines — GDPR's €20M or 4% of global turnover ceiling; British Airways' £183M penalty",
+      "Reputational damage — Equifax's stock dropped over 30% after its 147-million-person breach",
+      "Loss of license — New York DFS revoked a Bitcoin company's license in 2016",
+      "Free advertising — breaches always increase sales",
+      "Automatic compliance — fines convert violations into certifications"
+    ],
+    answer: [0, 1, 2],
+    why: "The five consequences: fines (GDPR ceilings, BA's £183M), sanctions (China 2017: warnings, fines, confiscated income), reputational damage (Equifax: 147M exposed, stock −30%), loss of license (NY DFS vs. Bitcoin firm 2016), and contractual impacts (lawsuits, termination). The last two options are nonsense distractors."
+  },
+  // ---------- Performance-based: matching ----------
+  {
+    type: 'match',
+    q: "PBQ — Match each document type to its definition. Each definition may be used once; not all definitions will be used.",
+    terms: ["Guideline", "Policy", "Standard", "Procedure"],
+    defs: [
+      "A recommended, non-mandatory approach to handling situations",
+      "High-level guidelines outlining the organization's commitments and intentions",
+      "Specific, often mandatory rules that must be followed to adhere to a policy",
+      "Step-by-step instructions for performing a specific task",
+      "A formal declaration that controls are compliant",
+      "A checklist for responding to a specific incident type"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "Guideline = recommended, not mandatory. Policy = high-level commitments. Standard = specific, often mandatory rules. Procedure = step-by-step task instructions. The distractors are compliance/operations terms: attestation and playbook."
+  },
+  {
+    type: 'match',
+    q: "PBQ — Match each access control model to its defining trait. Each trait may be used once; not all traits will be used.",
+    terms: ["DAC", "MAC", "RBAC"],
+    defs: [
+      "The resource owner decides who can access it",
+      "Labels or classifications determine access — used in government and military",
+      "Access is assigned by job role so users get only what their function requires",
+      "Access rotates automatically every hour regardless of identity",
+      "Anyone on the internet may request access"
+    ],
+    answer: [0, 1, 2],
+    why: "DAC = owner discretion. MAC = labels/classifications (government/military). RBAC = roles tied to job functions, supporting least privilege. The remaining options are invented nonsense traits."
+  },
+  // ---------- Performance-based: ordering ----------
+  {
+    type: 'order',
+    q: "PBQ — An IT team executes a significant change to a production system. Order the change management procedure. Click the steps in sequence.",
+    items: [
+      "Identify the need for change and assess its potential impacts",
+      "Develop a plan detailing implementation, participants, and required resources",
+      "Test the change and implement it — often in stages — with a rollback plan ready",
+      "Review the completed change, evaluate its effects, and record lessons learned"
+    ],
+    why: "The change management procedure flows: identify and assess → plan → implement in stages with rollback available (inside a maintenance window if disruptive) → review and document lessons for future changes. Skipping the impact assessment or the rollback plan are the classic real-world failures."
+  },
+  {
+    type: 'order',
+    q: "PBQ — Order the governance document hierarchy from highest-level intent to most granular instruction. Click the steps in sequence.",
+    items: [
+      "Guidelines recommend a non-mandatory approach to situations",
+      "Policies commit the organization at a high level to actions like data protection",
+      "Standards impose specific, often mandatory rules to adhere to the policy",
+      "Procedures lay out the exact step-by-step instructions for each task"
+    ],
+    why: "Intent flows downward: guidelines (recommended approach) → policies (high-level commitments) → standards (specific mandatory rules) → procedures (step-by-step execution). Governance shapes every layer, and each lower layer exists to make the one above it operational."
+  }
+];
+
+/* ============================================================
+   EXAM ENGINE
+   ============================================================ */
+const SECONDS_PER_QUESTION = 90;
+const totalTime = EXAM.length * SECONDS_PER_QUESTION;
+let answers = [];
+let flagged = [];
+let current = 0;
+let timeLeft = totalTime;
+let timerId = null;
+
+const TYPE_LABELS = {
+  mcq: 'Multiple Choice',
+  multi: 'Multiple Response',
+  match: 'Performance-Based · Matching',
+  order: 'Performance-Based · Ordering'
+};
+
+function fmtTime(s) {
+  const m = Math.floor(s / 60), r = s % 60;
+  return `${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`;
+}
+
+function beginExam() {
+  answers = EXAM.map(q => {
+    if (q.type === 'mcq') return null;
+    if (q.type === 'multi') return [];
+    if (q.type === 'match') return q.terms.map(() => null);
+    if (q.type === 'order') return [];
+    return null;
+  });
+  flagged = EXAM.map(() => false);
+  current = 0;
+  timeLeft = totalTime;
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('exam-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Questions';
+  document.getElementById('fact-q').textContent = EXAM.length;
+  document.getElementById('fact-t').textContent = fmtTime(totalTime);
+  startTimer();
+  renderQuestion();
+  renderPalette();
+}
+
+function startTimer() {
+  clearInterval(timerId);
+  updateTimerDisplay();
+  timerId = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) { clearInterval(timerId); submitExam(true); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timer');
+  el.textContent = fmtTime(Math.max(0, timeLeft));
+  el.classList.toggle('low', timeLeft <= 300);
+}
+
+function isAnswered(i) {
+  const a = answers[i], q = EXAM[i];
+  if (q.type === 'mcq') return a !== null;
+  if (q.type === 'multi') return a.length > 0;
+  if (q.type === 'match') return a.every(v => v !== null);
+  if (q.type === 'order') return a.length === q.items.length;
+  return false;
+}
+
+function renderQuestion() {
+  const q = EXAM[current];
+  document.getElementById('exam-pos').textContent = `Question ${current + 1} of ${EXAM.length}`;
+  document.getElementById('q-type').textContent = TYPE_LABELS[q.type];
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('prev-btn').disabled = current === 0;
+  document.getElementById('next-btn').textContent = current === EXAM.length - 1 ? 'Last Question' : 'Next →';
+  const fb = document.getElementById('flag-btn');
+  fb.classList.toggle('flagged', flagged[current]);
+  fb.textContent = flagged[current] ? '⚑ Flagged' : '⚑ Flag for review';
+
+  const body = document.getElementById('q-body');
+  body.innerHTML = '';
+
+  if (q.type === 'mcq') renderMcq(q, body);
+  else if (q.type === 'multi') renderMulti(q, body);
+  else if (q.type === 'match') renderMatch(q, body);
+  else if (q.type === 'order') renderOrder(q, body);
+
+  renderPalette();
+}
+
+function renderMcq(q, body) {
+  const letters = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option' + (answers[current] === i ? ' selected' : '');
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => {
+      answers[current] = i;
+      renderQuestion();
+    };
+    body.appendChild(btn);
+  });
+}
+
+function renderMulti(q, body) {
+  const hint = document.createElement('div');
+  hint.className = 'pick-hint';
+  const names = { 2: 'TWO', 3: 'THREE', 4: 'FOUR' };
+  hint.textContent = `Select ${names[q.pick] || q.pick}.`;
+  body.appendChild(hint);
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option' + (answers[current].includes(i) ? ' selected' : '');
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => {
+      const sel = answers[current];
+      const pos = sel.indexOf(i);
+      if (pos >= 0) sel.splice(pos, 1);
+      else {
+        if (sel.length >= q.pick) sel.shift(); // keep only 'pick' latest
+        sel.push(i);
+      }
+      renderQuestion();
+    };
+    body.appendChild(btn);
+  });
+}
+
+function renderMatch(q, body) {
+  // shuffle def indices once per question and cache on the question object
+  if (!q._defOrder) {
+    q._defOrder = q.defs.map((_, i) => i);
+    for (let i = q._defOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q._defOrder[i], q._defOrder[j]] = [q._defOrder[j], q._defOrder[i]];
+    }
+  }
+  q.terms.forEach((term, ti) => {
+    const row = document.createElement('div');
+    row.className = 'match-row';
+    const label = document.createElement('div');
+    label.className = 'match-term';
+    label.textContent = term;
+    const arrow = document.createElement('span');
+    arrow.className = 'match-arrow';
+    arrow.textContent = '→';
+    const sel = document.createElement('select');
+    sel.className = 'match-select' + (answers[current][ti] !== null ? ' selected' : '');
+    const noneOpt = document.createElement('option');
+    noneOpt.value = '';
+    noneOpt.textContent = '— choose a description —';
+    sel.appendChild(noneOpt);
+    q._defOrder.forEach(di => {
+      const o = document.createElement('option');
+      o.value = di;
+      o.textContent = q.defs[di];
+      if (answers[current][ti] === di) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.onchange = () => {
+      answers[current][ti] = sel.value === '' ? null : parseInt(sel.value, 10);
+      renderQuestion();
+    };
+    row.appendChild(label); row.appendChild(arrow); row.appendChild(sel);
+    body.appendChild(row);
+  });
+}
+
+function renderOrder(q, body) {
+  // shuffle item display order once per question
+  if (!q._itemOrder) {
+    q._itemOrder = q.items.map((_, i) => i);
+    for (let i = q._itemOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q._itemOrder[i], q._itemOrder[j]] = [q._itemOrder[j], q._itemOrder[i]];
+    }
+  }
+  const seqLabel = document.createElement('div');
+  seqLabel.style.cssText = 'font-size:13px;color:var(--muted);margin-bottom:6px';
+  seqLabel.textContent = 'Your answer (in order):';
+  body.appendChild(seqLabel);
+
+  const seq = document.createElement('div');
+  seq.className = 'order-seq';
+  if (answers[current].length === 0) {
+    seq.innerHTML = '<span class="placeholder">Click the items below in the correct sequence…</span>';
+  } else {
+    answers[current].forEach((itemIdx, pos) => {
+      const chip = document.createElement('span');
+      chip.className = 'order-item';
+      chip.innerHTML = `<span class="num">${pos + 1}</span>${q.items[itemIdx]}`;
+      chip.onclick = () => {
+        answers[current].splice(pos, 1);
+        renderQuestion();
+      };
+      chip.title = 'Click to remove';
+      seq.appendChild(chip);
+    });
+  }
+  body.appendChild(seq);
+
+  if (answers[current].length > 0) {
+    const reset = document.createElement('button');
+    reset.className = 'order-reset';
+    reset.textContent = '↺ Clear sequence';
+    reset.onclick = () => { answers[current] = []; renderQuestion(); };
+    body.appendChild(reset);
+  }
+
+  const poolLabel = document.createElement('div');
+  poolLabel.style.cssText = 'font-size:13px;color:var(--muted);margin-bottom:6px';
+  poolLabel.textContent = 'Available items:';
+  body.appendChild(poolLabel);
+
+  const pool = document.createElement('div');
+  pool.className = 'order-pool';
+  q._itemOrder.forEach(itemIdx => {
+    const used = answers[current].includes(itemIdx);
+    const chip = document.createElement('span');
+    chip.className = 'order-item' + (used ? ' used' : '');
+    chip.textContent = q.items[itemIdx];
+    if (!used) chip.onclick = () => {
+      if (answers[current].length < q.items.length) {
+        answers[current].push(itemIdx);
+        renderQuestion();
+      }
+    };
+    pool.appendChild(chip);
+  });
+  body.appendChild(pool);
+}
+
+function renderPalette() {
+  const pal = document.getElementById('palette');
+  pal.innerHTML = '';
+  EXAM.forEach((q, i) => {
+    const b = document.createElement('button');
+    b.className = 'pal-btn'
+      + (i === current ? ' current' : '')
+      + (isAnswered(i) ? ' answered' : '')
+      + (flagged[i] ? ' flagged' : '');
+    b.textContent = i + 1;
+    b.onclick = () => gotoQuestion(i);
+    pal.appendChild(b);
+  });
+}
+
+function gotoQuestion(i) {
+  if (i < 0 || i >= EXAM.length) return;
+  current = i;
+  renderQuestion();
+}
+
+function toggleFlag() {
+  flagged[current] = !flagged[current];
+  renderQuestion();
+}
+
+/* ---------- Grading ---------- */
+function gradeQuestion(q, a) {
+  if (q.type === 'mcq') {
+    return a === q.answer ? 1 : 0;
+  }
+  if (q.type === 'multi') {
+    // all-or-nothing: exactly the right set
+    const right = q.answer.slice().sort().join(',');
+    const mine = a.slice().sort().join(',');
+    return right === mine ? 1 : 0;
+  }
+  if (q.type === 'match') {
+    let c = 0;
+    a.forEach((v, i) => { if (v === q.answer[i]) c++; });
+    return c / q.terms.length;
+  }
+  if (q.type === 'order') {
+    if (a.length !== q.items.length) return 0;
+    let c = 0;
+    a.forEach((itemIdx, pos) => { if (itemIdx === pos) c++; });
+    return c / q.items.length;
+  }
+  return 0;
+}
+
+function submitExam(auto) {
+  const unanswered = answers.filter((a, i) => !isAnswered(i)).length;
+  if (!auto) {
+    const flaggedCount = flagged.filter(Boolean).length;
+    let msg = `You have answered ${EXAM.length - unanswered} of ${EXAM.length} questions.`;
+    if (unanswered > 0) msg += `\n\n${unanswered} question(s) are unanswered.`;
+    if (flaggedCount > 0) msg += `\n${flaggedCount} question(s) are flagged for review.`;
+    msg += '\n\nSubmit your exam?';
+    if (!confirm(msg)) return;
+  }
+  clearInterval(timerId);
+
+  let points = 0;
+  const details = EXAM.map((q, i) => {
+    const pts = gradeQuestion(q, answers[i]);
+    points += pts;
+    return { q, a: answers[i], pts };
+  });
+
+  const pct = points / EXAM.length;
+  const scaled = Math.round(100 + 800 * pct);
+  const passed = scaled >= 750;
+
+  document.getElementById('exam-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('scaled-score').textContent = scaled;
+  const v = document.getElementById('verdict');
+  v.textContent = passed ? 'PASS ✔' : 'BELOW PASSING ✘';
+  v.className = 'verdict ' + (passed ? 'pass' : 'fail');
+  document.getElementById('raw-line').textContent =
+    `${points.toFixed(2)} of ${EXAM.length} points (${Math.round(pct * 100)}%) · Time remaining: ${fmtTime(Math.max(0, timeLeft))}`;
+
+  const fill = document.getElementById('scale-fill');
+  fill.style.width = '0%';
+  setTimeout(() => { fill.style.width = ((scaled - 100) / 800 * 100) + '%'; }, 60);
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Question Review</h2>';
+  details.forEach((d, i) => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = reviewItemHtml(d, i);
+    review.appendChild(div);
+  });
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function reviewItemHtml(d, i) {
+  const { q, a, pts } = d;
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  let body = '';
+
+  if (q.type === 'mcq') {
+    const ok = a === q.answer;
+    body = `Your answer: <span class="${ok ? 'ok' : 'bad'}">${a !== null ? letters[a] + '. ' + esc(q.options[a]) : '(unanswered)'}</span>` +
+      (ok ? '' : `<br>Correct answer: <span class="ok">${letters[q.answer]}. ${esc(q.options[q.answer])}</span>`);
+  } else if (q.type === 'multi') {
+    const ok = pts === 1;
+    const mine = a.map(x => letters[x] + '. ' + esc(q.options[x])).join('<br>') || '(unanswered)';
+    const right = q.answer.map(x => letters[x] + '. ' + esc(q.options[x])).join('<br>');
+    body = `Your answer: <span class="${ok ? 'ok' : 'bad'}">${mine}</span>` +
+      (ok ? '' : `<br>Correct selections: <span class="ok">${right}</span>`);
+  } else if (q.type === 'match') {
+    body = q.terms.map((t, ti) => {
+      const ok = a[ti] === q.answer[ti];
+      const mine = a[ti] !== null ? q.defs[a[ti]] : '(none)';
+      const right = q.defs[q.answer[ti]];
+      return `<b>${esc(t)}</b> → <span class="${ok ? 'ok' : 'bad'}">${esc(mine)}</span>` +
+        (ok ? '' : ` &nbsp;(correct: <span class="ok">${esc(right)}</span>)`);
+    }).join('<br>');
+  } else if (q.type === 'order') {
+    const correctSeq = q.items.map((it, pos) => `${pos + 1}. ${esc(it)}`).join('<br>');
+    const mine = a.length
+      ? a.map((itemIdx, pos) => `${pos + 1}. ${esc(q.items[itemIdx])}${itemIdx === pos ? '' : ' ✗'}`).join('<br>')
+      : '(unanswered)';
+    const okAll = pts === 1;
+    body = `Your sequence:<br><span class="${okAll ? 'ok' : 'bad'}">${mine}</span>` +
+      (okAll ? '' : `<br>Correct sequence:<br><span class="ok">${correctSeq}</span>`);
+  }
+
+  return `
+    <div class="qhead">
+      <span class="q"><b>Q${i + 1}.</b> ${esc(q.q)}</span>
+      <span class="pts">${pts === 1 ? '1.0' : pts.toFixed(2)} / 1 pt</span>
+    </div>
+    <div class="a">${body}<br><br>${esc(q.why)}</div>`;
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Questions' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"SY0-701-exam-simulator-10-governance-and-compliance.html",title:"SY0-701 Exam Simulator 10 \u00b7 Governance and Compliance (Section 11)"};</script><script src="analytics.js"></script>
+</body>
+</html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Architecture Quiz · SY0-701 (Section 15)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 15</div>
+    <h1>Security Architecture — Practice Quiz</h1>
+    <p>49 questions across all 12 lessons (OBJ 3.1 & 4.1): on-premise vs cloud and the responsibility matrix, the key cloud considerations (availability, resilience, risk transference, patch availability...), the eight classic cloud security weaknesses including data remnants, virtualization and containerization (Type 1 vs Type 2 hypervisors, VM escape, resource reuse, VM sprawl), serverless (FaaS) and microservices, physical vs logical network separation and air gaps, the three SDN planes, Infrastructure as Code and idempotence, centralized vs decentralized architectures, IoT components and risks, and embedded systems with RTOS.</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+{ lesson: "132 - Security Architecture", q: "What does the term 'security architecture' refer to?",
+  options: ["The physical floor plan of the data center", "The design, structure and behavior of an organization's information security environment", "The firewall rule base only", "The organizational chart of the security team"],
+  answer: 1, why: "Security architecture = the design, structure and behavior of the security environment, encompassing hardware, software, processes and people." },
+{ lesson: "132 - Security Architecture", q: "Which two exam objectives does the Security Architecture section map to?",
+  options: ["1.2 and 2.4", "3.1 and 4.1", "5.3 and 5.5", "2.1 and 3.3"],
+  answer: 1, why: "OBJ 3.1 = compare/contrast security implications of architecture models; OBJ 4.1 = apply common security techniques to computing resources." },
+{ lesson: "133 - On-premise versus the Cloud", q: "In an IaaS responsibility matrix, which component does the CUSTOMER manage?",
+  options: ["The physical hypervisor", "The underlying network fabric", "The operating system and everything above it (middleware, runtime, data, applications)", "The power and cooling of the data center"],
+  answer: 2, why: "In IaaS the provider manages the infrastructure only; the customer handles the OS, middleware, runtime, data and applications." },
+{ lesson: "133 - On-premise versus the Cloud", q: "A healthcare org hosts patient records on-premise for HIPAA control but uses the cloud for email and data analysis. This is an example of:",
+  options: ["A private cloud", "A hybrid solution", "A community cloud", "Full risk transference"],
+  answer: 1, why: "Hybrid = on-premise + private cloud + public cloud combined, moving workloads by sensitivity and need." },
+{ lesson: "133 - On-premise versus the Cloud", q: "Which of these is NOT one of the key considerations when choosing between cloud and on-premise?",
+  options: ["Responsiveness", "Risk transference", "Stock price of the provider", "Patch availability"],
+  answer: 2, why: "The course's consideration list: availability, resilience, cost, responsiveness, scalability, ease of deployment, risk transference, ease of recovery, patch availability, inability to patch, power, compute." },
+{ lesson: "133 - On-premise versus the Cloud", q: "A company moves its CRM to a SaaS vendor. Which risk statement is most accurate?",
+  options: ["All security risk moves to the provider", "Some risk transfers to the provider, but the customer is still responsible for securing their own data, user access and configurations", "No risk changes hands", "The provider is responsible for the customer's data classification"],
+  answer: 1, why: "Risk transference is partial — the provider takes infrastructure/maintenance risk; the customer keeps responsibility for its data and access security." },
+{ lesson: "133 - On-premise versus the Cloud", q: "Availability and resilience are related but distinct. Which pairing is correct?",
+  options: ["Availability = recover from failure; resilience = be accessible when needed", "Availability = be accessible when needed; resilience = recover from failures and continue functioning", "They are synonyms", "Availability applies only to cloud; resilience only to on-premise"],
+  answer: 1, why: "Availability = accessible when needed (SLA/uptime); resilience = recover from failure and keep functioning." },
+{ lesson: "134 - Cloud Security", q: "In a multi-tenant cloud, one tenant's compromised data could affect others on the same physical server. This cloud weakness is called:",
+  options: ["Data remnants", "Shared physical server vulnerabilities", "VM sprawl", "An unclear policy"],
+  answer: 1, why: "Shared physical server vulnerability — mitigated with hypervisor protection and secure multi-tenancy isolation." },
+{ lesson: "134 - Cloud Security", q: "Residual data that remains recoverable after a deletion process is known as:",
+  options: ["A data remnant", "A snapshot", "Resource reuse", "Idempotence"],
+  answer: 0, why: "Data remnants = residual data left after deletion; can be recovered by attackers. Fix: secure deletion that overwrites, secure backup handling, verify removal." },
+{ lesson: "134 - Cloud Security", q: "Which set of controls best addresses inadequate user access management in the cloud?",
+  options: ["Strong password policy, MFA, least-privilege permissions, user activity monitoring", "More physical cameras in the data center", "Larger hard drives", "Disabling all logging to save storage"],
+  answer: 0, why: "Access management failures come from weak passwords and excessive permissions; counter with strong auth, MFA, least privilege and monitoring." },
+{ lesson: "134 - Cloud Security", q: "To reduce lateral movement between cloud VMs, the course recommends:",
+  options: ["Network segmentation to isolate VMs from each other", "Putting all VMs on one flat network", "Disabling VM patching", "Sharing one admin account across all VMs"],
+  answer: 0, why: "Network segmentation isolates VMs, reducing an attacker's ability to move laterally after compromising one." },
+{ lesson: "135 - Virtualization and Containerization", q: "Which is a Type 1 (bare-metal) hypervisor?",
+  options: ["VirtualBox on Windows", "VMware Workstation on macOS", "VMware ESXi", "Parallels Desktop"],
+  answer: 2, why: "ESXi, Hyper-V and XenServer run directly on hardware (Type 1). VirtualBox/Workstation run inside a host OS (Type 2)." },
+{ lesson: "135 - Virtualization and Containerization", q: "Why is a Type 1 hypervisor generally faster than a Type 2?",
+  options: ["It has a larger hard drive", "It does not spend host resources running a full desktop OS first — it acts as a streamlined, specialized OS", "It disables encryption", "It uses more RAM by default"],
+  answer: 1, why: "Bare-metal hypervisors allocate physical resources directly instead of through a host operating system." },
+{ lesson: "135 - Virtualization and Containerization", q: "Containers differ from VMs because containers:",
+  options: ["Each contain a full guest operating system", "Share the host's OS kernel while isolating the application and its dependencies", "Cannot be moved between machines", "Require a Type 2 hypervisor"],
+  answer: 1, why: "Containers = isolated user spaces sharing one OS kernel; each includes the app + dependencies. That's why they're lightweight." },
+{ lesson: "135 - Virtualization and Containerization", q: "An attacker who breaks out of an isolated VM to interact directly with the hypervisor has performed:",
+  options: ["Resource reuse", "VM escape", "Live migration", "A container breakout of the kernel"],
+  answer: 1, why: "VM escape = breaking out of the VM to reach the hypervisor, from where other VMs on the same host can be attacked. Very difficult, but a real concern." },
+{ lesson: "135 - Virtualization and Containerization", q: "To mitigate VM escape risk, the course recommends hosting VMs on the same physical server based on:",
+  options: ["Performance tier", "Network segment and classification (like-with-like)", "Alphabetical order", "Purchase date"],
+  answer: 1, why: "Group VMs of the same classification/segment together so an escape only reaches equally-classified systems." },
+{ lesson: "135 - Virtualization and Containerization", q: "During a live VM migration between two physical hosts, an attacker positioned between the hosts can capture unencrypted VM data. This is a:",
+  options: ["Denial of service", "Adversary-in-the-middle attack", "Brute-force attack", "Privilege elevation"],
+  answer: 1, why: "Live migration traffic crosses the network; an adversary-in-the-middle between the two hosts can capture it if unencrypted." },
+{ lesson: "135 - Virtualization and Containerization", q: "Memory assigned to a new cloud customer still contains the previous tenant's data because it was never cleared. This is a:",
+  options: ["Data remnant issue", "Resource reuse vulnerability", "VM sprawl issue", "Snowflake system"],
+  answer: 1, why: "Resource reuse = resources not cleared/reset before reassignment, leaking prior-task data — especially dangerous in multi-tenant clouds." },
+{ lesson: "135 - Virtualization and Containerization", q: "VM sprawl is best described as:",
+  options: ["VMs consuming too much CPU", "VMs created and deployed without proper oversight, becoming unpatched and untracked", "Too many physical servers", "Encrypting VM files"],
+  answer: 1, why: "Sprawl = loss of oversight over VMs; they go unpatched and forgotten. Track, patch, and encrypt VM files." },
+{ lesson: "136 - Serverless", q: "Serverless computing means:",
+  options: ["Computing with no servers involved", "The provider dynamically manages server allocation and provisioning while developers focus on writing code", "Applications that run continuously on dedicated servers", "Servers owned by the customer but managed by staff"],
+  answer: 1, why: "'Serverless' is a misnomer — servers exist, but the provider manages them; developers deploy individual functions." },
+{ lesson: "136 - Serverless", q: "Serverless architectures operate on which model?",
+  options: ["Platform as a Service", "Function as a Service (FaaS)", "Infrastructure as a Service", "Desktop as a Service"],
+  answer: 1, why: "FaaS: developers write functions triggered by events that run only when needed (AWS Lambda, Google Cloud Functions)." },
+{ lesson: "136 - Serverless", q: "What is the most significant risk of serverless computing highlighted in the course?",
+  options: ["Vendor lock-in from proprietary provider interfaces", "Inability to scale", "Mandatory upfront hardware cost", "Developers must patch the OS"],
+  answer: 0, why: "Vendor lock-in makes switching providers or going multi-provider hard; best practices are also still maturing." },
+{ lesson: "136 - Serverless", q: "Which is a key cost benefit of serverless?",
+  options: ["You pay a flat fee per server regardless of use", "You only pay for the computing time you consume — no charge when code is not running", "It eliminates all development costs", "It requires no monitoring"],
+  answer: 1, why: "Pay-per-execution pricing: idle code costs nothing, and scaling is automatic and precise with workload." },
+{ lesson: "137 - Microservices", q: "Microservices are best described as:",
+  options: ["One large interconnected application", "An application structured as a collection of small autonomous services, each performing a specific business function", "A single database with many tables", "A hardware clustering technique"],
+  answer: 1, why: "Microservice architecture breaks a large app into small, independent, self-contained services communicating over lightweight mechanisms." },
+{ lesson: "137 - Microservices", q: "Compared with a monolithic architecture, a microservices architecture gives which resilience benefit?",
+  options: ["If one service fails, it does not affect the entire system", "Services can never fail", "No network communication is needed", "All services must be updated together"],
+  answer: 0, why: "Service isolation means a single failure doesn't take down the whole system — unlike a monolith, where components are interdependent." },
+{ lesson: "137 - Microservices", q: "Which of these is a CHALLENGE of microservices, not a benefit?",
+  options: ["Independent scalability of each service", "Data consistency across services that each have their own database", "Faster, independent deployments", "Use of different languages per service"],
+  answer: 1, why: "Challenges: complexity, data management/consistency, network latency, and a larger attack surface (security)." },
+{ lesson: "138 - Network Infrastructure", q: "Physically disconnecting a system from all other networks — including Wi-Fi and Bluetooth — is called:",
+  options: ["Logical separation", "Air gapping", "Subnetting", "VLAN tagging"],
+  answer: 1, why: "Air gap = physical separation; no direct or indirect connections. The strongest isolation if strict physical security is maintained." },
+{ lesson: "138 - Network Infrastructure", q: "Which attack famously demonstrated that air-gapped systems can still be compromised?",
+  options: ["Stuxnet", "ILOVEYOU", "WannaCry", "Heartbleed"],
+  answer: 0, why: "Stuxnet crossed an air gap into Iranian nuclear facility systems, proving physical separation is not infallible." },
+{ lesson: "138 - Network Infrastructure", q: "HR and Marketing share one physical network, but HR traffic cannot reach Marketing devices. This logical separation is achieved with:",
+  options: ["Air gaps", "VLANs (with firewall/policy rules)", "Longer cables", "A second ISP"],
+  answer: 1, why: "VLANs segregate traffic on shared physical infrastructure per department — logical separation via rules and policies." },
+{ lesson: "138 - Network Infrastructure", q: "Which statement correctly compares physical vs logical separation?",
+  options: ["Logical is always more secure", "Physical (air gap) is the most secure but less flexible; logical is easier to implement and more flexible but not as secure if misconfigured", "Physical separation uses firewalls", "Logical separation requires removing Wi-Fi cards"],
+  answer: 1, why: "Air gap = strongest isolation, inflexible; VLANs/firewalls = flexible and easy, but misconfiguration can open holes." },
+{ lesson: "139 - Software-Defined Network (SDN)", q: "In SDN, the plane that MOVES data packets from place to place is the:",
+  options: ["Control plane", "Application plane", "Data (forwarding) plane", "Management plane"],
+  answer: 2, why: "The data/forwarding plane handles the actual sending and receiving of packets through switches and routers." },
+{ lesson: "139 - Software-Defined Network (SDN)", q: "The 'brain' of an SDN that makes decisions about where traffic is sent is the:",
+  options: ["Data plane", "Control plane — centralized in SDN, unlike traditional networks where each router has its own", "Application plane", "Session plane"],
+  answer: 1, why: "The control plane decides traffic flow. In SDN it is centralized: one controller dictates flow across the entire network." },
+{ lesson: "139 - Software-Defined Network (SDN)", q: "In SDN, network applications that instruct the controller reside in the:",
+  options: ["Application plane", "Data plane", "Transport plane", "Kernel plane"],
+  answer: 0, why: "The application plane houses apps that tell the controller what to do; the controller then manipulates the network." },
+{ lesson: "140 - Infrastructure as Code (IaC)", q: "Infrastructure as Code means:",
+  options: ["Writing applications in assembly", "Managing and provisioning IT infrastructure through machine-readable definition files rather than manual configuration", "Encrypting source code", "Coding on infrastructure projects like bridges"],
+  answer: 1, why: "IaC defines servers, storage and networks in code files (YAML, JSON, HCL) that can be versioned, tested and audited." },
+{ lesson: "140 - Infrastructure as Code (IaC)", q: "A script that produces an identical infrastructure every time it runs, regardless of the starting state, demonstrates:",
+  options: ["Vendor lock-in", "Idempotence", "VM escape", "Data remnants"],
+  answer: 1, why: "Idempotence = the operation produces the same results no matter how many times it executes. Core IaC concept." },
+{ lesson: "140 - Infrastructure as Code (IaC)", q: "The main goal of IaC is to eliminate:",
+  options: ["Cloud providers", "Snowflake systems — one-off, inconsistent configurations that introduce risk", "All documentation", "Version control"],
+  answer: 1, why: "Snowflakes = unique, inconsistent builds. IaC makes every environment identical, repeatable and auditable." },
+{ lesson: "140 - Infrastructure as Code (IaC)", q: "Which is listed as a challenge/ risk of IaC?",
+  options: ["Auditability", "Sensitive data exposed in code files or insecure configurations introduced", "Consistency", "Speed of provisioning"],
+  answer: 1, why: "Challenges: learning curve, growing complexity, and security risks (secrets in files, insecure configs). Auditability and consistency are benefits." },
+{ lesson: "141 - Centralized vs Decentralized", q: "The biggest risk unique to a centralized architecture is:",
+  options: ["Data inconsistency between nodes", "A single point of failure — if the central server fails or is compromised, everything is at risk", "Too many entry points", "Inability to add capacity"],
+  answer: 1, why: "Centralized = one authority: great control and consistency, but one failure or compromise affects the entire network." },
+{ lesson: "141 - Centralized vs Decentralized", q: "Decentralized architectures are valued chiefly for:",
+  options: ["Perfect data consistency", "Resiliency (a node failure doesn't stop the system), scalability and flexibility for distributed teams", "Having one control point", "Lower security exposure"],
+  answer: 1, why: "Decentralized benefits: resiliency, easy scaling by adding nodes, and flexibility. Their weaknesses: security exposure per node, management complexity, data inconsistency." },
+{ lesson: "141 - Centralized vs Decentralized", q: "An organization prioritizing data accuracy and tight resource control would most likely choose:",
+  options: ["A decentralized architecture", "A centralized architecture", "A serverless architecture", "An air-gapped IoT network"],
+  answer: 1, why: "Centralized systems give control, single-source consistency and cost-effective maintenance — at the cost of a single point of failure." },
+{ lesson: "142 - Internet of Things (IoT)", q: "In an IoT ecosystem, the component that acts as the central connection point, collecting and processing data from devices and sending commands back, is the:",
+  options: ["Sensor", "Hub / control system", "Wearable", "Container"],
+  answer: 1, why: "The hub (Amazon Echo, Google Home, or an app) connects all IoT devices and orchestrates them." },
+{ lesson: "142 - Internet of Things (IoT)", q: "The 'eyes and ears' of the IoT that detect environmental changes and convert them into data are:",
+  options: ["Sensors", "Hubs", "Wrappers", "Hypervisors"],
+  answer: 0, why: "Sensors measure temperature, motion, pressure, light etc. and feed the ecosystem." },
+{ lesson: "142 - Internet of Things (IoT)", q: "The most common IoT security risks called out in the course are:",
+  options: ["Strong random default passwords", "Weak default credentials and poorly configured network services (open ports, unencrypted communication, unnecessary services)", "Too much encryption", "Excessive patching"],
+  answer: 1, why: "Defaults like admin/admin and exposed services make IoT an easy entry point — hence the recommendation to isolate IoT on a separate network." },
+{ lesson: "142 - Internet of Things (IoT)", q: "The single most recommended network practice for IoT devices is:",
+  options: ["Give them public IP addresses", "Keep them on a separate network/segment", "Disable their firmware", "Connect them to the HR VLAN"],
+  answer: 1, why: "Segregating IoT devices contains the damage when (not if) one is compromised." },
+{ lesson: "144 - Embedded Systems", q: "An embedded system is:",
+  options: ["A general-purpose desktop PC", "A dedicated computer designed for one or two specific functions inside a larger device", "A cloud-only virtual machine", "Any device with a web browser"],
+  answer: 1, why: "Embedded systems are single-purpose: engine control, ABS, airbags, pacemakers, insulin pumps, microwaves, industrial robots." },
+{ lesson: "144 - Embedded Systems", q: "A real-time operating system (RTOS) is critical for embedded systems because it:",
+  options: ["Has a graphical interface", "Executes processes in a timely, predictable manner without buffer delays — essential for flight navigation and medical equipment", "Uses less electricity than any other OS", "Automatically patches itself"],
+  answer: 1, why: "RTOS guarantees predictable, buffer-free timing — life-critical in navigation and medical gear." },
+{ lesson: "144 - Embedded Systems", q: "Using IPsec to protect data moving between secure networks across an untrusted one, so interceptors only see the wrapper's entry and exit points, is an example of:",
+  options: ["Network segmentation", "A wrapper", "Firmware code control", "Air gapping"],
+  answer: 1, why: "Wrappers (e.g. IPsec) tunnel/encapsulate embedded-system data so attackers only see the wrapper header showing network entry and exit points." },
+{ lesson: "144 - Embedded Systems", q: "Why are embedded systems hard to patch?",
+  options: ["They have no software", "Downtime is unacceptable, devices may be physically unreachable, and many were never designed with update mechanisms", "Vendors patch them automatically like Office 365", "They are immune to vulnerabilities"],
+  answer: 1, why: "Long lifespans + no update design = outdated, vulnerable systems. Over-the-air updates help but need careful security planning." },
+{ lesson: "144 - Embedded Systems", q: "Secure boot mechanisms and cryptographic signatures on embedded devices support which security strategy?",
+  options: ["Resource reuse", "Firmware code control — ensuring only authorized, verified firmware runs", "VM sprawl prevention", "Data remnant removal"],
+  answer: 1, why: "Firmware code control = secure coding, reviews, automated testing, secure boot and signatures so only verified firmware executes." }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"security-architecture-quiz.html",title:"Security Architecture Quiz \u00b7 SY0-701 (Section 15)"};</script><script src="analytics.js"></script>
+</body>
+</html>

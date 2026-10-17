@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Engineering Quiz · SY0-701 (Section 05)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 05</div>
+    <h1>Social Engineering — Practice Quiz</h1>
+    <p>40 questions across all 10 lessons: the six motivational triggers, impersonation in its four forms, pretexting, the phishing family (spear, whaling, BEC, vishing, smishing), phishing prevention &amp; awareness campaigns, frauds &amp; scams, influence campaigns, and other SE attacks.</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  // ---- Lesson 36 · Social Engineering Intro ----
+  {
+    lesson: "Lesson 36 · Social Engineering Intro",
+    q: "How does the course define social engineering?",
+    options: [
+      "Using software exploits to bypass authentication systems",
+      "A manipulative strategy that exploits human psychology to gain unauthorized access to systems, data, or physical spaces",
+      "Encrypting a victim's files and demanding payment for the key",
+      "Intercepting network traffic between two communicating parties"
+    ],
+    answer: 1,
+    why: "Social engineering targets the human element — manipulating people into revealing confidential information or performing compromising actions, through written communication or face-to-face interaction, rather than using technical hacking techniques."
+  },
+  {
+    lesson: "Lesson 36 · Social Engineering Intro",
+    q: "Why does the course call security awareness training the best defense against social engineering?",
+    options: [
+      "Because training patches the vulnerabilities attackers exploit in people",
+      "Because the attacks target the human element — trained users recognize and respond to SE attempts correctly",
+      "Because it replaces the need for firewalls and antivirus",
+      "Because most social engineering attacks are automated"
+    ],
+    answer: 1,
+    why: "Social engineering exploits human psychology, not software flaws, so technical controls alone can't stop it. Regular security awareness training — how to recognize and respond to SE attacks — is crucial for both digital and physical security."
+  },
+  {
+    lesson: "Lesson 36 · Social Engineering Intro",
+    q: "Which two interaction channels does the course say social engineering includes?",
+    options: [
+      "Written communication and face-to-face interaction",
+      "Email and radio broadcasts",
+      "Phone calls only",
+      "Social media and television advertising"
+    ],
+    answer: 0,
+    why: "Social engineering includes written communication (emails, texts, messages) as well as face-to-face interaction — the common factor is manipulating a person, not attacking a system directly."
+  },
+  {
+    lesson: "Lesson 36 · Social Engineering Intro",
+    q: "Which objectives does this section of the course map to?",
+    options: [
+      "1.1 and 3.4",
+      "2.2 (threat vectors incl. social engineering) and 5.6 (security awareness practices)",
+      "4.2 and 4.3",
+      "2.1 and 5.1"
+    ],
+    answer: 1,
+    why: "Section 05 covers Domain 2 Objective 2.2 — human-based attack vectors like phishing, vishing, smishing, impersonation, pretexting, and typosquatting — and Domain 5 Objective 5.6 — implementing security awareness practices like anti-phishing campaigns."
+  },
+  // ---- Lesson 37 · Motivational Triggers ----
+  {
+    lesson: "Lesson 37 · Motivational Triggers",
+    q: "A caller claims to be from the IRS and says that if the victim doesn't pay a 'late fee' within 24 hours, agents will come to their house and arrest them. Which motivational trigger is being used?",
+    options: [
+      "Scarcity",
+      "Authority",
+      "Social proof",
+      "Likability"
+    ],
+    answer: 1,
+    why: "The attacker is assuming governmental authority to command compliance — the victim obeys because they believe the demand comes from a position of power. (The arrest threat also stacks fear on top — triggers often combine.)"
+  },
+  {
+    lesson: "Lesson 37 · Motivational Triggers",
+    q: "An attacker rushes up to a receptionist with a USB drive, saying a presentation is due to executives in five minutes and begging her to print the slides right now. Which trigger is this, and what procedure does it make her skip?",
+    options: [
+      "Scarcity — skipping password complexity rules",
+      "Urgency — skipping the normal malware-scanning procedure for removable media",
+      "Authority — skipping badge checks",
+      "Fear — skipping encryption requirements"
+    ],
+    answer: 1,
+    why: "Urgency creates time pressure that drives people to act without thinking. The 'five minutes' story pressures the receptionist to bypass the organization's normal procedure of scanning removable media for malware before connecting it."
+  },
+  {
+    lesson: "Lesson 37 · Motivational Triggers",
+    q: "An attacker seeds a scam website by getting friends to post about it on social media, so victims visit because 'everyone else is using it.' Which trigger is this?",
+    options: [
+      "Scarcity",
+      "Urgency",
+      "Social proof",
+      "Authority"
+    ],
+    answer: 2,
+    why: "Social proof is the tendency to look at others' actions and beliefs as a guide for your own. Likes, shares, and friends vouching for the scam site make people assume it's legitimate — marketers use the same psychology with reviews and enrollment numbers."
+  },
+  {
+    lesson: "Lesson 37 · Motivational Triggers",
+    q: "A phishing email offers a $2,000 MacBook for $1,000 — 'but only for the first five people who buy.' Which trigger is at work?",
+    options: [
+      "Fear",
+      "Scarcity",
+      "Likability",
+      "Social proof"
+    ],
+    answer: 1,
+    why: "Scarcity emphasizes limited availability — 'only five spots left' — to pressure quick decisions. It's often paired with urgency, but the defining element here is the limited quantity, not the clock."
+  },
+  {
+    lesson: "Lesson 37 · Motivational Triggers",
+    q: "A penetration tester wearing a rival team's jersey chats with an employee about last week's game, and soon the employee is casually describing internal projects. Which trigger did the tester exploit?",
+    options: [
+      "Likability — building rapport through a shared interest to gain trust",
+      "Authority — pretending to be a manager",
+      "Fear — threatening consequences",
+      "Scarcity — offering limited tickets"
+    ],
+    answer: 0,
+    why: "Likability works because people open up to people they like. Social engineers deliberately cultivate friendliness and common interests — sports talk, flirting, shared hobbies — to draw victims into their sphere of influence."
+  },
+  {
+    lesson: "Lesson 37 · Motivational Triggers",
+    q: "Ransomware that encrypts files and demands a $200 'fine' to decrypt them primarily plays on which trigger — often combined with which other?",
+    options: [
+      "Scarcity, combined with urgency",
+      "Fear, often combined with authority when the scammer poses as law enforcement",
+      "Social proof, combined with likability",
+      "Authority, combined with scarcity"
+    ],
+    answer: 1,
+    why: "Fear capitalizes on anxiety: 'if you don't do what I tell you, something bad will happen.' When the attacker impersonates the FBI or another agency, the scam stacks fear ON authority to become even more effective — triggers can overlap."
+  },
+  // ---- Lesson 38 · Impersonation ----
+  {
+    lesson: "Lesson 38 · Impersonation",
+    q: "What must an attacker typically do FIRST to make an impersonation attack believable, per the course?",
+    options: [
+      "Compromise the company's email server",
+      "Collect information about the organization so the impersonation details earn the target's trust",
+      "Register a typosquatted domain",
+      "Install a remote access trojan"
+    ],
+    answer: 1,
+    why: "Specific details make lies believable: 'Mike from IT on the third floor, checking the workstation issues others reported' is far more convincing than an anonymous caller. Impersonation attacks are therefore usually preceded by information gathering about the organization."
+  },
+  {
+    lesson: "Lesson 38 · Impersonation",
+    q: "What severe consequences does the course attribute to successful impersonation attacks?",
+    options: [
+      "Only minor password resets",
+      "Unauthorized access to sensitive data, disruption of services, or even complete system takeover",
+      "Slightly slower network performance",
+      "Nothing — impersonation is harmless pranking"
+    ],
+    answer: 1,
+    why: "Impersonation can escalate all the way to a complete system takeover, plus data theft and service disruption. Mitigation is regular security awareness training so employees stay vigilant."
+  },
+  {
+    lesson: "Lesson 38 · Impersonation",
+    q: "In November 2020, a fake Twitter account impersonating which company tweeted that its product would be 'free' — crashing the real company's stock 4% in under 24 hours?",
+    options: [
+      "Pfizer",
+      "Eli Lilly and Company",
+      "Tesla",
+      "Netflix"
+    ],
+    answer: 1,
+    why: "The fake Eli Lilly account tweeted that insulin would be free; investors believed it and sold shares, wiping out billions in market capitalization within a day. It's the course's flagship brand-impersonation case — defense includes monitoring the brand's online presence."
+  },
+  {
+    lesson: "Lesson 38 · Impersonation",
+    q: "Why is a watering hole attack considered a PASSIVE attack?",
+    options: [
+      "Because it only works on outdated browsers",
+      "Because the threat actor never communicates directly with the target — malware is delivered through a trusted third-party site the target already visits",
+      "Because it requires no malware",
+      "Because the victim must actively download something"
+    ],
+    answer: 1,
+    why: "The attacker compromises a website or service the target is known to use and waits — like a predator at a watering hole. The target comes to the site and gets attacked there, with no direct contact between attacker and victim. Defenses: patching, threat intelligence, advanced malware detection."
+  },
+  // ---- Lesson 39 · Pretexting ----
+  {
+    lesson: "Lesson 39 · Pretexting",
+    q: "How does the course define pretexting?",
+    options: [
+      "Sending mass phishing emails to random addresses",
+      "Creating a convincing fabricated scenario to manipulate a target into divulging information or performing compromising actions",
+      "Intercepting SMS messages between two parties",
+      "Registering misspelled domain names"
+    ],
+    answer: 1,
+    why: "Pretexting = a fabricated scenario, often impersonating a trusted individual or authority figure (bank official, IT support, vendor) to gain trust and extract information or actions from the victim."
+  },
+  {
+    lesson: "Lesson 39 · Pretexting",
+    q: "In the course's toner-call demonstration, why did the attacker deliberately GUESS the wrong printer brand?",
+    options: [
+      "To test whether the receptionist knew the brand",
+      "So the receptionist would 'correct' him with the real model — filling in the information he wanted",
+      "Because guessing right would end the call",
+      "To avoid raising suspicion by knowing too much"
+    ],
+    answer: 1,
+    why: "Pretexting feeds the victim plausible-sounding 'facts' so the victim fills in the gaps with real information. By guessing a common brand (HP/Epson/Lexmark), the attacker got the receptionist to volunteer the actual model — then escalated to the printer's IP address."
+  },
+  {
+    lesson: "Lesson 39 · Pretexting",
+    q: "The course's author's mother immediately knew the 'John from Microsoft, your Windows machine is infected' call was a pretext. Why?",
+    options: [
+      "She worked for Microsoft",
+      "She uses an iMac — she doesn't have a Windows machine, so the claim was impossible",
+      "She recognized the caller's voice",
+      "Microsoft never makes phone calls of any kind"
+    ],
+    answer: 1,
+    why: "The classic pretext claims your Windows PC is infected and 'calling out.' She ran an iMac, so the story was flatly impossible — technical impossibility is often the easiest way to spot a pretext. Training takeaway: never give out information over the phone."
+  },
+  {
+    lesson: "Lesson 39 · Pretexting",
+    q: "Which training message does the course give specifically for pretexting calls?",
+    options: [
+      "Only verify callers who ask about money",
+      "Never give information out over the phone — even 'innocent' details like a printer model or IP address fuel a later stage of the attack",
+      "Only the receptionist needs to worry about callers",
+      "Hang up only if the caller gets angry"
+    ],
+    answer: 1,
+    why: "Seemingly harmless details (printer model, IP address, org structure) are exactly what attackers chain into bigger attacks. The rule: don't give out information, and don't fill in the gaps for callers — in person or on the phone."
+  },
+  // ---- Lesson 40 · Phishing Attacks ----
+  {
+    lesson: "Lesson 40 · Phishing Attacks",
+    q: "An attacker emails one million random Americans a fake Bank of America security alert. Per the course, this is:",
+    options: [
+      "Spear phishing, because banks were involved",
+      "Phishing — a wide-net mass campaign; it would only be spear phishing if sent to a known list of that bank's customers",
+      "Whaling",
+      "Business email compromise"
+    ],
+    answer: 1,
+    why: "The dividing line is targeting. Sending 1M random people a BoA-themed email is spray-and-pray phishing — most recipients aren't customers (the author, never a customer, spotted it instantly). Spear phishing would target a curated list, e.g., 500 customers whose bank's data was breached."
+  },
+  {
+    lesson: "Lesson 40 · Phishing Attacks",
+    q: "What makes whaling different from ordinary spear phishing?",
+    options: [
+      "It uses whale-themed pretexts",
+      "It targets high-profile individuals like CEOs and CFOs — whose authority can approve large fund transfers, rewarding much greater preparation and precision",
+      "It only targets maritime companies",
+      "It is always conducted by nation-states"
+    ],
+    answer: 1,
+    why: "Whaling hunts the big fish: executives, board members, senior managers. They can authorize large transfers, so the payoff dwarfs ordinary phishing — but the attack takes far more preparation and effort. It's often step one in taking over an executive's account for follow-on attacks."
+  },
+  {
+    lesson: "Lesson 40 · Phishing Attacks",
+    q: "Which statement BEST describes business email compromise (BEC)?",
+    options: [
+      "Mass phishing emails pretending to be a bank",
+      "A sophisticated attack that takes over or impersonates a legitimate internal email account — often an executive's — to trick finance/HR staff into wire transfers, payment redirections, or data disclosure",
+      "Voice calls pretending to be a help desk",
+      "Text messages containing malicious links"
+    ],
+    answer: 1,
+    why: "BEC relies on the trust of a REAL internal account (compromised via social engineering or intrusion). The attacker impersonates a senior executive or trusted partner and targets employees in finance or HR. FBI IC3 reported a 14.5% increase and $2.7B in losses in one year."
+  },
+  {
+    lesson: "Lesson 40 · Phishing Attacks",
+    q: "Which pairing of phishing type and channel is correct?",
+    options: [
+      "Vishing — text messages; Smishing — phone calls",
+      "Vishing — voice/phone calls; Smishing — SMS text messages",
+      "Vishing — email; Smishing — voicemail",
+      "Both mean the same email attack"
+    ],
+    answer: 1,
+    why: "Vishing = voice phishing over the phone (attackers impersonate banks or government agencies; the course notes people are often easier to trick by phone than email). Smishing = SMS phishing via text messages with fraudulent links or phone numbers, usually baited with urgency."
+  },
+  // ---- Lesson 41 · Preventing Phishing ----
+  {
+    lesson: "Lesson 41 · Preventing Phishing",
+    q: "Which of the following is NOT one of the course's five key indicators of a phishing email?",
+    options: [
+      "A sense of urgency",
+      "An unusual request for sensitive information",
+      "A mismatched URL revealed by hovering over the link",
+      "The email arriving outside business hours"
+    ],
+    answer: 3,
+    why: "The five indicators: urgency, unusual requests (IT never asks for your password; banks never ask for card numbers), mismatched URLs (hover to reveal the real destination), suspicious sender addresses (display name vs. real address), and poor spelling/grammar. Delivery time is irrelevant."
+  },
+  {
+    lesson: "Lesson 41 · Preventing Phishing",
+    q: "A link in an email displays 'paypal.com/login' but hovering reveals 'paypal.hacked.xyz'. Which indicator is this, and what is the underlying trick?",
+    options: [
+      "Poor grammar — the attacker typed the URL wrong",
+      "Mismatched URL — HTML display text can say anything while the underlying hyperlink points anywhere",
+      "Unusual request — PayPal is unusual",
+      "Scarcity — the domain is rare"
+    ],
+    answer: 1,
+    why: "In HTML email, the visible text is just display text; the underlying URL can be set to anything. Hovering (or long-pressing) reveals the real destination. Brand-impersonation phishers exploit this constantly — an old trick users still fall for."
+  },
+  {
+    lesson: "Lesson 41 · Preventing Phishing",
+    q: "According to the course, why do many phishing emails deliberately contain broken English and spelling errors?",
+    options: [
+      "Attackers are usually non-native speakers",
+      "Poorly written emails weed out suspicious, well-trained users early — leaving only more gullible victims who are more profitable to exploit",
+      "Spam filters require a minimum number of errors",
+      "It makes the email look more personal"
+    ],
+    answer: 1,
+    why: "If phishing emails were flawless, everyone would fall for them and the attackers would be overwhelmed. Deliberate errors act as a filter: users who notice grammar mistakes self-select out, so the scammer's limited time goes only to the most gullible — though generative AI is eroding this indicator."
+  },
+  {
+    lesson: "Lesson 41 · Preventing Phishing",
+    q: "A security team triages a reported phishing email. Which response sequence matches the course's guidance?",
+    options: [
+      "Delete it silently and move on",
+      "Confirm it's phishing using the indicators, inform all users about the threat, remind them not to click links or provide info, investigate any users who clicked, and review/update countermeasures",
+      "Reply to the sender asking them to stop",
+      "Forward the email to all employees so they can see what it looks like"
+    ],
+    answer: 1,
+    why: "Triage = verify with the five indicators → broadcast a warning (others received it too) → remind staff not to click or provide information → investigate systems where the email was opened or links clicked → use the incident to update spam filters and training. Reporting channels include forwarding to phishing@yourdomain.com."
+  },
+  // ---- Lesson 42 · Anti-Phishing Campaign ----
+  {
+    lesson: "Lesson 42 · Anti-Phishing Campaign",
+    q: "What two components make up an anti-phishing campaign per the course?",
+    options: [
+      "Firewalls and antivirus updates",
+      "User security awareness training plus a simulated phishing campaign run by an outside contractor or SaaS platform",
+      "Password resets and MFA rollout",
+      "Spam filters and email encryption"
+    ],
+    answer: 1,
+    why: "An anti-phishing campaign combines training with hands-on practice: a simulated phishing campaign (via contractor or SaaS like Trend Micro's free Phish Insight) gives users practical experience spotting and reporting attempts — with remedial training for anyone who clicks."
+  },
+  {
+    lesson: "Lesson 42 · Anti-Phishing Campaign",
+    q: "In the course's Phish Insight demo, what was deliberately wrong with the spoofed sender 'invitations@linkedin.com' — and why?",
+    options: [
+      "It used the wrong TLD; to test DNS filtering",
+      "'LinkedIn' was missing a D and 'invitations' was misspelled — trained users should catch and flag it",
+      "It was too short; to fit in the subject line",
+      "Nothing was wrong; it was an exact copy"
+    ],
+    answer: 1,
+    why: "The demo sender was 'invitations@linkedin.com' with 'LinkedIn' missing a D plus a misspelled 'invitations' — deliberate flaws a trained user should catch. (A real attacker could spell it perfectly; the campaign teaches users to inspect senders and hover over links.)"
+  },
+  {
+    lesson: "Lesson 42 · Anti-Phishing Campaign",
+    q: "Hovering over the 'Accept' button in the demo's fake LinkedIn email revealed which real destination?",
+    options: [
+      "linkedin.com",
+      "websitefun.club — a site that merely looks like a LinkedIn page",
+      "microsoft.com",
+      "phishinsight.trendmicro.com"
+    ],
+    answer: 1,
+    why: "Every link in the fake invitation — Accept, View Profile, frequency settings — actually pointed to websitefun.club. The lesson for users: don't click links in email; open a new browser and navigate to the real site (linkedin.com) yourself."
+  },
+  {
+    lesson: "Lesson 42 · Anti-Phishing Campaign",
+    q: "When should remedial training be delivered in a simulated phishing campaign, per the course's options?",
+    options: [
+      "Only at annual review time",
+      "Immediately when a user clicks (the 'when phished' option) or when the campaign ends",
+      "Never — failing the simulation is punishment enough",
+      "Only for executives"
+    ],
+    answer: 1,
+    why: "Campaigns can deliver training the moment a user clicks ('when phished') or at campaign end. Immediate feedback connects the lesson to the mistake; campaigns can also run on schedules over weeks or months to measure improvement across a large organization."
+  },
+  // ---- Lesson 43 · Frauds and Scams ----
+  {
+    lesson: "Lesson 43 · Frauds and Scams",
+    q: "How does the course distinguish fraud from theft?",
+    options: [
+      "They are legally identical",
+      "Fraud tricks the victim into handing over money or information; theft takes it directly without the victim's cooperation",
+      "Theft only happens online",
+      "Fraud requires malware"
+    ],
+    answer: 1,
+    why: "Fraud is wrongful or criminal deception for financial or personal gain — the victim is manipulated into voluntarily handing over valuables (information or money). That's why fraud is considered part of social engineering: the human is the attack vector."
+  },
+  {
+    lesson: "Lesson 43 · Frauds and Scams",
+    q: "Per the course (and CompTIA's preference), what is the difference between identity fraud and identity theft?",
+    options: [
+      "Fraud is online; theft is physical",
+      "Fraud = using the victim's identity assets (charging on their existing card); theft = fully assuming the victim's identity (using their SSN to get a job). CompTIA prefers 'identity fraud' as the combined term",
+      "They are completely unrelated crimes",
+      "Theft only targets corporations"
+    ],
+    answer: 1,
+    why: "Charging purchases on a stolen card = identity FRAUD. Fully becoming the victim — e.g., a foreign national using your name, address, SSN, and birthdate to start a new job = identity THEFT. In practice the terms blur, and CompTIA uses 'identity fraud' to cover both."
+  },
+  {
+    lesson: "Lesson 43 · Frauds and Scams",
+    q: "Which sequence describes the classic toner invoice scam?",
+    options: [
+      "Malware encrypts the printer until payment",
+      "Caller 'confirms' toner details (recording the employee's 'yes'), ships wildly overpriced toner, then bills with no refunds/exchanges and a recording of the agreement",
+      "A fake vendor refunds the company by mistake",
+      "Attackers steal toner from the loading dock"
+    ],
+    answer: 1,
+    why: "The invoice scam tricks a business into paying for something never properly ordered. The caller builds a pretext ('still using the HP LaserJet?'), the employee confirms, overpriced toner arrives (~$950 vs. ~$100 retail), and the invoice cites the recorded 'yes' and no-refund terms. Any regularly consumed supply works."
+  },
+  {
+    lesson: "Lesson 43 · Frauds and Scams",
+    q: "What is the technical variation of the invoice scam the course warns about?",
+    options: [
+      "Invoices printed on special paper",
+      "A PDF invoice attached to a spear-phishing email — embedded malicious code infects the billing employee's machine, often giving the attacker remote access",
+      "Invoices sent by certified mail",
+      "Fake invoices that only display on mobile devices"
+    ],
+    answer: 1,
+    why: "The digital variant embeds malware in an invoice PDF sent via spear-phishing; opening it infects the billing department's computer (e.g., remote access trojan). Lesson: analyze emails from untrusted senders BEFORE opening attachments — especially invoice PDFs."
+  },
+  // ---- Lesson 44 · Influence Campaigns ----
+  {
+    lesson: "Lesson 44 · Influence Campaigns",
+    q: "What is the difference between misinformation and disinformation?",
+    options: [
+      "Misinformation is printed; disinformation is digital",
+      "Misinformation is false information shared WITHOUT harmful intent (honest mistakes); disinformation is deliberately created and shared to deceive or mislead",
+      "They are synonyms",
+      "Disinformation only comes from corporations"
+    ],
+    answer: 1,
+    why: "The distinction is INTENT. Misinformation spreads from honest mistakes (e.g., COVID-era claims that salt-water gargles or chlorine could kill the virus). Disinformation is a weapon: deliberately false content designed to manipulate opinion, spread discord, or undermine trust — e.g., Russian fake accounts in the 2016 US election."
+  },
+  {
+    lesson: "Lesson 44 · Influence Campaigns",
+    q: "Which example does the course give of a DISINFORMATION campaign?",
+    options: [
+      "A rumor about salt water preventing COVID-19",
+      "Russian state-sponsored operatives running fake Facebook and Twitter accounts to spread false information during the 2016 US presidential election",
+      "A typo in a news headline",
+      "A company's honest advertising error"
+    ],
+    answer: 1,
+    why: "US intelligence attributed the 2016 election influence operation to Russian state-sponsored operatives using fake social-media accounts to post divisive, false content — deliberate deception, i.e., disinformation. The COVID salt-water claim is the course's misinformation example (no harmful intent)."
+  },
+  {
+    lesson: "Lesson 44 · Influence Campaigns",
+    q: "What lesson does the 2020 Twitter Bitcoin scam teach about influence campaigns?",
+    options: [
+      "Bitcoin cannot be stolen",
+      "Influence campaigns aren't only political — hijacked accounts of Obama, Biden, Musk, and Gates promoted a 'double your Bitcoin' scam for pure financial gain",
+      "Twitter is immune to compromise",
+      "Only small accounts get hacked"
+    ],
+    answer: 1,
+    why: "In July 2020 attackers hijacked high-profile Twitter accounts and promised to double any Bitcoin sent to an address. Victims trusted the influential accounts and sent funds they never saw again — influence campaigns can target financial gain as readily as elections."
+  },
+  {
+    lesson: "Lesson 44 · Influence Campaigns",
+    q: "Which set does the course give as society-level mitigations against misinformation/disinformation?",
+    options: [
+      "Media literacy, prioritizing fact-checking, transparency and accountability, and appropriate regulation",
+      "More advertising and bigger social networks",
+      "Banning all anonymous speech",
+      "Relying on influencers to correct errors"
+    ],
+    answer: 0,
+    why: "The course's mitigation set: promote media literacy, prioritize fact-checking, ensure transparency and accountability, and consider appropriate regulation of online content, sponsored posts, and ads during elections and other events that rely on an informed public."
+  },
+  // ---- Lesson 45 · Other Social Engineering Attacks ----
+  {
+    lesson: "Lesson 45 · Other SE Attacks",
+    q: "An attacker manipulates DNS server settings so that typing a legitimate bank URL redirects users to a fraudulent lookalike site that harvests credentials. Which two attacks are combined here?",
+    options: [
+      "Baiting and tailgating",
+      "Diversion theft (via DNS spoofing) and brand impersonation",
+      "Eavesdropping and hoaxes",
+      "Pretexting and whaling"
+    ],
+    answer: 1,
+    why: "Diversion theft in the data realm means diverting traffic to fake websites to steal data — DNS spoofing redirects the URL, and the fake site relies on brand impersonation to look legitimate so victims type in usernames, passwords, and card details."
+  },
+  {
+    lesson: "Lesson 45 · Other SE Attacks",
+    q: "A Mac user sees a browser alert claiming 'Your Windows system is infected!' What does the course say this is — and what does the impossibility tell us?",
+    options: [
+      "A real threat — Macs can run Windows malware",
+      "A hoax — Windows malware cannot affect macOS/Linux systems; the impossibility exposes the deception",
+      "A watering hole attack",
+      "A BEC attempt"
+    ],
+    answer: 1,
+    why: "Hoaxes are malicious deceptions spread via social media/email/browser alerts, often paired with phishing or impersonation. A 'Windows virus' warning shown to a Mac user is technically impossible — checking claims for feasibility is the critical-thinking defense against hoaxes."
+  },
+  {
+    lesson: "Lesson 45 · Other SE Attacks",
+    q: "Which defenses does the course recommend against shoulder surfing in open-plan offices?",
+    options: [
+      "Banning all cameras company-wide",
+      "Privacy screens on workstations and shields over keypads when PINs or passwords are entered",
+      "Moving all work to home offices",
+      "Disabling monitors when someone approaches"
+    ],
+    answer: 1,
+    why: "Shoulder surfing is direct observation of confidential info — and attackers don't need to be close: high-powered or CCTV cameras can capture PINs from across the room, building, or city. Privacy screens and keypad shields protect the visual channel; situational awareness completes the defense."
+  },
+  {
+    lesson: "Lesson 45 · Other SE Attacks",
+    q: "An attacker retrieves 'deleted' files from a system's recycle bin and old hard drives bought at auction. Which attack is this, and which defense set applies?",
+    options: [
+      "Baiting — never use found USB devices",
+      "Dumpster diving (physical and digital) — shred sensitive documents, enforce a clean desk policy, and securely overwrite deleted files on HDDs, SSDs, and cloud storage",
+      "Eavesdropping — encrypt all channels",
+      "Tailgating — install turnstiles"
+    ],
+    answer: 1,
+    why: "Dumpster diving is recovering valuable information from discarded material — paper documents, or digitally, the recycle bin and 'deleted' files that were never actually overwritten. Defenses: shredding, clean desk policies, and proper secure deletion/sanitization of storage."
+  },
+  {
+    lesson: "Lesson 45 · Other SE Attacks",
+    q: "A parking-lot USB drive labeled 'Confidential — Q4 Layoffs' is found by an employee who plugs it in to look. Which attack is this, and why is it effective?",
+    options: [
+      "Baiting — curiosity lures victims into installing malware that can execute within seconds of connecting the device",
+      "Shoulder surfing — the attacker watches from the lot",
+      "A hoax — the files don't exist",
+      "Pretexting — the attacker calls to ask about it"
+    ],
+    answer: 0,
+    why: "Baiting leaves malware-infected physical media where victims will find it; curiosity ('what's on this drive?') does the rest, and malware can install within seconds of connection. Defense: never use a USB device unless you know exactly where it came from and that it's safe."
+  },
+  {
+    lesson: "Lesson 45 · Other SE Attacks",
+    q: "Per this lesson, why do INSIDER threats particularly favor piggybacking over tailgating?",
+    options: [
+      "It is faster than badging in",
+      "They convince an authorized employee to let them in, so THEIR badge is never recorded in the facility security log",
+      "Tailgating requires two attackers",
+      "Piggybacking works only in data centers"
+    ],
+    answer: 1,
+    why: "The lesson's new angle: insiders use piggybacking to enter an office or data center WITHOUT their own badge swipe appearing in the security log — the helpful employee's badge gets logged instead, hiding the insider's presence from the audit trail. (Tailgating = covert following without consent; piggybacking = the authorized person knowingly allows it.)"
+  }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"social-engineering-quiz.html",title:"Social Engineering Quiz \u00b7 SY0-701 (Section 05)"};</script><script src="analytics.js"></script>
+</body>
+</html>
