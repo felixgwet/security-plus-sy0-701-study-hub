@@ -271,10 +271,24 @@ for (const cfg of EXAMS) {
   // replace comment block
   html = replaceOnce(html, /\/\* =+[\s\S]*?=+ \*\//, `/* ============================================================\n   ${cfg.comment}\n   ============================================================ */`);
   // replace EXAM array
+  // replace EXAM array — robust bracket matching (template may minify EXAM to one line)
   const aStart = html.indexOf('const EXAM = [');
   const arrStart = html.indexOf('[', aStart);
-  const aEnd = html.indexOf('\n];', arrStart);
-  html = html.slice(0, aStart) + 'const EXAM = ' + JSON.stringify(clean, null, 1) + ';' + html.slice(aEnd + 3);
+  let depth = 0, aEnd = -1, inStr = false, quote = '', esc = false;
+  for (let i = arrStart; i < html.length; i++) {
+    const c = html[i];
+    if (inStr) {
+      if (esc) { esc = false; continue; }
+      if (c === '\\') { esc = true; continue; }
+      if (c === quote) inStr = false;
+      continue;
+    }
+    if (c === '"' || c === "'" || c === '`') { inStr = true; quote = c; continue; }
+    if (c === '[') depth++;
+    if (c === ']') { depth--; if (depth === 0) { aEnd = i; break; } }
+  }
+  if (aEnd < 0) { console.error('EXAM array end not found for', cfg.file); process.exit(1); }
+  html = html.slice(0, aStart) + 'const EXAM = ' + JSON.stringify(clean, null, 1) + ';' + html.slice(aEnd + 1);
   // timer: 60s per question -> 90:00
   html = replaceOnce(html, 'const SECONDS_PER_QUESTION = 90;', 'const SECONDS_PER_QUESTION = 60;');
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Security Fundamentals — Interactive Notes</title>
+<title>Section 1 · Security Fundamentals — Interactive Notes</title>
 <style>
   :root {
     --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
@@ -53,6 +53,52 @@
   .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
   @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
 </style>
+<style id="colorful-theme">
+/* ===== colorful theme override (inject-color.js) ===== */
+body { background-image:
+  radial-gradient(900px 420px at 85% -8%, rgba(240,136,62,.10), transparent 60%),
+  radial-gradient(700px 380px at -5% 108%, rgba(88,166,255,.08), transparent 60%),
+  radial-gradient(500px 300px at 50% 50%, rgba(227,75,169,.04), transparent 70%);
+  background-attachment: fixed; }
+h1 { background: linear-gradient(90deg, #f0883e 0%, #e34ba9 55%, #58a6ff 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent; }
+.badge { background: linear-gradient(90deg, rgba(240,136,62,.20), rgba(88,166,255,.14)) !important;
+  border: 1px solid rgba(240,136,62,.45) !important; color: #ffd9b3 !important; }
+.btn { background: linear-gradient(135deg, #f0883e, #e36414) !important;
+  border: none !important; box-shadow: 0 3px 14px rgba(240,136,62,.35); }
+.btn:hover { filter: brightness(1.12); box-shadow: 0 5px 20px rgba(240,136,62,.55); }
+.btn.ghost { background: rgba(240,136,62,.10) !important; border: 1px solid rgba(240,136,62,.5) !important;
+  box-shadow: none; color: #ffb26b !important; }
+a { color: #7fb0ff; }
+.fact b { background: linear-gradient(90deg, #f0883e, #e34ba9); -webkit-background-clip: text;
+  background-clip: text; color: transparent; }
+.score-big { background: linear-gradient(90deg, #f0883e, #e34ba9, #58a6ff);
+  -webkit-background-clip: text; background-clip: text; color: transparent !important; }
+.verdict { text-shadow: 0 0 22px rgba(240,136,62,.35); }
+.tile, .q-card, .card { border-color: #303a4a; transition: border-color .15s, transform .15s; }
+.tile:hover, .q-card:hover { border-color: #f0883e !important; }
+.option.selected, .opt.selected, .pal-btn.answered { border-color: #f0883e !important;
+  background: linear-gradient(135deg, rgba(240,136,62,.22), rgba(227,75,169,.14)) !important; }
+.pal-btn.flagged { border-color: #e34ba9 !important; }
+::selection { background: rgba(240,136,62,.4); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #0d1117; }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #f0883e, #e34ba9); border-radius: 5px; }
+table tbody tr:hover { background: rgba(240,136,62,.06) !important; }
+</style>
+<style id="iphone-optimizations">
+/* iPhone / touch optimizations */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: rgba(88,166,255,.25); }
+button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-size: 16px; }
+.q-text, .screen p { overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .container, .wrap { padding-left: 12px; padding-right: 12px; }
+  .screen { padding: 24px 16px; }
+  .exam-facts { flex-wrap: wrap; }
+  .card { padding: 16px; }
+}
+</style>
 </head>
 <body>
 <div class="container">
@@ -62,44 +108,78 @@
     <span class="grow"></span>
     <span id="prog" class="badge"></span>
   </div>
-  <h1>Security Fundamentals &mdash; Interactive Notes</h1>
+  <h1>Section 1 · Security Fundamentals &mdash; Interactive Notes</h1>
   <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
-  <div class="banner">Based on the course's Section 02 lecture (&quot;Fundamentals of Security&quot;) — SY0-701 Domain 1, objectives 1.1 and 1.2. This is the foundation every other section builds on.</div>
+  <div class="banner">Based on all 13 lectures of the course's Section 02 (lectures 04–16) — SY0-701 Domain 1, objectives 1.1 and 1.2. This is the foundation every other section builds on: the exam assumes you can classify controls, apply the AAA model, and reason about CIA/C/I/A/N/A in any scenario.</div>
   <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
   <div id="cards"><details class="topic" open><summary><span class="t-name">1. Security vs. Usability (The Core Tension)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
-<ul class="mdlist"><li>Security and convenience are <strong>always at odds</strong>. Make something more secure → less usable; make it more convenient → less secure.</li><li>Classic example: ISP-provided Wi-Fi routers ship with a long random password (secure, hard to memorize) — so users change it to <code>magic2912</code> (convenient, easy to crack). Some routers even <strong>print the password on the device itself</strong>.</li><li>Users will actively <strong>bypass controls</strong> that make their jobs harder — plan for this human factor in every security decision.</li><li>The business cost is real: in 2022 the average major-company data breach cost <strong>$4.35 million</strong>.</li><li>The goal (&quot;sweet spot&quot;): easy enough for legitimate users, hard enough that threat actors can't get in.</li></ul>
+<ul class="mdlist"><li>Security and convenience are <strong>always at odds</strong>. Make something more secure → less usable; make it more convenient → less secure.</li><li>Classic example: ISP-provided Wi-Fi routers ship with a long random password (secure, hard to memorize) — so users change it to <code>magic2912</code> (convenient, easy to crack). Some routers even <strong>print the password on the device itself</strong>.</li><li>Users will actively <strong>bypass controls</strong> that make their jobs harder — plan for this human factor in every security decision.</li><li>The business cost is real: in 2022 the average major-company data breach cost <strong>$4.35 million</strong> (IBM figure).</li><li>The goal (&quot;sweet spot&quot;): easy enough for legitimate users, hard enough that threat actors can't get in.</li></ul>
 </div></details>
-<details class="topic" open><summary><span class="t-name">2. Two Definitions the Exam Loves to Contrast</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<details class="topic" open><summary><span class="t-name">2. Information Security vs. Information System Security</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
 <div class="tblwrap"><table><thead><tr><th>Term</th><th>Protects</th><th>Example</th></tr></thead><tbody><tr><td><strong>Information security</strong></td><td>The <strong>data/information itself</strong> — protecting it from unauthorized access, unlawful modification, disruption, disclosure, corruption, destruction</td><td>Encrypting sensitive files</td></tr><tr><td><strong>Information system security</strong></td><td>The <strong>systems that hold and process</strong> the data</td><td>Hardening the server, network device, or smartphone that stores the data</td></tr></tbody></table></div>
 <p>Exam cue: data itself → information security; the devices holding it → information system security.</p>
 </div></details>
-<details class="topic" open><summary><span class="t-name">3. The CIA Triad — and Its Modern Extension</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
-<div class="tblwrap"><table><thead><tr><th>Pillar</th><th>Means</th><th>Example</th></tr></thead><tbody><tr><td><strong>Confidentiality</strong></td><td>Information accessible only to authorized parties</td><td>Encrypting files so only authorized people can decrypt and read them</td></tr><tr><td><strong>Integrity</strong></td><td>Data stays accurate and unaltered unless modification is required</td><td>Checksums verify a file was not changed/corrupted in transit</td></tr><tr><td><strong>Availability</strong></td><td>Resources accessible and functional when needed</td><td>Website redundancy keeps it online under high traffic</td></tr></tbody></table></div>
-<p><strong>Expanded model — C.I.A.N.A:</strong> the triad has grown to include:</p>
-<ul class="mdlist"><li><strong>Non-repudiation</strong> — guaranteeing an action/event took place and <strong>cannot be denied</strong> by the parties involved. Example: a <strong>digitally signed email</strong> — the sender cannot deny sending it.</li><li><strong>Authentication</strong> — verifying identity. (Leads directly into the AAAs below.)</li></ul>
+<details class="topic" open><summary><span class="t-name">3. Threats and Vulnerabilities (OBJ 1.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Term</th><th>Definition</th></tr></thead><tbody><tr><td><strong>Threat</strong></td><td>Any activity or event with the <strong>potential to cause harm</strong> to an information system, the data it holds, or the organization.</td></tr><tr><td><strong>Vulnerability</strong></td><td>A <strong>weakness</strong> that could be exploited to cause harm.</td></tr><tr><td><strong>Risk</strong></td><td>The <strong>likelihood</strong> that a threat will exploit a vulnerability, combined with the <strong>impact</strong> if it does.</td></tr></tbody></table></div>
+<ul class="mdlist"><li><strong>Threats</strong> come from three sources: <strong>natural</strong> (earthquake, flood, tornado), <strong>intentional/man-made</strong> (attacks by threat actors), and <strong>unintentional</strong> (accidental deletion, misconfiguration).</li><li>The chain to remember: a <strong>threat</strong> exploits a <strong>vulnerability</strong> → which creates a <strong>risk</strong> → mitigated by <strong>controls</strong> → protecting <strong>assets</strong>.</li></ul>
 </div></details>
-<details class="topic" open><summary><span class="t-name">4. The AAAs of Security</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
-<ul class="mdlist"><li><strong>Authentication</strong> — verifying the <strong>identity</strong> of a user or system. Example: username + password checked against a stored version at login.</li><li><strong>Authorization</strong> — determining <strong>what actions/resources</strong> an authenticated user may perform. Example: you may have read permission on database records but not write/edit.</li><li><strong>Accounting</strong> — <strong>tracking</strong> user activities and resource utilization, typically for <strong>auditing or billing</strong>. Example: logging all user activity on the network to detect unusual or unauthorized behavior.</li></ul>
-<p>Order matters: authenticate (who are you?) → authorize (what may you do?) → account (what did you do?).</p>
+<details class="topic" open><summary><span class="t-name">4. Confidentiality — Methods (OBJ 1.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Confidentiality = information is accessible <strong>only to authorized parties</strong>. Five methods the course lists:</p>
+<ul class="mdlist"><li><strong>Encryption</strong> — encode data so only authorized parties can read it (files, transmissions).</li><li><strong>Access controls</strong> — restrict who can view/read the data (file permissions, role-based views).</li><li><strong>Data masking / tokenization</strong> — hide portions of the data (showing only last 4 digits of a card number).</li><li><strong>Physical security</strong> — locks, guards, badge readers that keep unauthorized people away from the data/hardware.</li><li><strong>Training and awareness</strong> — teach people to protect sensitive information (clean desk, not discussing secrets publicly).</li></ul>
 </div></details>
-<details class="topic" open><summary><span class="t-name">5. Security Controls</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
-<p><strong>Definition:</strong> measures or mechanisms put in place to <strong>mitigate risks</strong> and protect the CIA of information systems and their data.</p>
-<p><strong>Categories (by nature):</strong></p>
-<ul class="mdlist"><li><strong>Technical</strong> — technology-based (firewalls, encryption, access control lists)</li><li><strong>Managerial</strong> — administrative/management processes (policies, risk assessments, standards)</li><li><strong>Operational</strong> — day-to-day procedures (awareness training, physical security procedures)</li><li><strong>Physical</strong> — tangible protections (locks, guards, fences)</li></ul>
-<p><strong>Types (by function):</strong></p>
-<ul class="mdlist"><li><strong>Preventative</strong> — stops an incident before it happens (firewall, encryption)</li><li><strong>Deterrent</strong> — discourages attackers (warning banners, visible cameras)</li><li><strong>Detective</strong> — identifies/discovers incidents (IDS, log monitoring, CCTV review)</li><li><strong>Corrective</strong> — restores after an incident (backups, patching, failover)</li><li><strong>Compensating</strong> — alternative control when the primary is not feasible</li><li><strong>Directive</strong> — directs/guid behavior (policies, signage, procedures)</li></ul>
+<details class="topic" open><summary><span class="t-name">5. Integrity — Methods (OBJ 1.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Integrity = data stays <strong>accurate and unaltered</strong> unless modification is required. Five methods:</p>
+<ul class="mdlist"><li><strong>Hashing</strong> — compute a fingerprint of the data; any change changes the hash.</li><li><strong>Digital signatures</strong> — prove the data came from a specific sender and wasn't altered.</li><li><strong>Checksums</strong> — verify a file was not changed/corrupted in transit.</li><li><strong>Access controls</strong> — restrict <strong>who can modify</strong> the data (separate from confidentiality's &quot;who can see&quot;).</li><li><strong>Audits and audit trails</strong> — review logs of who changed what and when.</li></ul>
+<p>Note for the exam: integrity protects data from <strong>unauthorized modification</strong> — not just corruption, but deliberate tampering.</p>
 </div></details>
-<details class="topic" open><summary><span class="t-name">6. Zero Trust</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
-<ul class="mdlist"><li><strong>Principle: trust no one by default</strong> — no user, inside or outside the organization, is trusted automatically. <strong>Everyone must be verified</strong> before accessing resources.</li><li>Achieved through two planes:</li><ul><li><strong>Control plane</strong>: adaptive identity, threat scope reduction, policy-driven access controls, secured zones.</li><li><strong>Data plane</strong>: subject and system, <strong>policy engine</strong>, <strong>policy administrator</strong>, and <strong>policy enforcement points</strong> (PEPs).</li></ul></ul>
+<details class="topic" open><summary><span class="t-name">6. Availability — &quot;The Nines&quot; and Redundancy (OBJ 1.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Availability = resources are <strong>accessible and functional when needed</strong>.</p>
+<div class="tblwrap"><table><thead><tr><th>Uptime</th><th>Downtime per year</th></tr></thead><tbody><tr><td>99% (&quot;two nines&quot;)</td><td>3.65 days</td></tr><tr><td>99.9% (&quot;three nines&quot;)</td><td>8.76 hours</td></tr><tr><td>99.99% (&quot;four nines&quot;)</td><td>52.56 minutes</td></tr><tr><td>99.999% (&quot;five nines&quot;)</td><td>5.26 minutes</td></tr></tbody></table></div>
+<p><strong>Four types of redundancy:</strong></p>
+<ul class="mdlist"><li><strong>Geographic / site redundancy</strong> — a second data center in another location takes over if the first fails.</li><li><strong>Hardware redundancy</strong> — spare components ready to swap in (servers, drives, power supplies, RAID arrays).</li><li><strong>Software redundancy</strong> — mirrored applications/services that keep running if one instance fails (clustering, failover).</li><li><strong>Data redundancy</strong> — multiple copies of the data (backups, replication).</li></ul>
+<p>Also supporting availability: fault tolerance, RAID, clustering, load balancing, UPS + generator, and keeping systems patched.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">7. Non-Repudiation (OBJ 1.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Non-repudiation</strong> = guaranteeing an action or event took place and <strong>cannot be denied</strong> by the parties involved.</li><li>Closely tied to <strong>integrity</strong> — if you can prove the data wasn't altered and who sent it, they can't deny it.</li><li>Examples: a <strong>digitally signed email</strong> (the sender cannot deny sending it), a <strong>signed contract</strong>, hash verification of a file, audit/receipt logs.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">8. Authentication — The Five Factors (OBJ 1.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Authentication = verifying the <strong>identity</strong> of a user or system — the <strong>first A</strong> of AAA. <strong>Five factors:</strong></p>
+<div class="tblwrap"><table><thead><tr><th>Factor</th><th>Name</th><th>Examples</th></tr></thead><tbody><tr><td>1</td><td>Something you <strong>know</strong></td><td>Password, PIN, passphrase</td></tr><tr><td>2</td><td>Something you <strong>have</strong></td><td>Smart card, hardware token, phone (OTP app)</td></tr><tr><td>3</td><td>Something you <strong>are</strong></td><td>Biometrics — fingerprint, retina, face</td></tr><tr><td>4</td><td>Something you <strong>do</strong></td><td>Behavior — typing cadence, mouse movement, gait</td></tr><tr><td>5</td><td>Somewhere you <strong>are</strong></td><td>Location — geofencing, IP-based location</td></tr></tbody></table></div>
+<ul class="mdlist"><li><strong>MFA</strong> = using <strong>two or more factors from different categories</strong>. Password + SMS code = MFA (know + have). Password + security question is <strong>NOT</strong> MFA (same category).</li><li>Passwordless authentication (Windows Hello, FIDO2 keys) still maps onto these factors.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">9. Authorization Models (OBJ 1.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Authorization = determining <strong>what an authenticated user may do</strong> — the <strong>second A</strong>.</p>
+<div class="tblwrap"><table><thead><tr><th>Model</th><th>Rule</th></tr></thead><tbody><tr><td><strong>MAC</strong> (Mandatory Access Control)</td><td>Labels/clearances — the <strong>system</strong> decides; users cannot change permissions (military: Top Secret/Secret)</td></tr><tr><td><strong>DAC</strong> (Discretionary Access Control)</td><td>The <strong>owner</strong> of the resource decides who gets access (file sharing on your own folder)</td></tr><tr><td><strong>RBAC</strong> (Role-Based Access Control)</td><td>Permissions attach to <strong>roles</strong> (HR, Finance, IT-Admin); join the role → get the permissions</td></tr><tr><td><strong>ABAC</strong> (Attribute-Based Access Control)</td><td>Decisions from <strong>attributes</strong> — user dept, device type, time of day, location</td></tr><tr><td><strong>Rule-based</strong></td><td>Rules apply to <strong>everyone</strong> regardless of who they are (&quot;no FTP after 6pm&quot;)</td></tr></tbody></table></div>
+<p>Supporting idea: <strong>least privilege</strong> — give only the minimum access needed for the job.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">10. Accounting (OBJ 1.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Accounting = <strong>tracking</strong> user activities and resource utilization — the <strong>third A</strong>.</p>
+<ul class="mdlist"><li>Purpose: <strong>auditing</strong> (who did what, when — for security investigations) and <strong>billing</strong> (usage metering).</li><li>Common tools: <strong>Syslog</strong> (centralized log collection), <strong>Wireshark</strong> (packet capture/analysis), <strong>SIEM</strong> (correlates logs from across the network, alerts on anomalies).</li><li>Order of the AAAs: authenticate (<strong>who are you?</strong>) → authorize (<strong>what may you do?</strong>) → account (<strong>what did you do?</strong>).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">11. Security Control Categories (OBJ 1.1)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Controls are grouped by <strong>nature</strong> into four categories:</p>
+<div class="tblwrap"><table><thead><tr><th>Category</th><th>Nature</th><th>Examples</th></tr></thead><tbody><tr><td><strong>Technical</strong></td><td>Technology-based mechanisms</td><td>Firewalls, encryption, access control lists, IDS</td></tr><tr><td><strong>Managerial</strong></td><td>Administrative/management processes</td><td>Policies, risk assessments, standards, procedures</td></tr><tr><td><strong>Operational</strong></td><td>Day-to-day operational procedures</td><td>Security awareness training, physical security procedures, maintenance</td></tr><tr><td><strong>Physical</strong></td><td>Tangible protections</td><td>Locks, guards, fences, badge readers, cameras</td></tr></tbody></table></div>
+</div></details>
+<details class="topic" open><summary><span class="t-name">12. Security Control Types (OBJ 1.1)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Controls are grouped by <strong>function</strong> into six types — the exam's favorite classification question:</p>
+<div class="tblwrap"><table><thead><tr><th>Type</th><th>Function</th><th>Course examples</th></tr></thead><tbody><tr><td><strong>Preventative</strong></td><td>Stops the incident before it happens</td><td>Firewall, encryption, a <strong>locked door</strong></td></tr><tr><td><strong>Deterrent</strong></td><td>Discourages an attack from being attempted</td><td>The burglar-alarm <strong>sign</strong> in the window, warning banners, lights, visible guards</td></tr><tr><td><strong>Detective</strong></td><td>Identifies/discovers the incident as it happens</td><td>The burglar <strong>alarm</strong> itself, IDS, CCTV, log monitoring</td></tr><tr><td><strong>Corrective</strong></td><td>Restores systems after an incident</td><td>Patching a vulnerability, restoring from backup, <strong>antivirus quarantining an infected file</strong></td></tr><tr><td><strong>Compensating</strong></td><td>Alternative control used when the primary isn't feasible</td><td>Using a <strong>VPN tunnel to protect a legacy system</strong> that can't support modern encryption</td></tr><tr><td><strong>Directive</strong></td><td>Directs/guides behavior</td><td>An <strong>acceptable use policy (AUP)</strong>, signage, procedures</td></tr></tbody></table></div>
+<p>Exam traps from this table: the alarm <strong>sign</strong> is deterrent but the alarm is detective; AV <strong>quarantine</strong> is corrective; a <strong>VPN over legacy</strong> is compensating; an <strong>AUP</strong> is directive.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">13. Zero Trust (OBJ 1.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Core principle: never trust, always verify</strong> — no user, device, or application is trusted by default, <strong>inside or outside</strong> the network. Everyone must be authenticated and authorized <strong>every time</strong>.</li><li>Operates through two planes:</li><ul><li><strong>Control plane</strong> — defines and manages access: <strong>adaptive identity</strong> (real-time validation using behavior, device, location), <strong>threat scope reduction</strong>, <strong>policy-driven access control</strong>, <strong>secured zones</strong> (isolated environments for sensitive data). The control plane uses a <strong>policy engine</strong> (cross-references each request against its rule book of policies) and a <strong>policy administrator</strong> (establishes and manages those policies) to <strong>decide</strong> whether access is granted.</li><li><strong>Data plane</strong> — <strong>executes</strong> the decisions: the <strong>subject or system</strong> (the individual/entity requesting access) and the <strong>policy enforcement point (PEP)</strong> (the gate that allows or denies the request at the resource).</li></ul><li>Related mantra: <strong>assume breach</strong> — design as if the attacker is already inside.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">14. Gap Analysis and POA&amp;M (OBJ 1.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Gap analysis = comparing <strong>where you are</strong> with <strong>where you want to be</strong>, then closing the gap. <strong>Four steps:</strong></p>
+<ul class="mdlist"><li><strong>Document the current state</strong> — measure against established <strong>baselines</strong>.</li><li><strong>Define the desired state</strong> — what the security posture should look like (from standards, regulations, business needs).</li><li><strong>Identify the gaps</strong> — the difference between the two.</li><li><strong>Create a remediation plan</strong> — a <strong>POA&amp;M (Plan of Action &amp; Milestones)</strong>: what will be fixed, by whom, and by when.</li></ul>
 </div></details>
 <details class="topic" open><summary><span class="t-name">Key Takeaways</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
-<ul class="mdlist"><li>Security vs. usability is a permanent trade-off — users bypass controls that are too painful, so design for the sweet spot.</li><li><strong>Information security = protect the data; information system security = protect the systems holding it.</strong></li><li>CIA triad + <strong>N</strong>on-repudiation + <strong>A</strong>uthentication = the modern pentagon; the AAAs (authentication → authorization → accounting) flow from it.</li><li>Know the four control <strong>categories</strong> (technical, managerial, operational, physical) and six <strong>types</strong> (preventative, deterrent, detective, corrective, compensating, directive).</li><li><strong>Zero trust = verify everyone</strong>, every time — control plane (policy decisions) + data plane (policy enforcement).</li></ul>
+<ul class="mdlist"><li>Security vs. usability is a permanent trade-off — design for the sweet spot.</li><li>A <strong>threat</strong> exploits a <strong>vulnerability</strong> → creates <strong>risk</strong> → mitigated by <strong>controls</strong>.</li><li>CIA + <strong>N</strong>on-repudiation + <strong>A</strong>uthentication = the modern pentagon; the <strong>AAAs</strong> (authenticate → authorize → account) flow from it.</li><li>Authentication has <strong>five factors</strong> (know / have / are / do / somewhere) — MFA needs two <strong>different</strong> categories.</li><li>Authorization models: <strong>MAC</strong> (system labels), <strong>DAC</strong> (owner decides), <strong>RBAC</strong> (roles), <strong>ABAC</strong> (attributes), <strong>rule-based</strong> (rules for everyone).</li><li><strong>Four control categories</strong> (technical, managerial, operational, physical) × <strong>six control types</strong> (preventative, deterrent, detective, corrective, compensating, directive) — know the course's exact examples.</li><li><strong>Zero trust = verify everything</strong>, via the control plane (policy engine decides) and data plane (PEP enforces).</li><li><strong>Gap analysis:</strong> current state → desired state → find gaps → <strong>POA&amp;M</strong> to remediate.</li></ul>
 </div></details></div>
   <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
-  <div class="pagenav"><a class="btn ghost" href="cyber-resilience-and-redundancy-study-notes.html">&larr; Prev: Cyber Resilience and Redundancy</a> </div>
+  <div class="pagenav"><a class="btn ghost" href="exam-tips-study-notes.html">&larr; Prev: Section 0 · Exam Tips</a> <a class="btn ghost" href="threat-actors-study-notes.html">Next &rarr;: Section 2 · Threat Actors</a></div>
   <script>
     var SLUG = "security-fundamentals";
-    var TOTAL = 7;
+    var TOTAL = 15;
     var KEY = 'secplus_review_v1';
     function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
     function myTopics(){ var s = loadState(); return s[SLUG] || []; }

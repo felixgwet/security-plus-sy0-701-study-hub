@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introduction — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+<style id="colorful-theme">
+/* ===== colorful theme override (inject-color.js) ===== */
+body { background-image:
+  radial-gradient(900px 420px at 85% -8%, rgba(240,136,62,.10), transparent 60%),
+  radial-gradient(700px 380px at -5% 108%, rgba(88,166,255,.08), transparent 60%),
+  radial-gradient(500px 300px at 50% 50%, rgba(227,75,169,.04), transparent 70%);
+  background-attachment: fixed; }
+h1 { background: linear-gradient(90deg, #f0883e 0%, #e34ba9 55%, #58a6ff 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent; }
+.badge { background: linear-gradient(90deg, rgba(240,136,62,.20), rgba(88,166,255,.14)) !important;
+  border: 1px solid rgba(240,136,62,.45) !important; color: #ffd9b3 !important; }
+.btn { background: linear-gradient(135deg, #f0883e, #e36414) !important;
+  border: none !important; box-shadow: 0 3px 14px rgba(240,136,62,.35); }
+.btn:hover { filter: brightness(1.12); box-shadow: 0 5px 20px rgba(240,136,62,.55); }
+.btn.ghost { background: rgba(240,136,62,.10) !important; border: 1px solid rgba(240,136,62,.5) !important;
+  box-shadow: none; color: #ffb26b !important; }
+a { color: #7fb0ff; }
+.fact b { background: linear-gradient(90deg, #f0883e, #e34ba9); -webkit-background-clip: text;
+  background-clip: text; color: transparent; }
+.score-big { background: linear-gradient(90deg, #f0883e, #e34ba9, #58a6ff);
+  -webkit-background-clip: text; background-clip: text; color: transparent !important; }
+.verdict { text-shadow: 0 0 22px rgba(240,136,62,.35); }
+.tile, .q-card, .card { border-color: #303a4a; transition: border-color .15s, transform .15s; }
+.tile:hover, .q-card:hover { border-color: #f0883e !important; }
+.option.selected, .opt.selected, .pal-btn.answered { border-color: #f0883e !important;
+  background: linear-gradient(135deg, rgba(240,136,62,.22), rgba(227,75,169,.14)) !important; }
+.pal-btn.flagged { border-color: #e34ba9 !important; }
+::selection { background: rgba(240,136,62,.4); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #0d1117; }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #f0883e, #e34ba9); border-radius: 5px; }
+table tbody tr:hover { background: rgba(240,136,62,.06) !important; }
+</style>
+<style id="iphone-optimizations">
+/* iPhone / touch optimizations */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: rgba(88,166,255,.25); }
+button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-size: 16px; }
+.q-text, .screen p { overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .container, .wrap { padding-left: 12px; padding-right: 12px; }
+  .screen { padding: 24px 16px; }
+  .exam-facts { flex-wrap: wrap; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Introduction &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  <div class="banner">What the Security+ certification is, the official exam logistics, and how to use this study pack effectively. Source: the course's Section 01 downloads (Exam Objectives v5.0, Study Guide, Study Plan) and the Exam Tips lecture.</div>
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><details class="topic" open><summary><span class="t-name">1. What Security+ Certifies</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>The CompTIA Security+ exam (SY0-701) certifies that the successful candidate has the knowledge and skills to:</p>
+<ul class="mdlist"><li><strong>Assess the security posture</strong> of an enterprise environment and recommend and implement appropriate security solutions.</li><li><strong>Monitor and secure hybrid environments</strong>, including cloud, mobile, and Internet of Things (IoT).</li><li><strong>Operate with awareness of applicable regulations and policies</strong>, including principles of governance, risk, and compliance.</li><li><strong>Identify, analyze, and respond to security events and incidents.</strong></li></ul>
+<p>It's a vendor-neutral, entry-level security certification — a common first security cert and a DoD 8570/8140 baseline qualification.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">2. Official Exam Logistics (SY0-701)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Detail</th><th>Value</th></tr></thead><tbody><tr><td>Required exam code</td><td><strong>SY0-701</strong></td></tr><tr><td>Number of questions</td><td><strong>Maximum of 90</strong></td></tr><tr><td>Question types</td><td><strong>Multiple-choice + performance-based (PBQs)</strong></td></tr><tr><td>Length of test</td><td><strong>90 minutes</strong></td></tr><tr><td>Recommended experience</td><td>Min. <strong>2 years</strong> IT administration with a security focus, hands-on technical security experience, broad security-concept knowledge</td></tr></tbody></table></div>
+<p><strong>Exam domains and weighting (Objectives v5.0):</strong></p>
+<div class="tblwrap"><table><thead><tr><th>Domain</th><th>Weight</th></tr></thead><tbody><tr><td>1.0 General Security Concepts</td><td>12%</td></tr><tr><td>2.0 Threats, Vulnerabilities, and Mitigations</td><td>22%</td></tr><tr><td>3.0 Security Architecture</td><td>18%</td></tr><tr><td>4.0 Security Operations</td><td>28%</td></tr><tr><td>5.0 Security Program Management and Oversight</td><td>20%</td></tr></tbody></table></div>
+<p>Domain 4.0 (Security Operations) is the largest — give it proportionally more revision time.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">3. How to Use This Pack</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Each course section in the library gives you five tools — work through them in this order:</p>
+<ul class="mdlist"><li><strong>Notes</strong> — read the interactive notes page to learn the material.</li><li><strong>Flashcards</strong> — drill the auto-generated deck until &quot;Know it&quot; on every card.</li><li><strong>Simulator</strong> — a quick 10–15 question section check with explanations.</li><li><strong>Feedback Exam</strong> — a graded pass that feeds the Analytics page.</li><li><strong>Final Exam</strong> — the full section scenario exam, CompTIA-style.</li></ul>
+<p><strong>Exam Tips section (Section 00):</strong> a video lecture turned into interactive notes, a quiz, a simulator, and a feedback exam — read this first if you're new to CompTIA exams.</p>
+<p><strong>The three big exams at the top of the library</strong> (<code>Foundations</code>, <code>Intermediate</code>, <code>Expert</code>) are full-course capstones: 90 questions each, matching the real exam's length, one per pass through the course. Take the Foundations one early as a baseline, Intermediate mid-course, and Expert when you feel ready.</p>
+<p><strong>The Analytics page</strong> turns every graded attempt into a readiness picture — domain coverage, strengths/weaknesses, pace, and a predicted score. Take exams early and often: analytics only works if it has data.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">4. Study Plan Advice (from the Study Plan PDF)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Work the course in order</strong> — sections build on each other; Section 02 (Fundamentals) is the vocabulary every later section assumes.</li><li><strong>Do a little every day</strong> — spaced repetition beats cramming; the flashcard &quot;Know it / Still learning&quot; tracking is built for exactly this.</li><li><strong>Test before you feel ready</strong> — a feedback exam is a diagnostic, not a verdict. A weak result tells you exactly what to read next.</li><li><strong>Read every explanation</strong> — on this exam, distractors are designed around common misconceptions; understanding *why* the wrong answers are wrong is half the preparation.</li><li><strong>Simulate real conditions before the real thing</strong> — 90 questions, one sitting, no notes, timed. If you can sit the Expert exam comfortably, the real 90-minute sitting holds no surprises.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">5. Integrity Warning</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>CompTIA <strong>does not authorize &quot;brain dump&quot; sites</strong>, and using them can get your certification revoked. Everything in this pack is original practice content built from the official exam objectives — safe to use, and it actually prepares you for the PBQ-style thinking the dumps can't teach.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Key Takeaways</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>SY0-701: <strong>max 90 questions, 90 minutes</strong>, MCQ + PBQs; passing score is scaled (750/900 reported).</li><li>Domain weights: <strong>4.0 is the biggest (28%)</strong>, then 2.0 (22%), 5.0 (20%), 3.0 (18%), 1.0 (12%).</li><li>Use each section's five tools in order: <strong>notes → flashcards → simulator → feedback → final</strong>.</li><li>Let <strong>Analytics</strong> guide revision — data beats guessing what you're weak on.</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="cyber-resilience-and-redundancy-study-notes.html">&larr; Prev: Cyber Resilience and Redundancy</a> </div>
+  <script>
+    var SLUG = "introduction";
+    var TOTAL = 6;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

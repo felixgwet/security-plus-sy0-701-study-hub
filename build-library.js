@@ -49,6 +49,9 @@ megas.forEach(f => used.add(f));
 const comptias = files.filter(f => /comptia-full-exam/.test(f)).sort();
 comptias.forEach(f => used.add(f));
 
+// Introduction notes are showcased in introBlock above, not the leftovers table
+used.add('introduction-study-notes.html');
+
 // Anything left over that looks like a quiz/notes/exam (e.g. security-fundamentals)
 // Study-tools pages (interactive notes html, flashcards) are linked from their own
 // index/columns, and raw .md sources stay in the repo for regeneration only.
@@ -63,8 +66,20 @@ const megaCards = megas.map(f => {
 const comptiaCards = comptias.map(f => {
   const m = f.match(/comptia-full-exam-(\d)-(.+)\.html$/);
   const name = m ? `Exam ${m[1]} &middot; ${titleize(m[2])}` : f;
-  return `<a class="tile" href="exam-simulator/${encodeURIComponent(f)}" style="border-color:#4a6fa5;"><b>CompTIA-Style Full &middot; ${name}</b><span>90 questions &middot; all 28 sections &middot; 90 minutes</span></a>`;
+  return `<a class="tile" href="exam-simulator/${encodeURIComponent(f)}" style="border-color:#4a6fa5;"><b>CompTIA-Style Full &middot; ${name}</b><span>90 questions &middot; full-course coverage &middot; 90 minutes</span></a>`;
 }).join('\n      ');
+
+// Section 01 — Introduction: study notes + the course's own PDF resources
+const doc = n => `course-docs/${encodeURIComponent(n)}`;
+const introBlock = `
+    <h2>Section 01 &mdash; Introduction &amp; Course Resources</h2>
+    <div class="megas">
+      <a class="tile" href="exam-simulator/introduction-study-notes.html"><b>Introduction &middot; Interactive Study Notes</b><span>What the cert covers, official exam logistics, how to use this pack, study-plan advice</span></a>
+      <a class="tile" href="${doc('01 - Welcome to the Course! - Dion-Training-Study-Sheet.pdf')}"><b>Course PDF &middot; Welcome Study Sheet</b><span>One-page course overview from the instructor</span></a>
+      <a class="tile" href="${doc('02 - Download the Study Guide - CompTIA-Security-SY0-701-Exam-Objectives.pdf')}"><b>Course PDF &middot; Official Exam Objectives v5.0</b><span>All 5 domains, every tested objective &mdash; the exam's table of contents</span></a>
+      <a class="tile" href="${doc('02 - Download the Study Guide - CompTIA-Security-SY0-701-Study-Guide.pdf')}"><b>Course PDF &middot; Full Study Guide (405 pages)</b><span>The complete written course notes &mdash; deep-dive reference</span></a>
+      <a class="tile" href="${doc('02 - Download the Study Guide - CompTIA-Security-SY0-701-Study-Plan.pdf')}"><b>Course PDF &middot; Study Plan</b><span>13-page structured revision schedule</span></a>
+    </div>`;
 
 const extraRows = extras.length ? `
     <h2>Additional Topics</h2>
@@ -152,6 +167,7 @@ const html = `<!DOCTYPE html>
     <div class="megas">
       ${megaCards}
     </div>
+    ${introBlock}
 
     <h2>Sections ${rows[0] ? rows[0].num : ''} &ndash; ${rows.length ? rows[rows.length - 1].num : ''} &mdash; each with simulator, quiz, notes, flashcards, feedback &amp; final exam</h2>
     <table>

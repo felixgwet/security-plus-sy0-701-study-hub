@@ -45,6 +45,25 @@
   .muted { color: #9aa4b2; font-size: 13px; }
   .trend-bar { display: inline-block; width: 90px; height: 10px; background: #21262e; border-radius: 4px; overflow: hidden; vertical-align: middle; margin-right: 8px; }
   .trend-fill { height: 100%; }
+  /* readiness chart + drilldown */
+  .chart { display: flex; align-items: flex-end; gap: 10px; height: 190px; padding: 14px 10px 4px; position: relative; border-bottom: 1px solid #2d333b; }
+  .chart-pass { position: absolute; left: 10px; right: 10px; border-top: 2px dashed #d29922; z-index: 1; }
+  .chart-pass span { position: absolute; right: 0; top: -18px; font-size: 11px; color: #d29922; }
+  .chart-col { flex: 1; max-width: 64px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; position: relative; z-index: 2; }
+  .chart-bar { width: 100%; border-radius: 6px 6px 0 0; background: linear-gradient(180deg, #58a6ff, #2f6fce); min-height: 3px; }
+  .chart-bar.latest { background: linear-gradient(180deg, #f0883e, #e36414); box-shadow: 0 0 14px rgba(240,136,62,.4); }
+  .chart-bar.failed { background: linear-gradient(180deg, #f85149, #a7221d); }
+  .chart-val { font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+  .chart-lbl { font-size: 10px; color: #9aa4b2; margin-top: 6px; white-space: nowrap; }
+  details.att { background: #161b22; border: 1px solid #2d333b; border-radius: 10px; margin-bottom: 8px; }
+  details.att summary { cursor: pointer; padding: 12px 16px; font-size: 14px; list-style: none; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  details.att summary::-webkit-details-marker { display: none; }
+  details.att summary:hover { background: #161b22; }
+  details.att .caret { color: #6e7681; font-size: 12px; }
+  details.att[open] .caret { transform: rotate(90deg); }
+  .att-body { padding: 4px 18px 14px 34px; }
+  .att-row { display: grid; grid-template-columns: minmax(140px,220px) 1fr 90px; gap: 10px; align-items: center; padding: 4px 0; font-size: 13px; }
+  .delta-up { color: #3fb950; } .delta-down { color: #f85149; } .delta-flat { color: #9aa4b2; }
 </style>
 <style id="iphone-optimizations">
 /* iPhone / touch optimizations */
@@ -59,6 +78,39 @@ button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-s
   .card { padding: 16px; }
 }
 </style>
+<style id="colorful-theme">
+/* ===== colorful theme override (inject-color.js) ===== */
+body { background-image:
+  radial-gradient(900px 420px at 85% -8%, rgba(240,136,62,.10), transparent 60%),
+  radial-gradient(700px 380px at -5% 108%, rgba(88,166,255,.08), transparent 60%),
+  radial-gradient(500px 300px at 50% 50%, rgba(227,75,169,.04), transparent 70%);
+  background-attachment: fixed; }
+h1 { background: linear-gradient(90deg, #f0883e 0%, #e34ba9 55%, #58a6ff 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent; }
+.badge { background: linear-gradient(90deg, rgba(240,136,62,.20), rgba(88,166,255,.14)) !important;
+  border: 1px solid rgba(240,136,62,.45) !important; color: #ffd9b3 !important; }
+.btn { background: linear-gradient(135deg, #f0883e, #e36414) !important;
+  border: none !important; box-shadow: 0 3px 14px rgba(240,136,62,.35); }
+.btn:hover { filter: brightness(1.12); box-shadow: 0 5px 20px rgba(240,136,62,.55); }
+.btn.ghost { background: rgba(240,136,62,.10) !important; border: 1px solid rgba(240,136,62,.5) !important;
+  box-shadow: none; color: #ffb26b !important; }
+a { color: #7fb0ff; }
+.fact b { background: linear-gradient(90deg, #f0883e, #e34ba9); -webkit-background-clip: text;
+  background-clip: text; color: transparent; }
+.score-big { background: linear-gradient(90deg, #f0883e, #e34ba9, #58a6ff);
+  -webkit-background-clip: text; background-clip: text; color: transparent !important; }
+.verdict { text-shadow: 0 0 22px rgba(240,136,62,.35); }
+.tile, .q-card, .card { border-color: #303a4a; transition: border-color .15s, transform .15s; }
+.tile:hover, .q-card:hover { border-color: #f0883e !important; }
+.option.selected, .opt.selected, .pal-btn.answered { border-color: #f0883e !important;
+  background: linear-gradient(135deg, rgba(240,136,62,.22), rgba(227,75,169,.14)) !important; }
+.pal-btn.flagged { border-color: #e34ba9 !important; }
+::selection { background: rgba(240,136,62,.4); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #0d1117; }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #f0883e, #e34ba9); border-radius: 5px; }
+table tbody tr:hover { background: rgba(240,136,62,.06) !important; }
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -70,7 +122,7 @@ button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-s
 <script>
 const KEY = 'secplus_results_v1';
 const SECTIONS = [
-  {num:0,slug:'exam-tips'},{num:2,slug:'threat-actors'},{num:3,slug:'physical-security'},
+  {num:0,slug:'exam-tips'},{num:1,slug:'security-fundamentals'},{num:2,slug:'threat-actors'},{num:3,slug:'physical-security'},
   {num:4,slug:'social-engineering'},{num:5,slug:'malware'},{num:6,slug:'data-protection'},
   {num:7,slug:'cryptographic-solutions'},{num:8,slug:'risk-management'},{num:9,slug:'third-party-vendor-risks'},
   {num:10,slug:'governance-and-compliance'},{num:11,slug:'asset-and-change-management'},{num:12,slug:'audits-and-assessments'},
@@ -82,6 +134,18 @@ const SECTIONS = [
   {num:28,slug:'conclusion'}
 ];
 const NOTES_OVERRIDE = { 'cyber-resilience': 'cyber-resilience-and-redundancy-study-notes.html' };
+// Official exam domains (Objectives v5.0) mapped to this pack's sections
+const DOMAINS = [
+  ['1.0 General Security Concepts', 12, ['security-fundamentals','asset-and-change-management','cryptographic-solutions']],
+  ['2.0 Threats, Vulnerabilities & Mitigations', 22, ['threat-actors','physical-security','social-engineering','malware','vulnerabilities-and-attacks','malicious-activity','hardening']],
+  ['3.0 Security Architecture', 18, ['data-protection','security-architecture','security-infrastructure','identity-and-access-management']],
+  ['4.0 Security Operations', 28, ['security-techniques','vulnerability-management','alerting-and-monitoring','incident-response','investigating-an-incident','automation-and-orchestration']],
+  ['5.0 Security Program Management & Oversight', 20, ['risk-management','third-party-vendor-risks','governance-and-compliance','audits-and-assessments','cyber-resilience','security-awareness']],
+];
+function domainOf(slug){
+  for (const [name,,slugs] of DOMAINS) if (slugs.includes(slug)) return name;
+  return 'Cross-domain (course wrap-up)';
+}
 function titleize(s){ const small=new Set(['and','of','the','for','in','a','an','to']); return s.split('-').map((w,i)=> i>0&&small.has(w) ? w : w[0].toUpperCase()+w.slice(1)).join(' '); }
 function pct(x){ return Math.round(x*100); }
 function load(){
@@ -279,6 +343,97 @@ if (!attempts.length) {
   });
   html += `</tbody></table>`;
 
+  // readiness trend chart
+  html += `<h2>Readiness trend</h2>`;
+  if (attempts.length > 1) {
+    const chartH = 150;
+    const passY = chartH * (1 - (750 - 100) / 800);
+    html += `<div class="card"><div class="chart">`;
+    html += `<div class="chart-pass" style="bottom:${(passY + 14).toFixed(0)}px"><span>750 pass</span></div>`;
+    attempts.forEach((a, i) => {
+      const s = scaledOf(a.pct);
+      const h = Math.max(3, chartH * (s - 100) / 800);
+      const cls = i === attempts.length - 1 ? 'chart-bar latest' : (s >= 750 ? 'chart-bar' : 'chart-bar failed');
+      html += `<div class="chart-col" title="${a.exam} — ${s}/900 on ${fmtDate(a.date)}">
+        <div class="chart-val">${s}</div>
+        <div class="${cls}" style="height:${h.toFixed(0)}px"></div>
+        <div class="chart-lbl">#${i + 1} · ${new Date(a.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</div>
+      </div>`;
+    });
+    html += `</div><div class="muted" style="margin-top:8px">Scaled score (100–900) per attempt, oldest to newest. ${passed ? 'You are above the pass line — the goal now is holding it under harder exams.' : 'Climb above the dashed 750 line consistently before booking the real exam.'}</div></div>`;
+  } else {
+    html += `<p class="muted">Finish a second exam and your readiness trend will chart here.</p>`;
+  }
+
+  // consistency, momentum, pacing, distance to pass
+  const pcts = attempts.map(a => a.pct);
+  const variance = pcts.reduce((s, p) => s + (p - avg) * (p - avg), 0) / pcts.length;
+  const stddev = Math.sqrt(variance);
+  const spread = Math.max(...pcts) - Math.min(...pcts);
+  const prev = attempts.length > 1 ? attempts[attempts.length - 2] : attempts[0];
+  const mom = last.pct - prev.pct;
+  const timed = attempts.filter(a => a.timeLeft != null);
+  const avgLeft = timed.length ? timed.reduce((s, a) => s + a.timeLeft, 0) / timed.length : null;
+  const squeaked = timed.filter(a => a.timeLeft !== null && a.timeLeft < 60).length;
+  const lastScaled = scaledOf(last.pct);
+  const qNeeded = lastScaled >= 750 ? 0 : Math.max(1, Math.ceil((0.8125 - last.pct) * 90));
+  html += `<div class="grid" style="margin-top:12px">
+    <div class="card"><div class="k">Consistency</div><div class="v">&plusmn;${Math.round(stddev * 100)}<span style="font-size:14px">pp</span></div><div class="s">score spread ${Math.round(spread * 100)}pp best&harr;worst — ${stddev < 0.05 ? 'very consistent, scores you can trust' : stddev < 0.1 ? 'fairly consistent' : 'volatile — one good exam isn&rsquo;t proof yet'}</div></div>
+    <div class="card"><div class="k">Momentum</div><div class="v ${mom >= 0 ? 'delta-up' : 'delta-down'}">${mom >= 0 ? '+' : ''}${Math.round(mom * 100)}<span style="font-size:14px">pp</span></div><div class="s">latest attempt vs the one before</div></div>
+    <div class="card"><div class="k">Pacing</div><div class="v">${avgLeft == null ? '&mdash;' : fmtLeft(avgLeft)}</div><div class="s">${timed.length ? `average time left across ${timed.length} timed attempt${timed.length > 1 ? 's' : ''}${squeaked ? ` · ${squeaked} finished under 1:00 left` : ''}` : 'no timing data recorded'}</div></div>
+    <div class="card"><div class="k">Distance to pass</div><div class="v">${lastScaled >= 750 ? '&check;' : '+' + qNeeded}</div><div class="s">${lastScaled >= 750 ? 'your latest attempt already clears the 750 line' : 'more correct answers needed on a 90-question exam, based on your latest attempt'}</div></div>
+  </div>`;
+
+  // domain coverage
+  const domAgg = {};
+  Object.entries(secAgg).forEach(([slug, v]) => {
+    const d = domainOf(slug);
+    if (!domAgg[d]) domAgg[d] = { c: 0, t: 0 };
+    domAgg[d].c += v.c; domAgg[d].t += v.t;
+  });
+  html += `<h2>Domain coverage — official SY0-701 weighting</h2>`;
+  if (Object.keys(domAgg).length) {
+    html += `<table><thead><tr><th>Domain</th><th>Real exam weight</th><th>Your mastery</th><th>Level</th><th>Questions</th></tr></thead><tbody>`;
+    DOMAINS.forEach(([name, weight]) => {
+      const agg = domAgg[name];
+      if (!agg) return;
+      const p = agg.c / agg.t;
+      html += `<tr><td>${name}</td><td class="muted">${weight}%</td><td class="pctcell"><span class="trend-bar" style="width:140px"><span class="trend-fill" style="display:block;width:${pct(p)}%;background:${barColor(p)}"></span></span> <b class="${clsOf(p)}">${pct(p)}%</b></td><td class="${clsOf(p)}">${labelOf(p)}</td><td class="muted">${agg.t}</td></tr>`;
+    });
+    if (domAgg['Cross-domain (course wrap-up)']) {
+      const agg = domAgg['Cross-domain (course wrap-up)'];
+      const p = agg.c / agg.t;
+      html += `<tr><td>Cross-domain (exam tips &amp; course wrap-up)</td><td class="muted">&mdash;</td><td class="pctcell"><span class="trend-bar" style="width:140px"><span class="trend-fill" style="display:block;width:${pct(p)}%;background:${barColor(p)}"></span></span> <b class="${clsOf(p)}">${pct(p)}%</b></td><td class="${clsOf(p)}">${labelOf(p)}</td><td class="muted">${agg.t}</td></tr>`;
+    }
+    html += `</tbody></table>`;
+  } else {
+    html += `<p class="muted">No per-section data recorded yet — take a section final or full exam.</p>`;
+  }
+
+  // per-attempt drilldown
+  html += `<h2>Attempt drilldown</h2><p class="muted" style="margin-top:-6px">Expand any attempt for its per-section breakdown — exactly where points were lost, worst section first.</p>`;
+  attempts.slice().reverse().forEach((a) => {
+    const s = scaledOf(a.pct);
+    const secs = Object.entries(a.sections || {}).filter(([slug]) => slug !== 'mixed')
+      .map(([slug, v]) => ({ slug, p: v.t ? v.c / v.t : 0, c: v.c, t: v.t }))
+      .sort((x, y) => x.p - y.p);
+    html += `<details class="att"><summary>
+      <span class="caret">&#9654;</span>
+      <b>${a.exam.replace('CompTIA Security+ SY0-701 · ', '')}</b>
+      <span class="muted">${fmtDate(a.date)}</span>
+      <span class="${s >= 750 ? 'strong' : 'weak'}">${pct(a.pct)}% &middot; ${s}/900 ${s >= 750 ? 'PASS' : 'below'}</span>
+      <span class="muted">time left ${fmtLeft(a.timeLeft)}</span>
+    </summary><div class="att-body">`;
+    if (secs.length) {
+      secs.forEach(r => {
+        html += `<div class="att-row"><span>${titleize(r.slug)}</span><span class="mini-track"><span class="mini-fill" style="display:block;width:${pct(r.p)}%;background:${barColor(r.p)}"></span></span><span class="muted">${(+r.c).toFixed(1)}/${r.t}</span></div>`;
+      });
+    } else {
+      html += `<div class="muted">No per-section data recorded for this attempt.</div>`;
+    }
+    html += `</div></details>`;
+  });
+
   // strengths & weaknesses
   html += `<h2>Strengths &amp; weaknesses by section</h2>`;
   if (secRows.length){
@@ -309,6 +464,7 @@ if (!attempts.length) {
               : gap > 0.10 ? 'Re-do the topic quiz, review the study notes, then retake the section final.'
               : 'One more pass over the study notes and a quiz should lock this in.';
       html += `<div class="rec"><b>${i+1}. ${titleize(r.slug)}</b> — scoring ${pct(r.pct)}% over ${r.t} question${r.t>1?'s':''}. ${q}
+        <div class="muted" style="margin-top:4px">Estimated to close the gap: &asymp;${Math.max(1, Math.round((0.85 - r.pct) * 20))} h of focused study on this section.</div>
         <div class="links" style="margin-top:6px">${secLinks(r.slug)}</div></div>`;
     });
   } else {
