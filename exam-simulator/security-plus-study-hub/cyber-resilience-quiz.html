@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Resilience and Redundancy Quiz · SY0-701 (Section 14)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+<style id="iphone-optimizations">
+/* iPhone / touch optimizations */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: rgba(88,166,255,.25); }
+button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-size: 16px; }
+.q-text, .screen p { overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .container, .wrap { padding-left: 12px; padding-right: 12px; }
+  .screen { padding: 24px 16px; }
+  .exam-facts { flex-wrap: wrap; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 14</div>
+    <h1>Cyber Resilience and Redundancy — Practice Quiz</h1>
+    <p>58 questions across all 10 lessons (OBJ 3.4): resilience vs redundancy, high availability (five nines vs six nines) with load balancing vs clustering, redundancy types (PSU, network, server/service, provider diversity, multi-cloud), RAID levels 0 / 1 / 5 / 6 / 10 and which are failure-, fault- and disaster-tolerant, capacity planning, power problems (surge, spike, sag, undervoltage, blackout) and protection (line conditioner, UPS, generators, PDC), backups and recovery (RPO, encryption, snapshots, replication, journaling), business continuity vs disaster recovery planning, hot / warm / cold / mobile sites, and resilience testing (tabletop, failover, simulation, parallel processing).</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+// ---- Lesson 122 · Cyber Resilience and Redundancy ----
+  {
+    lesson: "Lesson 122 · Cyber Resilience and Redundancy",
+    q: "What is cyber resilience?",
+    options: [
+      "The ability to prevent all cyber attacks from occurring",
+      "The entity's ability to continuously deliver the intended outcome despite adverse cyber events",
+      "The duplication of critical system components",
+      "The process of restoring data from backups"
+    ],
+    answer: 1,
+    why: "Cyber resilience = continuously delivering the intended outcome despite adverse cyber events — surviving and operating through attacks and failures, not just preventing them. Redundancy (option 3) is one of the key mechanisms that enables resilience."
+  },
+  {
+    lesson: "Lesson 122 · Cyber Resilience and Redundancy",
+    q: "What is redundancy?",
+    options: [
+      "Removing duplicate data to save storage space",
+      "Having additional systems, equipment, or processes to ensure continued functionality if the primary ones fail",
+      "Encrypting data twice for extra protection",
+      "A type of penetration test"
+    ],
+    answer: 1,
+    why: "Redundancy = additional systems, equipment, or processes ensuring continued functionality when primaries fail. It reduces the chance of total system failure because backups can take over — it is the backbone of both resilience and high availability designs."
+  },
+  {
+    lesson: "Lesson 122 · Cyber Resilience and Redundancy",
+    q: "Which exam objective does the Cyber Resilience and Redundancy section map to?",
+    options: [
+      "OBJ 5.5",
+      "OBJ 3.4",
+      "OBJ 1.3",
+      "OBJ 4.1"
+    ],
+    answer: 1,
+    why: "This section maps to objective 3.4: explain the importance of resilience and recovery in security architecture. It sits in Domain 3 (Security Architecture), covering HA, RAID, capacity planning, power, backups, continuity plans, redundant sites, and resilience testing."
+  },
+  {
+    lesson: "Lesson 122 · Cyber Resilience and Redundancy",
+    q: "Why does redundancy play a big role in cyber resilience?",
+    options: [
+      "It makes systems faster",
+      "The chances of a total system failure are significantly reduced because backups can take over when the primary system fails",
+      "It eliminates the need for backups",
+      "It reduces electricity costs"
+    ],
+    answer: 1,
+    why: "With backup systems in place, a single component failure no longer means total failure — operations switch to the redundant component. This is how organizations swiftly recover and continue operations even in the face of attacks or technical failures."
+  },
+  {
+    lesson: "Lesson 122 · Cyber Resilience and Redundancy",
+    q: "Which topics are covered under resilience and recovery in this section?",
+    options: [
+      "High availability, RAID, capacity planning, power, backups, continuity plans, redundant sites, resilience testing",
+      "Malware analysis and forensics",
+      "Identity and access management",
+      "Cryptography and key management"
+    ],
+    answer: 0,
+    why: "The section roadmap: high availability (load balancing vs clustering), data redundancy (RAID), configuring RAID, capacity planning (people/technology/infrastructure/processes), powering data centers (generators, UPS, line conditioners, PDCs), data backups (onsite/offsite, snapshots, replication, journaling), continuity of operations plans, redundant site considerations (hot/warm/cold/mobile/virtual, platform diversity), and resilience/recovery testing."
+  },
+// ---- Lesson 123 · High Availability ----
+  {
+    lesson: "Lesson 123 · High Availability",
+    q: "What does 'five nines of availability' mean?",
+    options: [
+      "99.5% uptime",
+      "99.999% uptime — a maximum of about five minutes of downtime per year",
+      "99.9999% uptime — about 31 seconds of downtime per year",
+      "99.99999% uptime"
+    ],
+    answer: 1,
+    why: "Five nines = 99.999% uptime ≈ 5 minutes of downtime per year — the gold standard. Six nines (99.9999%) ≈ 31 seconds/year, which some cloud networks target. Exam questions love swapping these two figures as distractors."
+  },
+  {
+    lesson: "Lesson 123 · High Availability",
+    q: "What is load balancing?",
+    options: [
+      "Combining multiple servers into one logical system for failover",
+      "Distributing workloads across multiple computing resources to optimize resource use and prevent overloading any single resource",
+      "Duplicating power supplies inside a server",
+      "Backing up data to two locations simultaneously"
+    ],
+    answer: 1,
+    why: "Load balancing distributes incoming requests across multiple servers so no single resource is overloaded — optimizing use, maximizing throughput, minimizing response time. All requests go to the load balancer first, which redirects them (e.g., three web servers taking turns for a popular blog)."
+  },
+  {
+    lesson: "Lesson 123 · High Availability",
+    q: "What is the key difference between load balancing and clustering?",
+    options: [
+      "Load balancing provides redundancy on failure; clustering handles excess traffic",
+      "Load balancing distributes traffic for performance; clustering provides redundancy so an application survives hardware failure with no single point of failure",
+      "They are identical technologies",
+      "Clustering is only for databases"
+    ],
+    answer: 1,
+    why: "Load balancing = performance/distribution of excess traffic. Clustering = multiple devices working as a single system to keep an application available through hardware failure — eliminating single points of failure. They combine: the balancer optimizes under normal conditions; clustering takes over on component failure."
+  },
+  {
+    lesson: "Lesson 123 · High Availability",
+    q: "Redundant hardware for everything would double costs. What does the course suggest doing instead for some redundancy needs?",
+    options: [
+      "Accept the risk and do nothing",
+      "Achieve the desired redundancy using software or cloud-based services instead of duplicated hardware",
+      "Buy cheaper hardware in bulk",
+      "Reduce the number of employees instead"
+    ],
+    answer: 1,
+    why: "The course notes that fully redundant hardware is prohibitively expensive, so design decisions should weigh whether redundancy for a given component requires hardware duplication or can be met with software/cloud services — balancing cost against availability requirements."
+  },
+  {
+    lesson: "Lesson 123 · High Availability",
+    q: "What is provider diversity?",
+    options: [
+      "Hiring staff from different backgrounds",
+      "Using two or more service providers for a critical service so operations continue if one provider has an outage",
+      "Using multiple programming languages",
+      "A cloud billing model"
+    ],
+    answer: 1,
+    why: "Provider diversity = two or more providers for critical external services (ISPs, payment processors). The course's example: Stripe as primary card processor with a secondary processor configured and ready if Stripe has a catastrophic outage. Two domain controllers (primary/secondary) follow the same principle."
+  },
+  {
+    lesson: "Lesson 123 · High Availability",
+    q: "Which benefits does a multi-cloud architecture provide?",
+    options: [
+      "Avoids vendor lock-in and allows workload transition if one provider has an outage",
+      "Guarantees lower costs in every scenario",
+      "Eliminates the need for security policies",
+      "Only works for small companies"
+    ],
+    answer: 0,
+    why: "Multi-cloud distributes data, apps, and services across several cloud environments: single-point-of-failure mitigation, rapid transition during outages, cost optimization (pick cheapest provider per service), flexibility for scaling, and avoidance of vendor lock-in (leverage when negotiating terms). Caveat: requires proper data management, unified threat management, and consistent policy enforcement across clouds."
+  },
+  {
+    lesson: "Lesson 123 · High Availability",
+    q: "A sysadmin must patch a domain controller without disrupting user logins. Which design makes this possible?",
+    options: [
+      "A single, more powerful domain controller",
+      "Two domain controllers as primary and secondary — patch one while the other maintains services",
+      "Load balancing between the DC and a file server",
+      "Turning off authentication during maintenance"
+    ],
+    answer: 1,
+    why: "Redundant servers/services configured as primary and secondary let one be restarted for patching while the other continues serving users — the course's own example of server redundancy. This is redundancy in action: no service interruption despite planned maintenance on one node."
+  },
+// ---- Lesson 124 · Data Redundancy ----
+  {
+    lesson: "Lesson 124 · Data Redundancy",
+    q: "What does RAID stand for?",
+    options: [
+      "Remote Access Internet Device",
+      "Redundant Array of Independent Disks",
+      "Rapid Array of Integrated Drives",
+      "Random Allocation of Independent Data"
+    ],
+    answer: 1,
+    why: "RAID = Redundant Array of Independent Disks — combines multiple physical storage devices into a single logical storage device recognized by the operating system."
+  },
+  {
+    lesson: "Lesson 124 · Data Redundancy",
+    q: "Which keyword identifies RAID 0?",
+    options: [
+      "Mirroring",
+      "Striping",
+      "Parity",
+      "Duplexing"
+    ],
+    answer: 1,
+    why: "RAID 0 = striping — data split evenly across two or more disks for performance. It is the ONLY RAID with no redundancy or fault tolerance: lose one disk and all data is gone. Use it when you need speed and don't care about fault tolerance (e.g., video-editing scratch drives)."
+  },
+  {
+    lesson: "Lesson 124 · Data Redundancy",
+    q: "Which keyword identifies RAID 1, and what is its storage overhead?",
+    options: [
+      "Striping; 0% overhead",
+      "Mirroring; 50% overhead — two disks provide one disk's worth of capacity",
+      "Parity; 25% overhead",
+      "Double parity; 33% overhead"
+    ],
+    answer: 1,
+    why: "RAID 1 = mirroring — identical data on two disks. It provides the least downtime (a complete copy is always ready) but only two physical devices producing one logical device — a 50% capacity sacrifice. It can lose one disk and keep operating without data loss."
+  },
+  {
+    lesson: "Lesson 124 · Data Redundancy",
+    q: "How many disks can RAID 5 lose, and what is a hot swap?",
+    options: [
+      "Two disks; restarting the server to replace a drive",
+      "One disk; replacing the failed drive while the server continues to operate, then rebuilding the data",
+      "One disk; shipping the server to the vendor",
+      "Zero disks; hot swap means overheating protection"
+    ],
+    answer: 1,
+    why: "RAID 5 (striping with parity, min 3 disks) survives ONE disk failure — the other disks reconstruct data from parity, albeit slower. A hot swap means removing the failed drive and inserting a replacement while the server keeps running; the array then rebuilds the missing data onto the new drive."
+  },
+  {
+    lesson: "Lesson 124 · Data Redundancy",
+    q: "Why is RAID 6 described as 'one better than RAID 5'?",
+    options: [
+      "It is faster in every way",
+      "It stores two identical pieces of parity (min 4 disks), so it can lose two disks and still rebuild",
+      "It uses one disk instead of two",
+      "It requires no parity at all"
+    ],
+    answer: 1,
+    why: "RAID 6 = striping with DOUBLE parity — two parity blocks instead of one, requiring at least four disks. The payoff: it survives the simultaneous failure of TWO storage devices without downtime or data loss, versus one for RAID 5."
+  },
+  {
+    lesson: "Lesson 124 · Data Redundancy",
+    q: "How is RAID 10 constructed, and which two-disk-loss scenario does it survive?",
+    options: [
+      "RAID 1 + RAID 0: stripe across two mirrored sets; survives losing one disk from each mirror, but not both disks in the same mirrored pair",
+      "RAID 0 + RAID 5: any two disks",
+      "Two RAID 5 arrays combined; any two disks",
+      "RAID 10 cannot lose any disks"
+    ],
+    answer: 0,
+    why: "RAID 10 = a striped array of mirrored arrays (RAID 1 sets first, then RAID 0 striping across them; min 4 disks). It survives losing up to two disks — but only if they are in DIFFERENT mirrored pairs. Lose both disks of one mirror and the data is gone; after one-per-mirror losses it still runs but with no fault tolerance left, so replace failed drives fast."
+  },
+  {
+    lesson: "Lesson 124 · Data Redundancy",
+    q: "Which RAID levels are considered disaster-tolerant, and why?",
+    options: [
+      "RAID 0 and RAID 5, because they stripe",
+      "RAID 1 and RAID 10, because their full mirrors give two independent zones always holding all the data",
+      "RAID 5 and RAID 6, because of parity",
+      "Only hardware RAIDs can be disaster-tolerant"
+    ],
+    answer: 1,
+    why: "Disaster tolerance requires two independent zones with full access to all data — full mirrors. RAID 1 and RAID 10 qualify because every byte exists complete on at least one device. Failure-resistant (mirroring: RAID 1/10) < fault-tolerant (no downtime: 1/5/6/10) < disaster-tolerant (independent full-access zones: 1/10)."
+  },
+// ---- Lesson 125 · Configuring a RAID ----
+  {
+    lesson: "Lesson 125 · Configuring a RAID",
+    q: "In the Windows RAID demo, what did 'New Striped Volume' create and what was the capacity result?",
+    options: [
+      "A RAID 1 mirror with one disk's worth of space",
+      "A RAID 0 with two 800GB disks combined into one ~1.6TB logical drive",
+      "A RAID 5 with three disks",
+      "A backup partition on the C drive"
+    ],
+    answer: 1,
+    why: "In Windows Disk Management, 'New Striped Volume' across Disk 1 and Disk 2 created a RAID 0 — two 800GB drives working in tandem became drive D at ~1.6TB (100% free). Striping gives full combined capacity but zero redundancy: if either disk fails, drive D is gone."
+  },
+  {
+    lesson: "Lesson 125 · Configuring a RAID",
+    q: "In the demo, the mirrored volume (drive R) showed only one disk's worth of capacity. Why?",
+    options: [
+      "A formatting error",
+      "One disk acts as primary and one as backup, both holding identical data — the 50% capacity sacrifice buys fault tolerance",
+      "The second disk was broken",
+      "Mirrors always show half capacity due to filesystem overhead"
+    ],
+    answer: 1,
+    why: "The RAID 1 mirror writes identical data to both disks, so the logical drive holds only one disk's capacity — a deliberate 50% overhead. The payoff: if either disk goes offline, the other keeps serving a full, current copy. The demo's trade-off line: performance and double space (RAID 0) versus redundancy and half space (RAID 1)."
+  },
+  {
+    lesson: "Lesson 125 · Configuring a RAID",
+    q: "The demo creator set up both a striped drive D and a mirrored drive R. Which workloads went where, and why?",
+    options: [
+      "D for finished videos (safety first), R for editing scratch (speed first)",
+      "D (RAID 0) as the fast scratch drive for video editing; R (RAID 1) as the redundant store for finished products",
+      "Both drives for the operating system",
+      "D for backups, R for games"
+    ],
+    answer: 1,
+    why: "Match the RAID to the need: RAID 0's speed suits active video-editing scratch work (regenerable data, no redundancy needed); RAID 1's mirror protects irreplaceable finished products. This 'choose both' approach uses each RAID's strength for the right data."
+  },
+// ---- Lesson 126 · Capacity Planning ----
+  {
+    lesson: "Lesson 126 · Capacity Planning",
+    q: "What is capacity planning?",
+    options: [
+      "Maximizing the number of servers in a rack",
+      "A strategic planning effort ensuring the organization is adequately equipped to meet future demands at the right time and in the most cost-effective manner",
+      "Planning office holiday parties",
+      "Compressing files to save disk space"
+    ],
+    answer: 1,
+    why: "Capacity planning = strategic preparation for future demand, cost-effectively and at the right time. It spans four elements — people, technology, infrastructure, and processes — balancing current operational requirements against future projections."
+  },
+  {
+    lesson: "Lesson 126 · Capacity Planning",
+    q: "Which four main aspects of capacity does the course identify?",
+    options: [
+      "Money, machines, materials, markets",
+      "People, technology, infrastructure, and processes",
+      "Hardware, software, data, networks",
+      "Speed, size, cost, quality"
+    ],
+    answer: 1,
+    why: "The four capacity elements: PEOPLE (skills, hiring, training), TECHNOLOGY (can current systems handle projected growth?), INFRASTRUCTURE (physical space, power, heat in data centers), and PROCESSES (workflows that withstand demand fluctuations, via automation or outsourcing)."
+  },
+  {
+    lesson: "Lesson 126 · Capacity Planning",
+    q: "A call center must onboard 500 seasonal employees at once. Manual account creation would take days. Which capacity element addresses this, and how?",
+    options: [
+      "People — hire 500 IT staff",
+      "Processes — automate the account-creation workflow to handle 500 simultaneous creations, eliminating the bottleneck",
+      "Infrastructure — build more offices",
+      "Technology — buy faster laptops"
+    ],
+    answer: 1,
+    why: "This is process capacity planning: streamlining workflows and using automation (or third-party outsourcing) so processes withstand demand fluctuations. Automating simultaneous bulk account creation removes the onboarding bottleneck — the technology exists; the process redesign unlocks it."
+  },
+  {
+    lesson: "Lesson 126 · Capacity Planning",
+    q: "An e-commerce site crashes during a flash sale because it cannot scale. Which capacity element failed, and what modern solution does the course cite?",
+    options: [
+      "People — not enough staff; hire more developers",
+      "Technology — the platform couldn't scale to demand; cloud services allow increasing storage/bandwidth during high demand and reducing it afterward",
+      "Infrastructure — buy a bigger headquarters",
+      "Processes — outsource the warehouse"
+    ],
+    answer: 1,
+    why: "This is technology capacity planning: understanding concurrent-user limits and investing in scalable solutions. Cloud services let organizations add capacity during promotions and automatically scale back down during low-demand periods to control costs — precisely the elasticity the crashed site lacked."
+  },
+  {
+    lesson: "Lesson 126 · Capacity Planning",
+    q: "A data center team rejects proposed server installs that could be hosted in the cloud, keeping scarce rack space for low-latency workloads. Which capacity element is this?",
+    options: [
+      "Process optimization",
+      "Infrastructure capacity planning — managing physical space, power consumption, and heat",
+      "People planning",
+      "Vendor management"
+    ],
+    answer: 1,
+    why: "Infrastructure capacity planning covers physical space and utilities. The theater NOC example: finite square footage meant tracking each server's power draw and heat output, and judiciously declining on-prem installs that cloud hosting could handle — reserving local capacity for workloads that genuinely needed low latency."
+  },
+// ---- Lesson 127 · Powering Data Centers ----
+  {
+    lesson: "Lesson 127 · Powering Data Centers",
+    q: "A lightning strike drives the line voltage from 120V to 175V for an instant. Which power condition is this, and what protects against it?",
+    options: [
+      "A surge; a UPS battery",
+      "A spike; a surge protector or line conditioner",
+      "A sag; a generator",
+      "An undervoltage event; redundant power grids"
+    ],
+    answer: 1,
+    why: "A spike is a short transient voltage surge — typically from lightning, short circuits, tripped breakers, or outages — which can push 120V to 150V or 175V+. Surge protectors and line conditioners remove power above the normal level. (A surge is only a small, sustained increase like 125–130V — the exam tests the difference.)"
+  },
+  {
+    lesson: "Lesson 127 · Powering Data Centers",
+    q: "How does a sag differ from an undervoltage (brownout) event?",
+    options: [
+      "A sag raises voltage; undervoltage lowers it",
+      "A sag is a small, short voltage decrease near normal levels (120V→115V); an undervoltage event is a longer, deeper reduction (120V→70–80V) that forces systems offline",
+      "They are identical terms",
+      "Sags only happen in Europe"
+    ],
+    answer: 1,
+    why: "A sag = small unexpected decrease (e.g., 120V to 115–117V), short-lived — systems usually stay online but hardware can degrade over time. An undervoltage event (brownout) = voltage reduced to much lower levels for a longer period (e.g., 70–80V) — too low to operate, so systems power down. Line conditioners can fix sags but not deep undervoltage or full outages."
+  },
+  {
+    lesson: "Lesson 127 · Powering Data Centers",
+    q: "What is the realistic runtime role of a UPS during a complete power failure?",
+    options: [
+      "Days of full operation",
+      "About 15–60 minutes (rack units ~10–15 minutes) — enough to prevent data loss or damage during short outages and bridge to generators, not a long-term solution",
+      "Exactly 24 hours",
+      "Unlimited, if properly maintained"
+    ],
+    answer: 1,
+    why: "UPS units provide emergency battery power plus line conditioning when normal input fails — but most only run 15–60 minutes (rack-mounted units roughly 10–15 minutes). They bridge short outages and protect against sudden power loss while generators start; they are not designed for long-term outages."
+  },
+  {
+    lesson: "Lesson 127 · Powering Data Centers",
+    q: "Which generator type is 'the backbone of a data center's emergency power architecture' and why?",
+    options: [
+      "Portable gas engine — cheapest to operate",
+      "Permanently installed (diesel/propane/natural gas) — large, auto-starts in a power loss, can power the whole building for hours, days, or weeks depending on fuel reserves",
+      "Battery inverter — quietest option",
+      "Hand-crank generator — requires no fuel"
+    ],
+    answer: 1,
+    why: "Permanently installed generators (diesel, propane, natural gas) are directly integrated into the data center's electrical setup and designed to kick in automatically during power loss — powering an entire building for extended periods based on fuel reserves. Portables are small/noisy/manual; battery inverters only bridge the gap until long-term generators come online."
+  },
+  {
+    lesson: "Lesson 127 · Powering Data Centers",
+    q: "What is the best role for a battery inverter generator in data center power design?",
+    options: [
+      "Primary long-term backup replacing diesel generators",
+      "Bridging the gap quietly until a longer-term solution (diesel/propane/natural gas generator) comes online",
+      "Cooling the server racks",
+      "Distributing power to secondary circuits"
+    ],
+    answer: 1,
+    why: "Battery inverter generators (lead-acid, NiCd, lithium-ion) are quiet and low-maintenance but provide minimum wattage or short-duration power — so they bridge the gap until permanent generators start (generators take ~30–60 seconds). Power DISTRIBUTION is the PDC's job, not the inverter's."
+  },
+  {
+    lesson: "Lesson 127 · Powering Data Centers",
+    q: "What is a power distribution center (PDC)?",
+    options: [
+      "A fancy power strip",
+      "A centralized hub receiving power and distributing it to all systems with integrated circuit protection, monitoring, and load balancing; integrates with UPS and generators for seamless backup transition",
+      "A room where generators are refueled",
+      "A cloud service for billing"
+    ],
+    answer: 1,
+    why: "A PDC is far more than a power strip: it centrally receives and distributes power with circuit protection, monitoring, and load balancing to avoid overloading circuits, and integrates with large UPS units and permanently installed generators so backup power transitions seamlessly during grid loss."
+  },
+  {
+    lesson: "Lesson 127 · Powering Data Centers",
+    q: "After a complete power loss, what hidden risk exists when power is restored?",
+    options: [
+      "The computers boot too slowly",
+      "Restoration can cause a power spike that damages systems",
+      "Nothing — restored power is always clean",
+      "Generators refuse to shut off"
+    ],
+    answer: 1,
+    why: "The course warns that when power is restored after a full loss event, it can cause a power spike — which can damage systems too. This is why surge protection/line conditioning belongs in the power chain, not just for the outage but for the recovery."
+  },
+// ---- Lesson 128 · Data Backups ----
+  {
+    lesson: "Lesson 128 · Data Backups",
+    q: "Why is an onsite-only backup strategy risky?",
+    options: [
+      "Onsite backups are always slower",
+      "The backups are destroyed along with everything else if the facility suffers a fire, flood, or other disaster",
+      "Onsite backups violate GDPR",
+      "Offsite backups are always cheaper"
+    ],
+    answer: 1,
+    why: "Onsite backups are convenient and fast to restore from — but they share the facility's fate. If the building and equipment are destroyed, onsite backups die with it. Offsite backups (geographically separate, cloud or shipped media) exist precisely to survive physical disasters and ensure data continuity."
+  },
+  {
+    lesson: "Lesson 128 · Data Backups",
+    q: "An organization can tolerate losing at most one hour of data. What backup schedule and metric drive this?",
+    options: [
+      "Daily backups, driven by RTO",
+      "Backups at least hourly, driven by the RPO (recovery point objective)",
+      "Weekly backups, driven by MTTR",
+      "Monthly backups, driven by the BCP"
+    ],
+    answer: 1,
+    why: "The RPO defines maximum acceptable data loss in time — an RPO of one hour means backups must run at least once per hour to keep loss under the threshold. RTO governs downtime (restore speed), not data loss. The driving question for frequency: 'how much data am I willing to lose?'"
+  },
+  {
+    lesson: "Lesson 128 · Data Backups",
+    q: "Which two encryption protections should backups use?",
+    options: [
+      "AES and RSA only",
+      "Data-at-rest encryption (on the storage device) and data-in-transit encryption (while moving to/from the backup destination)",
+      "File names and folder permissions",
+      "Passwords on zip files only"
+    ],
+    answer: 1,
+    why: "Backups need BOTH data-at-rest encryption (data encrypted as written to storage, so stolen media stays unreadable) and data-in-transit encryption (data protected while moving across networks or the system bus, preserving confidentiality and integrity). Encrypting backups ensures leaked media doesn't become a breach."
+  },
+  {
+    lesson: "Lesson 128 · Data Backups",
+    q: "How do snapshots differ from traditional backups?",
+    options: [
+      "Snapshots copy all data every time",
+      "Snapshots are point-in-time copies recording only changes since the previous snapshot — more efficient, quicker, and ideal for rolling databases back to a known-good state",
+      "Snapshots cannot be restored",
+      "Snapshots are a type of RAID"
+    ],
+    answer: 1,
+    why: "Snapshots capture a consistent frozen-in-time state but record only the changes since the last snapshot — reducing storage, speeding backup, and enabling frequent captures. They're especially valuable for databases and file servers where you can roll back to a specific point after corruption or accidental deletion."
+  },
+  {
+    lesson: "Lesson 128 · Data Backups",
+    q: "What is the best-practice frequency for practicing data recovery?",
+    options: [
+      "Once per year",
+      "At least once per month",
+      "Only after a real disaster",
+      "Never — recovery practice risks data loss"
+    ],
+    answer: 1,
+    why: "Backups are useless if you cannot recover from them when disaster strikes — so practicing recovery at least once per month is the course's best practice. Regular recovery testing identifies issues and bottlenecks before a real incident, and recovery plans must be well-defined AND thoroughly tested."
+  },
+  {
+    lesson: "Lesson 128 · Data Backups",
+    q: "How does replication differ from a periodic backup?",
+    options: [
+      "Replication is slower than backups",
+      "Replication makes real-time or near-real-time copies so data lives in two places simultaneously — if one server crashes, the other continues without interruption",
+      "Replication only works on tape",
+      "Backups run continuously; replication is periodic"
+    ],
+    answer: 1,
+    why: "Backups are periodic snapshots; replication is continuous — real-time or near-real-time copies keeping data in two places at once. If one server crashes, the other carries on seamlessly. Replication suits high-availability architectures that cannot afford downtime or interruption, providing seamless data continuity."
+  },
+  {
+    lesson: "Lesson 128 · Data Backups",
+    q: "What is journaling, and where is it particularly valuable?",
+    options: [
+      "Writing daily diary entries about server performance; useful for blogs",
+      "Maintaining a meticulous record of every change to data over time — valuable in databases and critical systems for granular point-in-time rollback and audit trails",
+      "Deleting old log files monthly",
+      "A type of RAID parity"
+    ],
+    answer: 1,
+    why: "Journaling (change tracking/logging) records every data modification, enabling precise recovery to a specific point and individual-change rollback — crucial for legal proceedings, compliance audits, and audit trails. Effective journaling requires choosing tracking granularity, managing journal size and retention, and securing the journal against tampering."
+  },
+  {
+    lesson: "Lesson 128 · Data Backups",
+    q: "Place the data recovery steps in order: (1) validate data integrity, (2) select the right backup, (3) document and report, (4) initiate the recovery, (5) test/validate the process, (6) notify stakeholders.",
+    options: [
+      "2 → 4 → 1 → 5 → 3 → 6",
+      "4 → 2 → 1 → 5 → 6 → 3",
+      "2 → 4 → 5 → 1 → 3 → 6",
+      "1 → 2 → 3 → 4 → 5 → 6"
+    ],
+    answer: 0,
+    why: "Recovery order: choose the appropriate backup copy (snapshot, offsite, onsite) → initiate restoration → validate the restored data's integrity and consistency → test the recovery process for bottlenecks → document steps/time/challenges for compliance and improvement → notify relevant stakeholders. You can't restore before choosing WHAT to restore, and validation must precede declaring success."
+  },
+// ---- Lesson 129 · Continuity of Operations Plan ----
+  {
+    lesson: "Lesson 129 · Continuity of Operations Plan",
+    q: "What is the relationship between a business continuity plan and a disaster recovery plan?",
+    options: [
+      "They are identical documents",
+      "The DRP is a subset of the BCP — the BCP covers responses to disruptive events broadly, while the DRP focuses on resuming operations after disasters",
+      "The BCP is a subset of the DRP",
+      "The DRP replaces the BCP during incidents"
+    ],
+    answer: 1,
+    why: "The BCP covers plans/processes for ANY disruptive event — including non-technical ones like a cancelled merchant account or street protests blocking the office. The DRP specifically addresses disasters (hurricanes, fires, floods) and how to resume operations quickly — a subset of the BCP. Often managed together as BC/DR. The event type decides which plan you follow."
+  },
+  {
+    lesson: "Lesson 129 · Continuity of Operations Plan",
+    q: "Who is responsible for driving business continuity plan development?",
+    options: [
+      "The IT help desk",
+      "Senior management — they set goals, determine risk acceptance, and appoint the business continuity coordinator",
+      "External auditors",
+      "Individual employees"
+    ],
+    answer: 1,
+    why: "BCP development is senior management's responsibility — without their support it stalls and fails. They set BC/DR goals, determine acceptable risk based on the organization's risk appetite and tolerance, appoint the business continuity coordinator, and define scope. The committee they charter includes technology, legal, security, communications — not just IT."
+  },
+  {
+    lesson: "Lesson 129 · Continuity of Operations Plan",
+    q: "Why must the business continuity committee include more than just IT staff?",
+    options: [
+      "Regulations require a minimum headcount",
+      "Continuity covers the entire business, not just technology — legal, security, communications and other departments all have continuity roles",
+      "IT staff cannot attend meetings",
+      "To keep the committee large"
+    ],
+    answer: 1,
+    why: "The committee needs representatives from technology, legal, security, communications, and other departments because business continuity covers EVERYTHING in the business — the course's BCP examples (backup payment processors, riot/protest plans) are business problems, not IT problems. The committee sets recovery priorities, prioritizes continuity-critical systems, and reports to senior management."
+  },
+  {
+    lesson: "Lesson 129 · Continuity of Operations Plan",
+    q: "A training company in hurricane-prone Orlando hosts all infrastructure on AWS spread across multiple regions and availability zones. Which continuity strategy does this exemplify?",
+    options: [
+      "A cold site",
+      "Using cloud geographic dispersion for continuity — the business continues even if a severe local disaster strikes",
+      "Avoiding all planning",
+      "A tabletop exercise"
+    ],
+    answer: 1,
+    why: "Hosting services across multiple AWS regions and AZs provides continuity even if a hurricane devastates Orlando — geographic dispersion of systems. Combined with staff split across Florida, the US, and the Philippines (who cover for each other during local floods/outages), it shows continuity planning for both systems and people."
+  },
+  {
+    lesson: "Lesson 129 · Continuity of Operations Plan",
+    q: "Which risk-management concepts does senior management apply when defining BCP scope?",
+    options: [
+      "RPO and RTO",
+      "Risk appetite and risk tolerance — determining the level of risk the organization is willing to accept",
+      "ALE and SLE",
+      "MTBF and MTTR"
+    ],
+    answer: 1,
+    why: "Senior management determines the level of risk they're willing to accept based on the organization's RISK APPETITE and RISK TOLERANCE thresholds — this drives scope definition and prevents scope creep. Large organizations may split plans by business function or geography, but all pieces must operate coherently during a crisis."
+  },
+// ---- Lesson 130 · Redundant Site Considerations ----
+  {
+    lesson: "Lesson 130 · Redundant Site Considerations",
+    q: "Rank hot, warm, and cold sites by switchover speed and cost.",
+    options: [
+      "Hot: instant/most expensive; warm: days/middle; cold: weeks-to-months/cheapest",
+      "Cold: instant/most expensive; hot: months/cheapest",
+      "All three cost and switch over identically",
+      "Warm: instant; hot: days; cold: months"
+    ],
+    answer: 0,
+    why: "Hot = fully equipped and running continuously — near-instant switchover, but requires 'two of everything' (most expensive; usually reserved for mission-critical functions). Warm = fundamentals (power, phones, network) but equipment bought after disaster — operational in days, moderate cost. Cold = an empty shell (the course example: leased building with bathrooms and furniture but no network/computers) — operational in 1–2 months, cheapest."
+  },
+  {
+    lesson: "Lesson 130 · Redundant Site Considerations",
+    q: "What is a mobile site in redundant-site planning?",
+    options: [
+      "A site that moves locations monthly",
+      "Independent portable units — trailers or tents delivered to your location and connected to power and internet; can be configured as hot, warm, or cold",
+      "A smartphone app for disaster alerts",
+      "Another name for a cold site"
+    ],
+    answer: 1,
+    why: "Mobile sites use portable units (trailers/tents) delivered to the affected location — fully contained with power, connectivity, and technicians. The US military's DJC2 (Deployable Joint Command and Control) is the marquee example: deliverable anywhere in ~72 hours, functional in 24 hours, full services in up to 7 days, supporting ~200 people — deployed to Haiti for 2010 earthquake recovery."
+  },
+  {
+    lesson: "Lesson 130 · Redundant Site Considerations",
+    q: "What is a virtual cold site?",
+    options: [
+      "A physical data center kept at low temperature",
+      "Critical data and configurations stored in the cloud, with resources activated only in response to a disaster to minimize ongoing operational costs",
+      "A site that exists only on paper",
+      "A hot site with extra air conditioning"
+    ],
+    answer: 1,
+    why: "Virtual sites are cloud-based equivalents: virtual hot = fully replicated, instantly accessible; virtual warm = partially replicated, quickly scaled up; virtual cold = data/config stored but resources activated only when disaster strikes — minimizing ongoing cost. Cloud virtual sites offer rapid scalability, cost-effectiveness, and easy maintenance."
+  },
+  {
+    lesson: "Lesson 130 · Redundant Site Considerations",
+    q: "What is platform diversity, and what risk does it mitigate?",
+    options: [
+      "Using many OS versions everywhere; mitigates boredom",
+      "Diversifying operating systems, network equipment, and cloud providers at redundant sites so a single-vendor vulnerability or outage cannot take down both primary and backup",
+      "Training staff on multiple platforms; mitigates turnover",
+      "Running identical equipment at both sites; mitigates complexity"
+    ],
+    answer: 1,
+    why: "Platform diversity = different OSes, network gear, or cloud providers at redundant sites. Same-platform redundancy is easier to support — but a vulnerability affecting all Cisco networks, say, would hit primary AND hot site together. Diverse platforms remain immune to single-vendor flaws; the trade-off is more complex configuration and support. Senior leaders weigh risk vs reward."
+  },
+  {
+    lesson: "Lesson 130 · Redundant Site Considerations",
+    q: "Why do most companies NOT run their entire business from a hot site?",
+    options: [
+      "Hot sites are illegal for large firms",
+      "Hot sites require two of everything, making full-business hot sites prohibitively expensive — so they're reserved for mission-critical functions (e.g., 50 essential staff of 500)",
+      "Hot sites cannot hold more than 10 people",
+      "Employees refuse to work at hot sites"
+    ],
+    answer: 1,
+    why: "A true hot site means duplicating everything — servers AND desks, chairs, phones for every employee. The cost of a 500-person hot site is enormous, so organizations typically hot-site only mission-critical functions and handle everyone else later via warm/cold arrangements or telework. Cloud makes hot DATA cheap, but not hot PEOPLE."
+  },
+// ---- Lesson 131 · Resilience and Recovery Testing ----
+  {
+    lesson: "Lesson 131 · Resilience and Recovery Testing",
+    q: "What is the difference between resilience testing and recovery testing?",
+    options: [
+      "Resilience testing evaluates restoring operations after an event; recovery testing checks withstanding events",
+      "Resilience testing assesses withstanding and adapting to disruptive events; recovery testing evaluates restoring normal operations afterward",
+      "They are identical",
+      "Resilience testing is only for networks; recovery testing only for people"
+    ],
+    answer: 1,
+    why: "Resilience testing = can the system WITHSTAND and ADAPT to disruptive events? Recovery testing = can it RESTORE normal operations afterward? Together they act as a fire drill for enterprise networks and operations — testing against power loss, natural disasters, ransomware, or data breaches."
+  },
+  {
+    lesson: "Lesson 131 · Resilience and Recovery Testing",
+    q: "What happens in a tabletop exercise?",
+    options: [
+      "Production systems are shut down for testing",
+      "Key stakeholders discuss a simulated scenario around a table — a facilitator announces an exercise inject (e.g., a compromised domain controller) and teams walk through their responses; no real resources are deployed",
+      "All data is migrated to the cloud",
+      "Employees take written certification exams"
+    ],
+    answer: 1,
+    why: "A tabletop exercise is a scenario-based DISCUSSION among key stakeholders: the facilitator injects a hypothetical event ('your domain controller was compromised by a nation-state actor') and each team explains its response. Low cost, highly engaging, reveals gaps that become SOPs/playbooks — and doubles as team building."
+  },
+  {
+    lesson: "Lesson 131 · Resilience and Recovery Testing",
+    q: "Which testing method involves actually cutting operations over from a primary data center to a backup site?",
+    options: [
+      "Tabletop exercise",
+      "A failover test — verifying the seamless real-world transition from primary to secondary components, with a rollback plan ready",
+      "A simulation",
+      "Journaling"
+    ],
+    answer: 1,
+    why: "A failover test is a controlled experiment that performs the REAL cutover (e.g., East Coast DC → West Coast hot site) to prove the plan works — costing more resources, time, and energy than a tabletop. The course's DC-area organization ran one yearly, flying a team to the hot site, always with a rollback plan to return operations while issues were investigated."
+  },
+  {
+    lesson: "Lesson 131 · Resilience and Recovery Testing",
+    q: "How does a simulation differ from a tabletop exercise?",
+    options: [
+      "A simulation is just a longer tabletop",
+      "A simulation puts responders inside a virtualized/simulated environment (e.g., a cloud replica of the corporate network) where a red team attacks and the blue team responds in real time",
+      "Simulations never involve red teams",
+      "Tabletops use computers; simulations use paper"
+    ],
+    answer: 1,
+    why: "Tabletop = discussion on paper. Simulation = responders perform real actions in a virtual environment: spin up a cloud replica of the corporate network, let a red team attack while blue team detects, responds, and isolates — testing people under realistic chaos, with observer feedback afterward. Simulations evaluate the staff, not just the plan."
+  },
+  {
+    lesson: "Lesson 131 · Resilience and Recovery Testing",
+    q: "What is parallel processing in resilience/recovery testing?",
+    options: [
+      "Running two applications on one CPU",
+      "Replicating data and processes to a secondary system and running BOTH primary and secondary simultaneously to verify the secondary handles processing without disrupting operations",
+      "Backing up data twice in one night",
+      "Load balancing between two data centers"
+    ],
+    answer: 1,
+    why: "Parallel processing runs primary and secondary systems TOGETHER to prove the secondary can carry the processing load with zero disruption — requiring meticulous planning and flawless execution. It tests resilience (handling multiple simultaneous failure scenarios like network outages, hardware failures, data corruption) and recovery efficiency from multiple failure points."
+  },
+  {
+    lesson: "Lesson 131 · Resilience and Recovery Testing",
+    q: "What does the course say about the frequency of resilience and recovery testing?",
+    options: [
+      "Once is enough — plans don't change",
+      "Testing must be routine and ongoing: regularly test, adapt, and improve plans as threats and vulnerabilities evolve",
+      "Only test after a real disaster",
+      "Test only when auditors require it"
+    ],
+    answer: 1,
+    why: "Resilience is 'an ongoing, ever-continuing journey towards continual improvement,' not a checkbox. Plans must be tested routinely and evolved in response to the changing threat environment and emerging vulnerabilities — plan, test the plan, and assure stakeholders it will really work when disaster strikes."
+  }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"cyber-resilience-quiz.html",title:"Cyber Resilience and Redundancy Quiz \u00b7 SY0-701 (Section 14)"};</script><script src="analytics.js"></script>
+</body>
+</html>

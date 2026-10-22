@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vulnerabilities and Attacks Quiz · SY0-701 (Section 18)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+<style id="iphone-optimizations">
+/* iPhone / touch optimizations */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: rgba(88,166,255,.25); }
+button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-size: 16px; }
+.q-text, .screen p { overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .container, .wrap { padding-left: 12px; padding-right: 12px; }
+  .screen { padding: 24px 16px; }
+  .exam-facts { flex-wrap: wrap; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 18</div>
+    <h1>Vulnerabilities and Attacks — Practice Quiz</h1>
+    <p>44 questions across all 11 lessons of Section 18 — hardware, Bluetooth and mobile vulnerabilities, SQL/XML injection, zero-days, XSS/XSRF, buffer overflows and race conditions. Pick an answer to reveal the explanation.</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+{ lesson: "166 - Hardware Vulnerabilities", q: "A server was reimaged with a clean OS, but malware persists across reboots. Which hardware-level attack is most likely responsible?", options: ["Firmware attack", "Bluejacking", "SQL injection", "Race condition"], answer: 0, why: "Malware embedded in firmware (BIOS/UEFI or device firmware) survives OS reinstallation." },
+{ lesson: "166 - Hardware Vulnerabilities", q: "Which systems can never receive security patches again and should be isolated or decommissioned?", options: ["Hardened systems", "End-of-life/unsupported systems", "Air-gapped systems", "Virtualized systems"], answer: 1, why: "EOL/legacy/unsupported systems receive no patches, so their vulnerabilities are permanent. Isolate and segment them, then plan decommissioning." },
+{ lesson: "166 - Hardware Vulnerabilities", q: "Leaving a device on a known-vulnerable, unpatched firmware version is an example of which hardware vulnerability?", options: ["Misconfiguration", "Unpatched system", "Zero-day", "Sideloading"], answer: 1, why: "Unpatched systems leave known CVEs open; patch management is the fix." },
+{ lesson: "166 - Hardware Vulnerabilities", q: "Default passwords and insecure out-of-box settings on network appliances are examples of:", options: ["Firmware attacks", "Unpatched systems", "Misconfigurations", "Zero-days"], answer: 2, why: "Misconfigurations are insecure settings left in place; fix with configuration baselines/enforcement and hardening." },
+{ lesson: "166 - Hardware Vulnerabilities", q: "Which mitigation is BEST for protecting the rest of the network from a legacy device that must stay online but can no longer be patched?", options: ["Install a bigger firewall for the whole network", "Isolate and segment the legacy device", "Enable Bluetooth discoverability", "Increase its memory"], answer: 1, why: "Isolation/segmentation (e.g., VLAN plus firewall rules) contains the risk of unpatched legacy gear." },
+{ lesson: "167 - Bluetooth Attacks", q: "An attacker sends unsolicited advertising messages to nearby Bluetooth phones. This is:", options: ["Bluesnarfing", "Bluebugging", "Bluejacking", "Bluesmack"], answer: 2, why: "Bluejacking = sending unsolicited messages to a Bluetooth device." },
+{ lesson: "167 - Bluetooth Attacks", q: "An attacker copies a victim's contacts and text messages from their phone over Bluetooth without consent. This is:", options: ["Bluejacking", "Bluesnarfing", "Bluebugging", "Blueborne"], answer: 1, why: "Bluesnarfing = unauthorized reading/theft of data (contacts, call logs, texts) from the device." },
+{ lesson: "167 - Bluetooth Attacks", q: "Which Bluetooth attack gives an attacker control over a device's functions, such as placing calls or sending texts?", options: ["Bluebugging", "Bluesmack", "Bluejacking", "Bluesnarfing"], answer: 0, why: "Bluebugging takes control of device functions; bluesnarfing only steals data." },
+{ lesson: "167 - Bluetooth Attacks", q: "An attacker floods a Bluetooth headset with traffic until it crashes and becomes unusable. This DoS attack is:", options: ["Blueborne", "Bluebugging", "Bluesmack", "Bluesnarfing"], answer: 2, why: "Bluesmack is a DoS attack that floods and crashes the Bluetooth device." },
+{ lesson: "167 - Bluetooth Attacks", q: "Which attack spreads malware between Bluetooth devices through the air within seconds, without pairing?", options: ["Blueborne", "Bluesnarfing", "Bluejacking", "Bluesmack"], answer: 0, why: "Blueborne is a worm-like airborne Bluetooth exploit that spreads in seconds with no pairing required." },
+{ lesson: "167 - Bluetooth Attacks", q: "Which is a Bluetooth BEST practice?", options: ["Keep the device discoverable at all times", "Pair with any device that requests it", "Turn Bluetooth off when not in use and stay non-discoverable by default", "Use 0000 as the PIN for convenience"], answer: 2, why: "Disable BT when unused, default to non-discoverable, update firmware, pair only known devices, use unique PINs/passkeys." },
+{ lesson: "168 - Mobile Device Vulnerabilities", q: "Installing an app from a third-party website instead of the official app store is called:", options: ["Jailbreaking", "Sideloading", "Rooting", "Bluesnarfing"], answer: 1, why: "Sideloading bypasses the app store and its malware screening; MDM should block it." },
+{ lesson: "168 - Mobile Device Vulnerabilities", q: "An iOS phone with escalated privileges and blocked official updates has been:", options: ["Sideloaded", "Bluesnarfed", "Jailbroken", "Air-gapped"], answer: 2, why: "Jailbreaking (iOS) / rooting (Android) removes built-in protections and often prevents OTA updates." },
+{ lesson: "168 - Mobile Device Vulnerabilities", q: "Which connection should mobile users prefer over open public Wi-Fi for sensitive work?", options: ["Open Wi-Fi with a short PIN", "Unknown Bluetooth pairing", "Cellular data or 802.1X-secured enterprise Wi-Fi", "Any network with a captive portal"], answer: 2, why: "Open Wi-Fi and unknown Bluetooth are insecure; use cellular or 802.1X-authenticated Wi-Fi." },
+{ lesson: "168 - Mobile Device Vulnerabilities", q: "Which MDM capability detects a phone that has had its built-in security removed?", options: ["Jailbreak/root detection", "Cookie encryption", "Input validation", "ASLR"], answer: 0, why: "MDM can detect jailbreak/root, enforce patching and baselines, block sideloading, and force VPN." },
+{ lesson: "169 - SQL and XML Injection", q: "An attacker enters ' OR 1=1; into a login password field and gains access. What attack occurred?", options: ["Cross-site scripting", "SQL injection", "Buffer overflow", "Bluejacking"], answer: 1, why: "Apostrophe + always-true condition (1=1) forces the SQL WHERE clause true via Boolean OR — the classic SQLi signature." },
+{ lesson: "169 - SQL and XML Injection", q: "What is the BEST primary defense against SQL injection?", options: ["Longer passwords", "Input validation and sanitization", "A bigger monitor", "More database replicas"], answer: 1, why: "Validate/sanitize all user input so apostrophes and true-condition strings never reach the database." },
+{ lesson: "169 - SQL and XML Injection", q: "A company cannot rewrite a vulnerable web app's code. What can it deploy in front of the app to filter SQLi attempts?", options: ["A proxy server", "A load balancer", "A web application firewall (WAF)", "A NAT gateway"], answer: 2, why: "A WAF performs input validation/sanitization between clients and the web server even when the app can't be rewritten." },
+{ lesson: "169 - SQL and XML Injection", q: "An attacker hides malicious SQL in a URL parameter, a cookie, a form field, and an HTTP header. These are all injection vectors for:", options: ["SQL injection", "Cross-site request forgery", "Bluesmack", "ASLR bypass"], answer: 0, why: "SQLi can be delivered via any input channel that reaches the query: URL params, forms, cookies, headers, POST data." },
+{ lesson: "169 - SQL and XML Injection", q: "You see log entries with nested entities labelled lol1 through lol9 that expand exponentially and consume server memory. This is:", options: ["An XML bomb (billion laughs attack)", "A DOM-based XSS attack", "A session prediction attack", "A NOP slide"], answer: 0, why: "Nested entity references that expand factorial-style (the billion laughs pattern) exhaust memory — a denial of service." },
+{ lesson: "169 - SQL and XML Injection", q: "An XML document contains: <!ENTITY xxe SYSTEM 'file:///etc/shadow'>. This is:", options: ["An XML bomb", "An XXE (XML external entity) attack", "A SQL injection", "A reflected XSS"], answer: 1, why: "XXE embeds a request for a local resource — here trying to read the Linux /etc/shadow password-hash file." },
+{ lesson: "169 - SQL and XML Injection", q: "How do you tell XML apart from HTML/JavaScript in a code snippet?", options: ["XML always uses lowercase", "XML uses custom tags that say whatever the app defines, unlike HTML's fixed keywords", "XML cannot be sent over TLS", "XML is always malicious"], answer: 1, why: "XML tags are configurable per application; HTML uses fixed tags like img/href. Exam tip: clearly-XML snippet = XML vulnerability question." },
+{ lesson: "170 - Zero-Day Attacks", q: "What defines a zero-day vulnerability?", options: ["A bug with a patch released zero days ago", "A vulnerability unknown to the vendor with no patch available", "A vulnerability published for zero dollars", "An attack that lasts zero days"], answer: 1, why: "Zero-day = the vendor has had zero days to fix it; no patch or signature exists yet." },
+{ lesson: "170 - Zero-Day Attacks", q: "Why are signature-based antivirus tools ineffective against a brand-new zero-day exploit?", options: ["They only scan email", "No signature exists for it yet", "They cannot run on servers", "They require a WAF"], answer: 1, why: "Signature AV matches known patterns; until a signature is created, a zero-day passes. Behavior/heuristic and AI detection are the fallback." },
+{ lesson: "170 - Zero-Day Attacks", q: "Zero-day exploits are typically:", options: ["Free and widely shared", "Expensive, stockpiled, and used against high-value targets", "Used only against home users", "Impossible to deploy"], answer: 1, why: "Zero-days are costly and reserved for high-value targets, usually after generic malware has failed." },
+{ lesson: "171 - Operating System Vulnerabilities", q: "Which defense verifies that a software update is genuine before installation?", options: ["Checking the update's digital signature or hash", "Disabling the host firewall", "Increasing the screen timeout", "Allow-listing all executables"], answer: 0, why: "Malicious updates are an OS threat; verify signatures/hashes before installing. Other OS defenses: patching, HIPS, config management, encryption at rest, endpoint protection, host firewall, allow-listing." },
+{ lesson: "171 - Operating System Vulnerabilities", q: "Which host-based control watches for and blocks attack patterns on an individual server?", options: ["A network tap", "A host-based intrusion prevention system (HIPS)", "A load balancer", "An XML parser"], answer: 1, why: "HIPS monitors and blocks malicious activity on the host itself." },
+{ lesson: "171 - Operating System Vulnerabilities", q: "Encrypting data stored on a laptop's drive protects against which OS-level threat?", options: ["Data exfiltration from stolen devices", "Bluejacking", "SQL injection", "Race conditions"], answer: 0, why: "Encryption at rest renders stolen data unreadable — one of the core OS vulnerability mitigations." },
+{ lesson: "171 - Operating System Vulnerabilities", q: "Restricting which executables may run on a server, blocking everything not explicitly approved, is called:", options: ["Input validation", "Application allow-listing", "Sideloading", "Session hijacking"], answer: 1, why: "Allow-listing (application control) prevents unauthorized/malicious programs from executing." },
+{ lesson: "172 - Conducting an SQL Injection", q: "Which statement best describes why an attacker uses an automated tool such as sqlmap?", options: ["To write secure code", "To discover injectable parameters and dump database contents automatically", "To patch databases", "To encrypt cookies"], answer: 1, why: "Tools automate finding vulnerable parameters, enumerating databases/tables/columns and dumping data — hence why input validation matters." },
+{ lesson: "173 - SQL Injection Demonstration", q: "In the demo, what did the attacker's web proxy (Burp Suite) capture that enabled the injection?", options: ["The database schema documentation", "The request's cookie/session data sent from the browser", "The server's BIOS password", "The victim's phone contacts"], answer: 1, why: "Intercepting the browser request captured cookies/session info reused to run automated SQLi against the vulnerable app." },
+{ lesson: "174 - XSS and XSRF", q: "An attacker posts a comment containing a script on a forum; every visitor's browser that loads the page runs it. This is:", options: ["Reflected (non-persistent) XSS", "Persistent (stored) XSS", "A SQL injection", "Bluesmack"], answer: 1, why: "Persistent XSS stores the malicious code in the site's database, so every user loading that content runs it." },
+{ lesson: "174 - XSS and XSRF", q: "A crafted URL must be clicked by the victim and the attack executes only once. This XSS variant is:", options: ["Persistent XSS", "DOM-based XSS", "Reflected (non-persistent) XSS", "Stored XSS"], answer: 2, why: "Reflected/non-persistent XSS fires only when the victim clicks the maliciously crafted link." },
+{ lesson: "174 - XSS and XSRF", q: "A log entry contains a payload referencing document.cookie inside a script. This indicates:", options: ["A DOM-based XSS attack", "An XML bomb", "A SQL injection", "A NOP slide"], answer: 0, why: "document.* references mean the payload manipulates the browser's Document Object Model — DOM-based XSS." },
+{ lesson: "174 - XSS and XSRF", q: "What is the key difference between XSS and XSRF/CSRF?", options: ["XSRF only works on mobile devices", "XSS runs attacker code in the victim's browser on a trusted site; XSRF tricks the victim's browser into performing an unwanted action", "They are the same attack with different names", "XSS only targets databases"], answer: 1, why: "XSS = code execution in the browser under the trusted site's context. XSRF = the victim's own authenticated session performs an action (e.g., password/email change) they never intended." },
+{ lesson: "174 - XSS and XSRF", q: "Which defense is MOST effective against cross-site request forgery?", options: ["User-specific anti-CSRF tokens in every form submission", "Longer session timeouts", "Larger passwords", "Bluetooth non-discoverability"], answer: 0, why: "Anti-CSRF tokens bind forms to the specific user/session; also add randomness + 2FA to password resets and require the current password to change it." },
+{ lesson: "174 - XSS and XSRF", q: "Session hijacking via guessing a weak, predictable session token is specifically called:", options: ["Session prediction", "Sideloading", "Bluebugging", "A NOP slide"], answer: 0, why: "Session prediction attacks guess non-random session tokens. Defend with truly random, non-predictable, one-time-use tokens." },
+{ lesson: "174 - XSS and XSRF", q: "Which cookie type is stored in memory and deleted when the browser session ends?", options: ["Persistent cookie", "Session (non-persistent) cookie", "Third-party marketing cookie", "Signed cookie"], answer: 1, why: "Session cookies live in memory only; persistent cookies sit in the browser cache until expiry or deletion. All cookies carrying sensitive data should be encrypted." },
+{ lesson: "175 - Buffer Overflow", q: "A buffer overflow attack aims to overwrite what, in order to redirect execution?", options: ["The DNS record", "The return address/pointer on the program's stack", "The session cookie", "The Bluetooth PIN"], answer: 1, why: "Overflowing the buffer overwrites adjacent stack memory, changing the return pointer so the program jumps to attacker code — smashing the stack." },
+{ lesson: "175 - Buffer Overflow", q: "What is the purpose of a NOP slide in a buffer overflow exploit?", options: ["It encrypts the payload", "It fills memory with no-operation instructions so the guessed return address slides down to the attacker's code", "It sanitizes user input", "It randomizes memory addresses"], answer: 1, why: "A sled of NOP instructions makes the exact return address forgiving — execution slides down to the malicious code." },
+{ lesson: "175 - Buffer Overflow", q: "Which mitigation randomizes memory addresses of well-known programs so return pointers are hard to guess?", options: ["ASLR (Address Space Layout Randomization)", "A WAF", "Input validation", "Blueborne patching"], answer: 0, why: "ASLR randomizes where programs load in memory (introduced with Windows Vista), defeating the fixed-address assumptions of stack smashing." },
+{ lesson: "176 - Race Conditions", q: "A bank app checks an account balance, but before the transfer executes, the attacker fires transfers that drain the account in the gap. This is a:", options: ["Time-of-check/time-of-use (TOC/TOU) race condition", "Buffer overflow", "XML bomb", "Bluejacking"], answer: 0, why: "TOC and TOU are two moments of the same race-condition vulnerability: state checked, then changed before the operation uses it." },
+{ lesson: "176 - Race Conditions", q: "The Dirty COW exploit abused a race condition in which Linux kernel mechanism to escalate privileges?", options: ["Copy-on-write (COW) memory management", "Address space layout randomization", "The session token generator", "The XML parser"], answer: 0, why: "Dirty COW (2016) raced the kernel's copy-on-write function to turn a read-only file mapping into a writable one, and left nothing in the logs." },
+{ lesson: "176 - Race Conditions", q: "Which mechanism prevents race conditions by allowing only one thread into a code section at a time?", options: ["A NOP slide", "Locks and mutexes (mutually exclusive flags)", "Persistent cookies", "A NOP instruction"], answer: 1, why: "Mutexes/resource locks serialize access; poorly designed locks can cause a deadlock — a circular wait needing external intervention." }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"vulnerabilities-and-attacks-quiz.html",title:"Vulnerabilities and Attacks Quiz \u00b7 SY0-701 (Section 18)"};</script><script src="analytics.js"></script>
+</body>
+</html>

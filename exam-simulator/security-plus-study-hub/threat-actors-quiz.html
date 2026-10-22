@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Threat Actors Quiz · SY0-701 (Section 03)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+<style id="iphone-optimizations">
+/* iPhone / touch optimizations */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: rgba(88,166,255,.25); }
+button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-size: 16px; }
+.q-text, .screen p { overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .container, .wrap { padding-left: 12px; padding-right: 12px; }
+  .screen { padding: 24px 16px; }
+  .exam-facts { flex-wrap: wrap; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 03</div>
+    <h1>Threat Actors — Practice Quiz</h1>
+    <p>37 questions across all 11 lessons: motivations, attributes, unskilled attackers, hacktivists, organized crime, nation-states, insider threats, shadow IT, threat vectors &amp; attack surfaces, and deception technologies.</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 37</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  // ---- Motivations ----
+  {
+    lesson: "Lesson 18 · Threat Actor Motivations",
+    q: "Which distinction does the course draw between motivation and intent?",
+    options: [
+      "They are two words for the same thing",
+      "Motivation is the underlying reason; intent is the desired outcome of the action",
+      "Intent is the underlying reason; motivation is the desired outcome",
+      "Motivation applies to insiders; intent applies to outsiders"
+    ],
+    answer: 1,
+    why: "Motivation is the 'why' behind an attack (money, ideology, revenge); intent is the 'what' — the specific outcome the actor wants from an action, like data theft or service disruption. Exams often describe both and ask for one."
+  },
+  {
+    lesson: "Lesson 18 · Threat Actor Motivations",
+    q: "An attacker steals a company's product designs, customer PII, and trade secrets and quietly transfers them to an external server. Which motivation best describes this?",
+    options: [
+      "Service disruption",
+      "Data exfiltration",
+      "Disruption and chaos",
+      "Ethical hacking"
+    ],
+    answer: 1,
+    why: "Data exfiltration is the unauthorized transfer of data out of an organization. Its prime targets are intellectual property, PII, and trade secrets."
+  },
+  {
+    lesson: "Lesson 18 · Threat Actor Motivations",
+    q: "A threat actor threatens to publish a victim's private photos unless payment is sent in Bitcoin. Which motivation — and which form of it — is at work?",
+    options: [
+      "Espionage, in the form of cyber warfare",
+      "Blackmail, in the form of sextortion",
+      "Financial gain, in the form of a banking trojan",
+      "Hacktivism, in the form of doxxing"
+    ],
+    answer: 1,
+    why: "Blackmail means threatening to expose or damage unless demands are met, and payment is typically demanded in cryptocurrency like Bitcoin. Its forms include ransomware, doxxing, and sextortion."
+  },
+  {
+    lesson: "Lesson 18 · Threat Actor Motivations",
+    q: "Which motivation is MOST commonly associated with nation-state actors?",
+    options: [
+      "Financial gain",
+      "Recognition among peers",
+      "Espionage",
+      "Curiosity"
+    ],
+    answer: 2,
+    why: "Espionage — spying to steal secrets — is mostly the domain of nation-state actors. (North Korea is the famous exception, hacking banks and crypto exchanges for revenue.)"
+  },
+  {
+    lesson: "Lesson 18 · Threat Actor Motivations",
+    q: "A penetration tester is hired to attack a company's network with written authorization, then reports every weakness found. Which motivation drives this actor?",
+    options: [
+      "Ethical reasons",
+      "Disruption and chaos",
+      "Revenge",
+      "Blackmail"
+    ],
+    answer: 0,
+    why: "Actors motivated by ethical reasons are the 'good guys': penetration testers and bug bounty hunters, who are authorized to attack systems to find and report vulnerabilities."
+  },
+  {
+    lesson: "Lesson 18 · Threat Actor Motivations",
+    q: "An employee who was just fired logs in on his last day and deletes critical project files. Which motivation is the MOST likely driver?",
+    options: [
+      "Philosophical or political beliefs",
+      "Financial gain",
+      "Revenge",
+      "Espionage"
+    ],
+    answer: 2,
+    why: "Revenge-motivated attacks come from disgruntled or fired employees aiming to harm the organization over a perceived wrong — like taking or destroying sensitive data on the way out."
+  },
+  // ---- Attributes ----
+  {
+    lesson: "Lesson 19 · Threat Actor Attributes",
+    q: "Which attribute pair classifies a threat actor based on their relationship to the targeted organization?",
+    options: [
+      "Skilled vs. unskilled",
+      "Funded vs. unfunded",
+      "Internal vs. external",
+      "Solo vs. group"
+    ],
+    answer: 2,
+    why: "The internal vs. external classification is based on the actor's relationship to the organization — not their physical location. Internal actors (employees, contractors, business associates) have legitimate access they misuse; external actors start with no authorized access."
+  },
+  {
+    lesson: "Lesson 19 · Threat Actor Attributes",
+    q: "Why are internal threat actors often more damaging than external ones?",
+    options: [
+      "They always have nation-state funding",
+      "They possess intimate knowledge of the infrastructure and its vulnerabilities",
+      "They never get caught",
+      "They use zero-day exploits"
+    ],
+    answer: 1,
+    why: "Internal actors already know the network layout, security processes, and weak points — like a disgruntled employee with a working badge and knowledge of the building. That intimate knowledge makes them potentially more damaging than an outsider."
+  },
+  {
+    lesson: "Lesson 19 · Threat Actor Attributes",
+    q: "When rating threat actors from low to high sophistication, which traits mark the HIGH end of the scale?",
+    options: [
+      "Widely available tools and phishing kits",
+      "Custom-developed malware, zero-day exploits, and advanced evasion techniques",
+      "Reliance on scripts written by others",
+      "Opportunistic attacks on easy targets"
+    ],
+    answer: 1,
+    why: "High-sophistication actors have advanced technical skills, use custom malware and zero-day exploits, and can evade detection — like nation-state groups and APTs, which can dwell undetected in well-defended networks for extended periods."
+  },
+  // ---- Unskilled attackers ----
+  {
+    lesson: "Lesson 20 · Unskilled Attackers",
+    q: "What BEST defines a script kiddie?",
+    options: [
+      "A hacker who writes custom exploit code for zero-days",
+      "An individual with limited technical knowledge who uses pre-made tools and scripts created by others",
+      "A state-sponsored operative using advanced tooling",
+      "A paid penetration tester"
+    ],
+    answer: 1,
+    why: "Script kiddies lack the technical knowledge to develop their own tools or exploits, so they rely on scripts and programs built by others — often without understanding how they work."
+  },
+  {
+    lesson: "Lesson 20 · Unskilled Attackers",
+    q: "A teenager downloads a ready-made tool, types in a target's IP address, and clicks a button to flood it with traffic. Which tool — and which motivation — fit this scenario?",
+    options: [
+      "Carbanak, motivated by financial gain",
+      "The Low Orbit Ion Cannon, motivated by recognition or the thrill of disruption",
+      "Stuxnet, motivated by espionage",
+      "A SIEM, motivated by ethical reasons"
+    ],
+    answer: 1,
+    why: "The Low Orbit Ion Cannon (LOIC) is the classic point-and-click DDoS tool for unskilled attackers. Script kiddies are typically motivated by recognition, the thrill of disruption, or curiosity — not money or ideology — and they attack easy targets opportunistically."
+  },
+  // ---- Hacktivists ----
+  {
+    lesson: "Lesson 21 · Hacktivists",
+    q: "A group defaces a corporation's website with political slogans, then leaks internal emails to the press — all to protest the company's environmental record. What are they?",
+    options: [
+      "Organized cyber criminals",
+      "Hacktivists",
+      "Script kiddies",
+      "Nation-state actors"
+    ],
+    answer: 1,
+    why: "Hacktivists use hacking to promote a political or social cause rather than personal gain. Their toolkit includes website defacement (electronic graffiti/vandalism), DDoS, doxxing, and leaking sensitive data."
+  },
+  {
+    lesson: "Lesson 21 · Hacktivists",
+    q: "What is doxxing?",
+    options: [
+      "Encrypting a victim's files and demanding ransom",
+      "The public release of private information about an individual or organization to provoke real-world action against them",
+      "Intercepting voice calls to steal credentials",
+      "Embedding malware inside image files"
+    ],
+    answer: 1,
+    why: "Doxxing involves publicly releasing private information — name, home address, phone number, email — in hopes someone takes real-world action against the victim. It's a classic hacktivist technique and a form of blackmail."
+  },
+  {
+    lesson: "Lesson 21 · Hacktivists",
+    q: "Which hacktivist group launched 'Operation Payback' with DDoS attacks against anti-piracy organizations like the MPAA and RIAA?",
+    options: [
+      "LulzSec",
+      "Anonymous",
+      "FIN7",
+      "Carbanak"
+    ],
+    answer: 1,
+    why: "Anonymous — a loosely affiliated collective — launched Operation Payback in 2010 against organizations involved in digital anti-piracy, including the MPAA and RIAA. LulzSec ran '50 Days of Lulz' in 2011 against Sony, the CIA, and the FBI."
+  },
+  // ---- Organized crime ----
+  {
+    lesson: "Lesson 22 · Organized Crime",
+    q: "What is the PRIMARY motivation of organized cybercrime groups?",
+    options: [
+      "Political ideology",
+      "Religious conviction",
+      "Financial gain",
+      "Recognition"
+    ],
+    answer: 2,
+    why: "Organized cybercrime groups are motivated almost entirely by financial gain — via data breaches, identity theft, online fraud, and ransomware. Unlike hacktivists or nation-states, they aren't driven by ideology (though governments can hire them as 'hired guns')."
+  },
+  {
+    lesson: "Lesson 22 · Organized Crime",
+    q: "FIN7 and the Carbanak group are cited in the course as examples of which threat actor type?",
+    options: [
+      "Hacktivists",
+      "Nation-state actors",
+      "Organized cybercrime groups",
+      "Unskilled attackers"
+    ],
+    answer: 2,
+    why: "FIN7 is a sophisticated cybercrime syndicate known for advanced phishing against retail and hospitality; the Carbanak group reportedly stole over $1 billion from banks worldwide using its custom Carbanak malware to move money and dispense ATM cash remotely."
+  },
+  {
+    lesson: "Lesson 22 · Organized Crime",
+    q: "Why are transnational organized cybercrime groups especially difficult to prosecute?",
+    options: [
+      "They only attack on weekends",
+      "Their operations cross national borders, creating legal complexity for law enforcement",
+      "They never leave any evidence",
+      "They are protected by international treaties"
+    ],
+    answer: 1,
+    why: "Operating across national borders gives these groups anonymity and global reach while increasing complexity for law enforcement trying to investigate and prosecute them."
+  },
+  // ---- Nation-state ----
+  {
+    lesson: "Lesson 23 · Nation-state Actors",
+    q: "Which statement about nation-state actors is TRUE?",
+    options: [
+      "They are always formally part of the military and act openly",
+      "They may operate as independent entities with state-backed resources so the country keeps plausible deniability",
+      "They are mainly motivated by quick financial profit",
+      "They can only attack systems connected to the internet"
+    ],
+    answer: 1,
+    why: "Nation-state actors usually belong to intelligence or military organizations but may operate as independent entities with state backing — giving the country plausible deniability. They pursue long-term strategic goals (intelligence, disruption, influence), not quick profit, and they can even cross air gaps, as Stuxnet showed."
+  },
+  {
+    lesson: "Lesson 23 · Nation-state Actors",
+    q: "Investigators find malware whose code mimics a known North Korean tool, but deeper analysis reveals it was actually built by Russian actors trying to frame North Korea. What is this called?",
+    options: [
+      "A false flag attack",
+      "An evil twin",
+      "A honeypot",
+      "Shadow IT"
+    ],
+    answer: 0,
+    why: "A false flag attack is orchestrated to appear as if it originated from a different source or group than the actual perpetrators, misleading investigators and attribution — like the 2018 Winter Olympics malware that mimicked North Korean tools but was traced to Russia."
+  },
+  {
+    lesson: "Lesson 23 · Nation-state Actors",
+    q: "Stuxnet is a landmark nation-state attack because it…",
+    options: [
+      "Stole over $1 billion from banks using ATM malware",
+      "Caused physical damage to Iranian nuclear centrifuges by crossing an air gap on USB drives and exploiting Windows zero-days",
+      "Defaced the websites of anti-piracy organizations",
+      "Leaked classified documents to the media"
+    ],
+    answer: 1,
+    why: "Attributed to the US and Israeli governments, Stuxnet sabotaged Iran's nuclear program by physically damaging enrichment centrifuges. It used multiple Windows zero-days, spread undetected, and crossed the facility's air gap by infecting USB drives."
+  },
+  {
+    lesson: "Lesson 23 · Nation-state Actors",
+    q: "Which nation-state is the notable EXCEPTION that conducts cyber operations primarily for financial gain?",
+    options: [
+      "Russia",
+      "North Korea",
+      "Israel",
+      "France"
+    ],
+    answer: 1,
+    why: "Most nation-states pursue strategic goals, not money. But due to its isolated economy and international sanctions, North Korea's state actors target banks, cryptocurrency exchanges, and financial institutions to fund the regime."
+  },
+  {
+    lesson: "Lesson 23 · Nation-state Actors",
+    q: "Which statement best defines an advanced persistent threat (APT)?",
+    options: [
+      "Any virus that spreads quickly between machines",
+      "A prolonged, targeted attack in which an intruder stays undetected for an extended period to steal data or monitor activity rather than cause immediate damage",
+      "A DDoS attack that lasts more than 24 hours",
+      "A phishing campaign with unusually well-written emails"
+    ],
+    answer: 1,
+    why: "An APT is a prolonged and targeted cyberattack where the intruder gains unauthorized access and remains undetected for an extended period to steal data or monitor the network. The term once meant nation-state specifically, but highly sophisticated organized crime groups are now also called APTs."
+  },
+  // ---- Insider threats ----
+  {
+    lesson: "Lesson 24 · Insider Threats",
+    q: "Edward Snowden's 2013 leak of classified NSA material and the 2020 Twitter Bitcoin scam both illustrate which threat type?",
+    options: [
+      "Nation-state espionage",
+      "Insider threats",
+      "Script kiddies",
+      "Organized crime"
+    ],
+    answer: 1,
+    why: "Snowden was an NSA contractor with legitimate access whose intimate knowledge let him gather data undetected; the 2020 Twitter attack involved an external attacker collaborating with two insiders. Both are textbook insider threat cases."
+  },
+  {
+    lesson: "Lesson 24 · Insider Threats",
+    q: "An untrained employee clicks a phishing link and unknowingly lets malware into the corporate network. How is this BEST classified?",
+    options: [
+      "Not a security concern, since there was no malicious intent",
+      "An unintentional insider threat caused by carelessness or lack of awareness",
+      "A nation-state false flag attack",
+      "An external threat, because the email came from outside"
+    ],
+    answer: 1,
+    why: "Insider threats aren't always malicious — they can be unintentional, the result of carelessness or poor security awareness, like an untrained user clicking a phishing link. Insider threats originate from within (current/former employees, contractors, associates) and can also facilitate external attacks by planting backdoors."
+  },
+  {
+    lesson: "Lesson 24 · Insider Threats",
+    q: "Which set of measures does the course recommend to mitigate insider threats?",
+    options: [
+      "Longer passwords and more firewalls only",
+      "Zero Trust architecture, robust access controls, regular audits, and employee security awareness programs",
+      "Disabling all removable devices and cameras",
+      "Outsourcing the security operations center"
+    ],
+    answer: 1,
+    why: "The course's mitigation package: implement a Zero Trust architecture, employ robust access controls, conduct regular audits, and provide effective employee security awareness training."
+  },
+  // ---- Shadow IT ----
+  {
+    lesson: "Lesson 25 · Shadow IT",
+    q: "An employee stores work documents in a personal Dropbox account and installs an unapproved browser plugin — both without telling IT. What is this called?",
+    options: [
+      "Bring your own device",
+      "Shadow IT",
+      "A compensating control",
+      "Hacktivism"
+    ],
+    answer: 1,
+    why: "Shadow IT is the use of IT systems, devices, software, applications, or services without explicit organizational approval (also called stealth IT or client IT). Personal cloud storage and unapproved plugins are classic examples."
+  },
+  {
+    lesson: "Lesson 25 · Shadow IT",
+    q: "What does the course identify as a root cause of shadow IT?",
+    options: [
+      "Organizations set their security posture too high or too complex for business operations to function smoothly",
+      "Employees are required to use only company-issued devices",
+      "IT departments approve requests too quickly",
+      "Regulations forbid personal devices"
+    ],
+    answer: 0,
+    why: "Shadow IT often exists because the security posture is set too high or is too complex for business to operate — like a 45-day approval process for a $100 monitor, which drives employees to buy and connect their own. Convenience and cloud/BYOD trends also fuel it."
+  },
+  {
+    lesson: "Lesson 25 · Shadow IT",
+    q: "Why is shadow IT considered so dangerous?",
+    options: [
+      "It always contains malware",
+      "IT cannot secure hardware, software, or services it doesn't know exist",
+      "It is illegal in most countries",
+      "It always disables the firewall"
+    ],
+    answer: 1,
+    why: "If the technology department doesn't know a device, app, or cloud service is in use, it cannot secure it — unknown posture, no lifecycle management, no patching. That opens the door to data breaches, non-compliance, and disruption."
+  },
+  // ---- Threat vectors & attack surfaces ----
+  {
+    lesson: "Lesson 26 · Threat Vectors & Attack Surfaces",
+    q: "Which statement correctly separates a threat vector from an attack surface?",
+    options: [
+      "Threat vector = the means or pathway of attack; attack surface = all the points where an unauthorized user could enter or extract data",
+      "Threat vector = the target; attack surface = the tool",
+      "They are synonyms",
+      "Threat vector applies to networks; attack surface applies to applications"
+    ],
+    answer: 0,
+    why: "Think 'vector = how, surface = where.' A threat vector is the pathway used to deliver a payload or unwanted action; the attack surface is the sum of all potential entry points and vulnerabilities. Shrink it by restricting access, removing unneeded software, and disabling unused protocols."
+  },
+  {
+    lesson: "Lesson 26 · Threat Vectors & Attack Surfaces",
+    q: "In the Stegano attack (2017), cyber criminals embedded malicious code where — and how did it execute?",
+    options: [
+      "Inside pirated video games; it ran when the game was cracked",
+      "Within the pixels of banner ads on popular websites; it executed when a vulnerable Internet Explorer browser loaded the image",
+      "Inside a USB drive left in a parking lot; it ran on insertion",
+      "Inside a voicemail; it ran when the victim called back"
+    ],
+    answer: 1,
+    why: "Stegano was a large-scale image-based attack: malicious code was hidden inside the pixels of banner ads. When a user visited a site carrying the ad, vulnerable versions of Internet Explorer executed the code and redirected the user to an exploit kit that silently installed malware."
+  },
+  {
+    lesson: "Lesson 26 · Threat Vectors & Attack Surfaces",
+    q: "An attacker leaves malware-infected USB drives in a company's parking lot, hoping curious employees will plug them in. What is this technique called?",
+    options: [
+      "Vishing",
+      "Baiting",
+      "BlueBorne",
+      "An evil twin"
+    ],
+    answer: 1,
+    why: "Baiting is the classic removable-device technique: leave an infected USB drive where a target will find it (parking lot, lobby) and let curiosity do the rest. An alternative is social-engineering a way into the building to connect the device directly."
+  },
+  {
+    lesson: "Lesson 26 · Threat Vectors & Attack Surfaces",
+    q: "An attacker sets up a rogue Wi-Fi access point named 'Airport_Free_WiFi' that mimics a legitimate network, then intercepts the traffic of users who connect. What is this?",
+    options: [
+      "An evil twin attack",
+      "Baiting",
+      "Port triggering",
+      "A false flag"
+    ],
+    answer: 0,
+    why: "An evil twin is a rogue access point that imitates a legitimate Wi-Fi network. Users who connect have their data intercepted, captured, and possibly modified. It's the signature wireless threat vector."
+  },
+  {
+    lesson: "Lesson 26 · Threat Vectors & Attack Surfaces",
+    q: "Which pairing of Bluetooth attacks is correct?",
+    options: [
+      "BlueBorne = denial of service; BlueSmack = device takeover",
+      "BlueBorne = a set of vulnerabilities letting attackers take over devices, spread malware, or run on-path attacks without user interaction; BlueSmack = a DoS that crashes devices via oversized L2CAP packets",
+      "Both are Wi-Fi attacks",
+      "Both are voice-call scams"
+    ],
+    answer: 1,
+    why: "BlueBorne is a family of Bluetooth vulnerabilities that lets an attacker seize devices, spread malware, or intercept communications — with no user interaction. BlueSmack is a denial-of-service attack that exhausts a device's resources with a specially crafted L2CAP packet until it crashes."
+  },
+  // ---- Deception tech ----
+  {
+    lesson: "Lesson 27 · Outsmarting Threat Actors",
+    q: "What is the PRIMARY purpose of a honeypot?",
+    options: [
+      "To block attacks before they reach production servers",
+      "To gather information about attackers' methods, motives, and TTPs",
+      "To encrypt sensitive files",
+      "To speed up network traffic"
+    ],
+    answer: 1,
+    why: "A honeypot is a decoy system with attractive fake vulnerabilities. It is NOT designed to block attacks — it logs everything so defenders can study methods, motives, and tactics/techniques/procedures (TTPs). It should sit in a screened subnet or isolated segment."
+  },
+  {
+    lesson: "Lesson 27 · Outsmarting Threat Actors",
+    q: "What makes a honeynet a 'double-edged sword'?",
+    options: [
+      "It costs twice as much as a honeypot",
+      "An attacker who discovers it can study it and learn how the organization's production systems are configured",
+      "It only detects insider threats",
+      "It requires an air-gapped network"
+    ],
+    answer: 1,
+    why: "A honeynet is a whole network of honeypots mimicking servers, routers, and switches. It logs successful and failed attacks — but if attackers realize what it is, they can learn about your real production configuration from it, which cuts both ways."
+  },
+  {
+    lesson: "Lesson 27 · Outsmarting Threat Actors",
+    q: "A security team creates a fake user account named 'Admin' that no legitimate user would ever touch. Any login attempt with it triggers an alert. What is this?",
+    options: [
+      "A honeyfile",
+      "A honeytoken",
+      "A honeynet",
+      "A decoy directory"
+    ],
+    answer: 1,
+    why: "A honeytoken is a piece of data with no legitimate value — a fake account, bogus URL, or dummy database record — that is monitored for access. Since no one should ever use it, any interaction signals a likely breach. Honeytokens are especially good at catching insider threats and tracing data-leak pathways."
+  },
+  {
+    lesson: "Lesson 27 · Outsmarting Threat Actors",
+    q: "How is a honeyfile different from a honeytoken?",
+    options: [
+      "A honeyfile is real sensitive data; a honeytoken is fake",
+      "A honeyfile is a decoy file that looks valuable and contains fake data with watermarks; a honeytoken is fake data itself, like a bogus credential or dummy record",
+      "A honeyfile runs on routers; a honeytoken runs on servers",
+      "There is no difference"
+    ],
+    answer: 1,
+    why: "A honeyfile is a decoy FILE (any type) planted under looser defenses, containing fake data plus hidden watermarks/identifiers, and it raises an alert when opened. A honeytoken is a piece of fake DATA — an account, URL, or record — where any use at all is inherently suspicious."
+  }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"threat-actors-quiz.html",title:"Threat Actors Quiz \u00b7 SY0-701 (Section 03)"};</script><script src="analytics.js"></script>
+</body>
+</html>

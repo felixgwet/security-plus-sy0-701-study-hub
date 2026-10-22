@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SY0-701 Practice Exam 16 · Instant Feedback (Section 17)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #3fb950;
+    --accent-dim: rgba(63,185,80,.12);
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+    --blue: #58a6ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 860px; }
+
+  /* ---------- Start / Result ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 36px;
+  }
+  .center { text-align: center; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(63,185,80,.4);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 14px; }
+  .screen p { color: var(--muted); line-height: 1.65; margin-bottom: 10px; font-size: 15px; }
+  .exam-facts { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin: 22px 0 6px; }
+  .fact {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .fact b { display: block; color: var(--text); font-size: 17px; margin-bottom: 2px; }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 32px;
+    cursor: pointer;
+    margin-top: 22px;
+    transition: filter .15s;
+  }
+  .btn:hover:not(:disabled) { filter: brightness(1.12); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); margin-left: 8px; }
+  .btn.nav-btn { margin-top: 0; padding: 10px 24px; }
+  .score-big { font-size: 60px; font-weight: 700; margin: 10px 0 2px; }
+  .pass-line { color: var(--muted); font-size: 14px; margin-bottom: 4px; }
+  .verdict { font-size: 18px; font-weight: 600; margin: 8px 0 2px; }
+  .verdict.pass { color: var(--green); }
+  .verdict.fail { color: var(--red); }
+  .scale-track {
+    position: relative; height: 10px; background: var(--border);
+    border-radius: 5px; margin: 26px auto 6px; max-width: 560px;
+  }
+  .scale-pass-mark { position: absolute; left: 81.25%; top: -5px; bottom: -5px; width: 2px; background: var(--gold); }
+  .scale-fill {
+    height: 100%; border-radius: 5px; width: 0%;
+    background: linear-gradient(90deg, var(--red), var(--gold) 70%, var(--green));
+    transition: width 1s ease;
+  }
+  .scale-labels { display: flex; justify-content: space-between; max-width: 560px; margin: 0 auto; font-size: 12px; color: var(--muted); }
+  .review { text-align: left; margin-top: 30px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; font-size: 14px; }
+  .review-item .qhead { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  .review-item .pts { color: var(--muted); white-space: nowrap; }
+  .review-item .q { line-height: 1.5; margin-bottom: 6px; }
+  .review-item .a { color: var(--muted); line-height: 1.55; }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+
+  /* ---------- Question screen ---------- */
+  .exam-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 14px; color: var(--muted); }
+  .qtype-tag {
+    display: inline-block; font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--accent); background: var(--accent-dim);
+    border: 1px solid rgba(63,185,80,.35); border-radius: 4px; padding: 2px 8px; margin-bottom: 10px;
+  }
+  .q-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 26px 28px; }
+  .q-text { font-size: 17px; line-height: 1.55; margin-bottom: 20px; }
+  .pick-hint { font-size: 13px; color: var(--gold); margin: -12px 0 16px; font-weight: 600; }
+
+  .option {
+    display: block; width: 100%; text-align: left;
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; font-size: 15px; margin-bottom: 9px;
+    cursor: pointer; transition: border-color .15s, background .15s; user-select: none;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.selected { border-color: var(--accent); background: var(--accent-dim); }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter { display: inline-block; width: 22px; font-weight: 700; color: var(--muted); }
+
+  .match-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .match-term {
+    min-width: 190px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; font-size: 14px; font-weight: 600;
+  }
+  .match-term.good { border-color: var(--green); background: rgba(63,185,80,.1); }
+  .match-term.bad { border-color: var(--red); background: rgba(248,81,73,.1); }
+  .match-arrow { color: var(--muted); }
+  select.match-select {
+    flex: 1; min-width: 220px; background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 14px;
+  }
+  select.match-select.selected { border-color: var(--accent); }
+  select.match-select:disabled { opacity: .85; }
+
+  .order-seq-label { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .order-seq { border: 1px dashed var(--border); border-radius: 8px; padding: 12px; min-height: 54px; margin-bottom: 16px; }
+  .order-seq .placeholder { color: var(--muted); font-size: 13px; }
+  .order-item {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 9px 14px; font-size: 14px; margin: 4px 6px 4px 0; cursor: pointer; user-select: none;
+  }
+  .order-item:hover:not(.used) { border-color: var(--accent); }
+  .order-item .num {
+    display: inline-block; width: 20px; height: 20px; line-height: 20px; text-align: center;
+    background: var(--accent); color: #0d1117; border-radius: 50%; font-size: 12px; font-weight: 700;
+  }
+  .order-item .num.good { background: var(--green); }
+  .order-item .num.bad { background: var(--red); }
+  .order-item.used { opacity: .35; pointer-events: none; }
+  .order-reset { background: none; border: none; color: var(--blue); font-size: 13px; cursor: pointer; margin-bottom: 8px; }
+
+  .feedback {
+    display: none; margin-top: 18px; border-radius: 8px; padding: 14px 16px;
+    font-size: 14px; line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback.part { background: rgba(210,153,34,.08); border: 1px solid rgba(210,153,34,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+
+  .check-btn { margin-top: 6px; width: 100%; }
+  .exam-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; gap: 10px; flex-wrap: wrap; }
+
+  .palette { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-top: 18px; }
+  .palette h3 { font-size: 13px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
+  .pal-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pal-btn {
+    width: 34px; height: 34px; background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px; font-size: 13px; cursor: pointer; position: relative;
+  }
+  .pal-btn.current { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .pal-btn.answered::after {
+    content: ''; position: absolute; right: 3px; top: 3px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  }
+  .legend { display: flex; gap: 16px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+  .legend span::before { content: '● '; }
+  .legend .l-ans::before { color: var(--green); }
+
+  .hidden { display: none !important; }
+</style>
+<style id="iphone-optimizations">
+/* iPhone / touch optimizations */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: rgba(88,166,255,.25); }
+button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-size: 16px; }
+.q-text, .screen p { overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .container, .wrap { padding-left: 12px; padding-right: 12px; }
+  .screen { padding: 24px 16px; }
+  .exam-facts { flex-wrap: wrap; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen center">
+    <div class="badge">CompTIA Security+ SY0-701 · Feedback Mode</div>
+    <h1>Practice Exam 16 — Instant Feedback</h1>
+    <p><b style="color:var(--text)">Same exam-paper question styles as the simulator</b> — single-answer multiple choice, multiple-response, and performance-based matching &amp; ordering tasks — but in study mode: after each answer you immediately see whether you're right, your points, and an explanation. A completely new question set on Identity and Access Management.</p>
+    <div class="exam-facts">
+      <div class="fact"><b id="fact-q">20</b>All-new questions</div>
+      <div class="fact"><b id="fact-t">—</b>Timer</div>
+      <div class="fact"><b>750 / 900</b>Passing score</div>
+      <div class="fact"><b>Instant</b>Feedback</div>
+    </div>
+    <p style="margin-top:16px">The clock counts up (no pressure) and records your total time. Answer every question, then get a full CompTIA-style score report with review.</p>
+    <button class="btn" onclick="beginExam()">Start Practice Exam</button>
+  </div>
+
+  <!-- EXAM -->
+  <div id="exam-screen" class="hidden">
+    <div class="exam-top">
+      <span id="exam-pos">Question 1 of 20</span>
+      <span>Score: <b id="live-score">0.00</b> / 20 &nbsp;·&nbsp; ⏱ <span id="timer">00:00</span></span>
+    </div>
+    <div class="q-card">
+      <div class="qtype-tag" id="q-type"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-body"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn check-btn" id="check-btn" onclick="checkAnswer()">Check Answer</button>
+      <div class="exam-footer">
+        <button class="btn ghost nav-btn" id="prev-btn" onclick="gotoQuestion(current-1)">← Previous</button>
+        <button class="btn nav-btn" id="next-btn" onclick="gotoQuestion(current+1)">Next →</button>
+      </div>
+    </div>
+    <div class="palette">
+      <h3>Question Summary</h3>
+      <div class="pal-grid" id="palette"></div>
+      <div class="legend"><span class="l-ans">Answered</span></div>
+      <div style="margin-top:14px">
+        <button class="btn" style="margin-top:0" onclick="finishExam()">Finish &amp; See Score Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen center hidden">
+    <div class="badge">Exam Score Report</div>
+    <div class="score-big" id="scaled-score">—</div>
+    <div class="pass-line">Scale: 100 – 900 · Passing score: 750</div>
+    <div class="verdict" id="verdict"></div>
+    <p id="raw-line" style="margin-top:10px"></p>
+    <div class="scale-track">
+      <div class="scale-fill" id="scale-fill"></div>
+      <div class="scale-pass-mark"></div>
+    </div>
+    <div class="scale-labels"><span>100</span><span style="color:var(--gold)">750 ▲</span><span>900</span></div>
+    <div>
+      <button class="btn" onclick="beginExam()">Retake Exam</button>
+      <button class="btn ghost" onclick="toggleReview()" id="review-btn">Review Questions</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   PRACTICE EXAM (FEEDBACK MODE) — SY0-701 Section 17 content
+   Domain 5: Risk Management Process (Obj 5.2)
+   All-new question set — distinct from the quiz & simulator.
+   ============================================================ */
+const EXAM = [
+// ---------- Single-answer multiple choice ----------
+  {
+    type: 'mcq',
+    q: "A company requires smart card + PIN + fingerprint for the data center. Categorizing each factor correctly:",
+    options: [
+      "Possession, knowledge, inherence — three different categories = true MFA",
+      "All three are knowledge factors",
+      "Two possession factors and one knowledge factor",
+      "Smart cards count as inherence"
+    ],
+    answer: 0,
+    why: "Smart card = something you have; PIN = something you know; fingerprint = something you are. Three distinct categories = multifactor. The exam loves factor classification."
+  },
+  {
+    type: 'mcq',
+    q: "Which password attack is MOST likely to succeed against an account named 'admin' protected by 'P@$$w0rd123' yet still evade a five-attempt lockout policy?",
+    options: [
+      "Online brute force against that one account",
+      "Password spraying across thousands of accounts with a handful of leet-speak dictionary entries",
+      "A hybrid attack against a single hash offline",
+      "MAC flooding"
+    ],
+    answer: 1,
+    why: "Spraying spreads a few guesses (including leet variants) across many accounts, never tripping any single account's lockout. Online brute force on one account would lock out."
+  },
+  {
+    type: 'mcq',
+    q: "John the Ripper instantly cracked a demo hash via a wordlist lookup. Which defense would have forced real computation instead of a table lookup?",
+    options: [
+      "Longer password", "Salting — the random string defeats precomputed hash/lookup tables", "Password history", "Minimum password age"],
+    answer: 1,
+    why: "Salts make every hash unique, so precomputed tables fail and attackers must compute per-hash. (Length still raises that computation time.) Use SHA-256 + salt rather than bare MD5."
+  },
+  {
+    type: 'mcq',
+    q: "A firm wants single sign-on across internal apps using an existing employee directory, with credential lookups encrypted in transit. Best fit:",
+    options: [
+      "OAuth with JWT", "LDAP over SSL/TLS (LDAPS) against the directory", "Plain LDAP", "OpenID Connect only"],
+    answer: 1,
+    why: "LDAP is the directory protocol for user/group lookups and SSO; plain LDAP can pass credentials cleartext, so LDAPS/StartTLS is required for sensitive traffic."
+  },
+  {
+    type: 'mcq',
+    q: "'Log in with Google' on a third-party training site, where the site receives a signed token but never the password, is an example of:",
+    options: [
+      "SAML assertions", "OAuth — token-based authorization via JWT without password exposure", "Kerberos ticketing", "MAC filtering"],
+    answer: 1,
+    why: "OAuth issues scoped access tokens (JWTs) after user approval — third party gets capability, not credentials. SAML would be XML assertions between IdP and SP."
+  },
+  {
+    type: 'mcq',
+    q: "Deprovisioning matters most to security because it:",
+    options: [
+      "Speeds up onboarding", "Removes access for departed users — cutting off a potential insider-threat path the moment employment ends", "Reduces software cost", "Improves password strength"],
+    answer: 1,
+    why: "Stale accounts of ex-employees are a classic breach vector. Deprovisioning promptly denies the 'revenge access' scenario the course describes."
+  },
+  {
+    type: 'mcq',
+    q: "An air-gapped SCADA network needs device authentication before any switch port carries traffic. The correct framework and its transport layer are:",
+    options: [
+      "802.1x — port-based authentication operating at Layer 2 for wired and wireless",
+      "OAuth at Layer 7", "SAML at Layer 5", "RDP on 3389"],
+    answer: 0,
+    why: "802.1x authenticates devices at the port (Layer 2) before network access, using EAP methods against RADIUS/TACACS+ — ideal for stopping rogue devices."
+  },
+  {
+    type: 'mcq',
+    q: "Which EAP method fits: mutual authentication required, no client certificate infrastructure available, Active Directory in place?",
+    options: [
+      "EAP-TLS", "PEAP — server certificate plus AD-backed password authentication inside a protected tunnel", "EAP-MD5", "LEAP"],
+    answer: 1,
+    why: "PEAP/TTLS give mutual auth with only a server cert; MD5 is one-way; TLS needs client certs; LEAP is Cisco-only."
+  },
+  {
+    type: 'mcq',
+    q: "Attestation in IAM primarily involves:",
+    options: [
+      "Creating accounts faster", "Regular reviews/audits validating that accounts and access rights remain correct, current and minimal", "Encrypting databases", "Rotating hardware tokens"],
+    answer: 1,
+    why: "Attestation = periodic validation of accounts and rights — the process that catches permission creep and orphaned access."
+  },
+  {
+    type: 'mcq',
+    q: "A helpdesk wants fewer password-reset tickets while improving security. Which technology serves both goals, and why?",
+    options: [
+      "SSO — one credential set means fewer forgotten passwords, and users can finally memorize one strong unique password instead of reusing weak ones",
+      "Shorter password expiry", "Shared accounts", "Security questions"],
+    answer: 0,
+    why: "SSO cuts reset volume and enables stronger single passwords (less reuse) — the course lists UX, productivity, support cost and security as the four benefits."
+  },
+  {
+    type: 'mcq',
+    q: "Under MAC, a user with a 'Confidential' label attempts to write to a 'Secret' file. Result?",
+    options: [
+      "Allowed — read up is fine", "Denied — MAC requires the user's level to equal or exceed the resource's level for access", "Allowed if the owner approves", "Allowed outside business hours"],
+    answer: 1,
+    why: "MAC is label-driven with no owner override: Confidential < Secret → blocked. Owner approval is a DAC concept."
+  },
+  {
+    type: 'mcq',
+    q: "A Windows user clicks an installer and sees a consent prompt requiring admin approval. This mechanism is:",
+    options: [
+      "MAC labeling", "UAC — enforcing least privilege by requiring explicit authorization for administrative actions", " federation", "An EAP handshake"],
+    answer: 1,
+    why: "User Account Control intercepts privilege-escalation attempts (shield icon = will prompt) so malware can't silently gain admin rights."
+  },
+// ---------- Multiple response ----------
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which are knowledge-based ('something you know') factors? (Choose THREE.)",
+    options: ["Password", "PIN", "Security question answer", "Smart card", "Fingerprint"],
+    answer: [0, 1, 2],
+    why: "Password, PIN and security answers are all knowledge. Smart card = possession; fingerprint = inherence. Mixing two knowledge items is still single-factor."
+  },
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which statements about passkeys are true? (Choose THREE.)",
+    options: [
+      "The private key is stored on the user's device",
+      "Only the public key sits on the server, so server breaches expose no login secret",
+      "Each passkey is unique to its service, resisting phishing",
+      "Passkeys are sent to websites as passwords are",
+      "Passkeys require SMS"
+    ],
+    answer: [0, 1, 2],
+    why: "Passkeys use device-bound private keys and server-side public keys, service-unique by design — no shared secret ever transits or rests on the server."
+  },
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which are among the five password policy characteristics? (Choose THREE.)",
+    options: [
+      "Password length",
+      "Password complexity",
+      "Password reuse (history enforcement)",
+      "Screen brightness",
+      "Monitor count"
+    ],
+    answer: [0, 1, 2],
+    why: "The five: length, complexity, reuse/history, expiration, age (minimum). Hardware settings are unrelated."
+  },
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which benefits does federation provide? (Choose THREE.)",
+    options: [
+      "Simplified user experience — one home credential set",
+      "Reduced administrative overhead — no partner account management",
+      "Improved security — less password reuse and insecure storage",
+      "Guaranteed elimination of phishing",
+      "Faster WAN links"
+    ],
+    answer: [0, 1, 2],
+    why: "Federation benefits: UX, reduced admin overhead, better security posture. It does not eliminate phishing, nor does it affect link speed."
+  },
+// ---------- Matching ----------
+  {
+    type: 'match',
+    q: "PBQ — Match each attack to its signature technique. Each may be used once; not all will be used.",
+    terms: ["Brute force", "Dictionary", "Spraying", "Hybrid"],
+    defs: [
+      "Every possible combination tried exhaustively",
+      "A list of common passwords, including leet-speak substitutions",
+      "Few common passwords tried across many accounts to dodge lockouts",
+      "Dictionary base word plus dynamically brute-forced suffixes",
+      "Flooding a switch CAM table",
+      "Intercepting a SAML assertion"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "The four password attack classes. MAC flooding is a Layer 2 attack; assertion interception is not a password attack per the course."
+  },
+  {
+    type: 'match',
+    q: "PBQ — Match each IAM concept to its definition. Each may be used once; not all will be used.",
+    terms: ["Provisioning", "Identity proofing", "Attestation", "Deprovisioning"],
+    defs: [
+      "Creating accounts with appropriate access",
+      "Verifying real-world identity before account creation",
+      "Periodic review that access remains correct and minimal",
+      "Removing access rights when no longer needed",
+      "Rotating codes every 30–60 seconds",
+      "Sharing one password across sites"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "The four lifecycle concepts. TOTP rotation and password reuse are distractors."
+  },
+// ---------- Ordering ----------
+  {
+    type: 'order',
+    q: "PBQ — Order the defenses a company should deploy against credential attacks, from foundation upward. Click the items in sequence.",
+    items: [
+      "Password manager policy: unique, long, complex passwords per account",
+      "Password history and minimum age to block recycling tricks",
+      "MFA on all remote and privileged access",
+      "Lockout limits and CAPTCHAs to blunt online guessing"
+    ],
+    why: "Strong unique secrets first, policy mechanics second, a second factor third, and throttling last — each layer compounds the previous one."
+  },
+  {
+    type: 'order',
+    q: "PBQ — Order the employee lifecycle events with their IAM actions. Click the items in sequence.",
+    items: [
+      "Hire — identity proof, then provision the account with role-appropriate access",
+      "Promote/transfer — grant the new role's permissions and revoke the old ones",
+      "Periodically — attest that access remains minimal and correct",
+      "Terminate — deprovision all access immediately"
+    ],
+    why: "Proof→provision at hire, swap (not stack) permissions on moves, attest continuously, deprovision at exit. This chain prevents permission creep and insider access."
+  }
+];
+
+/* ============================================================
+   ENGINE — feedback mode
+   ============================================================ */
+let answers = [];
+let checked = [];
+let points = [];
+let current = 0;
+let elapsed = 0;
+let timerId = null;
+
+const TYPE_LABELS = {
+  mcq: 'Multiple Choice',
+  multi: 'Multiple Response',
+  match: 'Performance-Based · Matching',
+  order: 'Performance-Based · Ordering'
+};
+
+function fmtTime(s) {
+  const m = Math.floor(s / 60), r = s % 60;
+  return `${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`;
+}
+
+function beginExam() {
+  answers = EXAM.map(q => {
+    if (q.type === 'mcq') return null;
+    if (q.type === 'multi') return [];
+    if (q.type === 'match') return q.terms.map(() => null);
+    if (q.type === 'order') return [];
+    return null;
+  });
+  checked = EXAM.map(() => false);
+  points = EXAM.map(() => 0);
+  current = 0;
+  elapsed = 0;
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('exam-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Questions';
+  document.getElementById('fact-q').textContent = EXAM.length;
+  document.getElementById('fact-t').textContent = 'elapsed';
+  startTimer();
+  renderQuestion();
+  renderPalette();
+}
+
+function startTimer() {
+  clearInterval(timerId);
+  updateTimerDisplay();
+  timerId = setInterval(() => { elapsed++; updateTimerDisplay(); }, 1000);
+}
+
+function updateTimerDisplay() {
+  document.getElementById('timer').textContent = fmtTime(elapsed);
+}
+
+function isAnswered(i) { return checked[i]; }
+
+function isInputComplete(i) {
+  const q = EXAM[i], a = answers[i];
+  if (q.type === 'mcq') return a !== null;
+  if (q.type === 'multi') return a.length > 0;
+  if (q.type === 'match') return a.every(v => v !== null);
+  if (q.type === 'order') return a.length === q.items.length;
+  return false;
+}
+
+function updateLiveScore() {
+  const total = points.reduce((s, p) => s + p, 0);
+  document.getElementById('live-score').textContent = total.toFixed(2);
+}
+
+function renderQuestion() {
+  const q = EXAM[current];
+  const done = checked[current];
+  document.getElementById('exam-pos').textContent = `Question ${current + 1} of ${EXAM.length}`;
+  document.getElementById('q-type').textContent = TYPE_LABELS[q.type];
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('prev-btn').disabled = current === 0;
+  document.getElementById('next-btn').textContent = current === EXAM.length - 1 ? 'Last Question' : 'Next →';
+
+  const body = document.getElementById('q-body');
+  body.innerHTML = '';
+  if (q.type === 'mcq') renderMcq(q, body, done);
+  else if (q.type === 'multi') renderMulti(q, body, done);
+  else if (q.type === 'match') renderMatch(q, body, done);
+  else if (q.type === 'order') renderOrder(q, body, done);
+
+  const checkBtn = document.getElementById('check-btn');
+  const fb = document.getElementById('feedback');
+  if (done) {
+    checkBtn.classList.add('hidden');
+    showFeedback(q);
+  } else {
+    checkBtn.classList.remove('hidden');
+    checkBtn.disabled = !isInputComplete(current);
+    checkBtn.textContent = 'Check Answer';
+    fb.className = 'feedback';
+    fb.innerHTML = '';
+  }
+  updateLiveScore();
+  renderPalette();
+}
+
+function renderMcq(q, body, done) {
+  const letters = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    if (done) {
+      btn.disabled = true;
+      if (i === q.answer) btn.classList.add('correct');
+      else if (answers[current] === i) btn.classList.add('wrong');
+    } else {
+      if (answers[current] === i) btn.classList.add('selected');
+      btn.onclick = () => { answers[current] = i; renderQuestion(); };
+    }
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    body.appendChild(btn);
+  });
+}
+
+function renderMulti(q, body, done) {
+  const hint = document.createElement('div');
+  hint.className = 'pick-hint';
+  const names = { 2: 'TWO', 3: 'THREE', 4: 'FOUR' };
+  hint.textContent = `Select ${names[q.pick] || q.pick}.`;
+  body.appendChild(hint);
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    const chosen = answers[current].includes(i);
+    if (done) {
+      btn.disabled = true;
+      if (q.answer.includes(i)) btn.classList.add('correct');
+      else if (chosen) btn.classList.add('wrong');
+    } else {
+      if (chosen) btn.classList.add('selected');
+      btn.onclick = () => {
+        const sel = answers[current];
+        const pos = sel.indexOf(i);
+        if (pos >= 0) sel.splice(pos, 1);
+        else {
+          if (sel.length >= q.pick) sel.shift();
+          sel.push(i);
+        }
+        renderQuestion();
+      };
+    }
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    body.appendChild(btn);
+  });
+}
+
+function renderMatch(q, body, done) {
+  if (!q._defOrder) {
+    q._defOrder = q.defs.map((_, i) => i);
+    for (let i = q._defOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q._defOrder[i], q._defOrder[j]] = [q._defOrder[j], q._defOrder[i]];
+    }
+  }
+  q.terms.forEach((term, ti) => {
+    const row = document.createElement('div');
+    row.className = 'match-row';
+    const label = document.createElement('div');
+    label.className = 'match-term';
+    if (done) label.classList.add(answers[current][ti] === q.answer[ti] ? 'good' : 'bad');
+    label.textContent = term;
+    const arrow = document.createElement('span');
+    arrow.className = 'match-arrow';
+    arrow.textContent = '→';
+    const sel = document.createElement('select');
+    sel.className = 'match-select' + (answers[current][ti] !== null ? ' selected' : '');
+    if (done) sel.disabled = true;
+    const noneOpt = document.createElement('option');
+    noneOpt.value = '';
+    noneOpt.textContent = '— choose a description —';
+    sel.appendChild(noneOpt);
+    q._defOrder.forEach(di => {
+      const o = document.createElement('option');
+      o.value = di;
+      o.textContent = q.defs[di];
+      if (answers[current][ti] === di) o.selected = true;
+      sel.appendChild(o);
+    });
+    if (!done) {
+      sel.onchange = () => {
+        answers[current][ti] = sel.value === '' ? null : parseInt(sel.value, 10);
+        renderQuestion();
+      };
+    }
+    row.appendChild(label); row.appendChild(arrow); row.appendChild(sel);
+    body.appendChild(row);
+  });
+}
+
+function renderOrder(q, body, done) {
+  if (!q._itemOrder) {
+    q._itemOrder = q.items.map((_, i) => i);
+    for (let i = q._itemOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q._itemOrder[i], q._itemOrder[j]] = [q._itemOrder[j], q._itemOrder[i]];
+    }
+  }
+  const seqLabel = document.createElement('div');
+  seqLabel.className = 'order-seq-label';
+  seqLabel.textContent = 'Your answer (in order):';
+  body.appendChild(seqLabel);
+
+  const seq = document.createElement('div');
+  seq.className = 'order-seq';
+  if (answers[current].length === 0) {
+    seq.innerHTML = '<span class="placeholder">Click the items below in the correct sequence…</span>';
+  } else {
+    answers[current].forEach((itemIdx, pos) => {
+      const chip = document.createElement('span');
+      chip.className = 'order-item';
+      const num = document.createElement('span');
+      num.className = 'num';
+      num.textContent = pos + 1;
+      if (done) num.classList.add(itemIdx === pos ? 'good' : 'bad');
+      chip.appendChild(num);
+      chip.appendChild(document.createTextNode(q.items[itemIdx]));
+      if (!done) {
+        chip.onclick = () => { answers[current].splice(pos, 1); renderQuestion(); };
+        chip.title = 'Click to remove';
+      }
+      seq.appendChild(chip);
+    });
+  }
+  body.appendChild(seq);
+
+  if (!done && answers[current].length > 0) {
+    const reset = document.createElement('button');
+    reset.className = 'order-reset';
+    reset.textContent = '↺ Clear sequence';
+    reset.onclick = () => { answers[current] = []; renderQuestion(); };
+    body.appendChild(reset);
+  }
+
+  const poolLabel = document.createElement('div');
+  poolLabel.className = 'order-seq-label';
+  poolLabel.textContent = 'Available items:';
+  body.appendChild(poolLabel);
+
+  const pool = document.createElement('div');
+  pool.className = 'order-pool';
+  q._itemOrder.forEach(itemIdx => {
+    const used = answers[current].includes(itemIdx);
+    const chip = document.createElement('span');
+    chip.className = 'order-item' + (used ? ' used' : '');
+    chip.textContent = q.items[itemIdx];
+    if (!used && !done) {
+      chip.onclick = () => {
+        if (answers[current].length < q.items.length) {
+          answers[current].push(itemIdx);
+          renderQuestion();
+        }
+      };
+    }
+    pool.appendChild(chip);
+  });
+  body.appendChild(pool);
+}
+
+/* ---------- Grading & feedback ---------- */
+function gradeCurrent() {
+  const q = EXAM[current], a = answers[current];
+  if (q.type === 'mcq') return a === q.answer ? 1 : 0;
+  if (q.type === 'multi') {
+    const right = q.answer.slice().sort().join(',');
+    const mine = a.slice().sort().join(',');
+    return right === mine ? 1 : 0;
+  }
+  if (q.type === 'match') {
+    let c = 0;
+    a.forEach((v, i) => { if (v === q.answer[i]) c++; });
+    return c / q.terms.length;
+  }
+  if (q.type === 'order') {
+    if (a.length !== q.items.length) return 0;
+    let c = 0;
+    a.forEach((itemIdx, pos) => { if (itemIdx === pos) c++; });
+    return c / q.items.length;
+  }
+  return 0;
+}
+
+function checkAnswer() {
+  if (checked[current] || !isInputComplete(current)) return;
+  points[current] = gradeCurrent();
+  checked[current] = true;
+  renderQuestion();
+}
+
+function showFeedback(q) {
+  const pts = points[current];
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (pts === 1 ? 'ok' : pts > 0 ? 'part' : 'no');
+  const head = pts === 1 ? '✔ Correct!' : pts > 0 ? `◐ Partially correct — ${pts.toFixed(2)} / 1 point` : '✘ Incorrect';
+  fb.innerHTML = `<strong>${head}</strong>${q.why}`;
+}
+
+/* ---------- Navigation & palette ---------- */
+function renderPalette() {
+  const pal = document.getElementById('palette');
+  pal.innerHTML = '';
+  EXAM.forEach((q, i) => {
+    const b = document.createElement('button');
+    b.className = 'pal-btn' + (i === current ? ' current' : '') + (isAnswered(i) ? ' answered' : '');
+    b.textContent = i + 1;
+    b.onclick = () => gotoQuestion(i);
+    pal.appendChild(b);
+  });
+}
+
+function gotoQuestion(i) {
+  if (i < 0 || i >= EXAM.length) return;
+  current = i;
+  renderQuestion();
+}
+
+/* ---------- Results ---------- */
+function finishExam() {
+  const unchecked = checked.filter(c => !c).length;
+  let msg = `You've answered ${checked.filter(Boolean).length} of ${EXAM.length} questions.`;
+  if (unchecked > 0) msg += `\n\n${unchecked} question(s) haven't been checked yet — they score 0.`;
+  msg += '\n\nFinish and see your score report?';
+  if (!confirm(msg)) return;
+  showResults();
+}
+
+function showResults() {
+  clearInterval(timerId);
+  const total = points.reduce((s, p) => s + p, 0);
+  const pct = total / EXAM.length;
+  const scaled = Math.round(100 + 800 * pct);
+  const passed = scaled >= 750;
+
+  document.getElementById('exam-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('scaled-score').textContent = scaled;
+  const v = document.getElementById('verdict');
+  v.textContent = passed ? 'PASS ✔' : 'BELOW PASSING ✘';
+  v.className = 'verdict ' + (passed ? 'pass' : 'fail');
+  document.getElementById('raw-line').textContent =
+    `${total.toFixed(2)} of ${EXAM.length} points (${Math.round(pct * 100)}%) · Total time: ${fmtTime(elapsed)}`;
+
+  const fill = document.getElementById('scale-fill');
+  fill.style.width = '0%';
+  setTimeout(() => { fill.style.width = ((scaled - 100) / 800 * 100) + '%'; }, 60);
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Question Review</h2>';
+  EXAM.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = reviewItemHtml(q, answers[i], points[i], i);
+    review.appendChild(div);
+  });
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function reviewItemHtml(q, a, pts, i) {
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  let body = '';
+  if (!checked[i]) {
+    body = '<span class="bad">Not answered.</span>';
+  } else if (q.type === 'mcq') {
+    const ok = a === q.answer;
+    body = `Your answer: <span class="${ok ? 'ok' : 'bad'}">${letters[a]}. ${esc(q.options[a])}</span>` +
+      (ok ? '' : `<br>Correct answer: <span class="ok">${letters[q.answer]}. ${esc(q.options[q.answer])}</span>`);
+  } else if (q.type === 'multi') {
+    const ok = pts === 1;
+    const mine = a.map(x => letters[x] + '. ' + esc(q.options[x])).join('<br>') || '(none)';
+    const right = q.answer.map(x => letters[x] + '. ' + esc(q.options[x])).join('<br>');
+    body = `Your selections:<br><span class="${ok ? 'ok' : 'bad'}">${mine}</span>` +
+      (ok ? '' : `<br>Correct selections:<br><span class="ok">${right}</span>`);
+  } else if (q.type === 'match') {
+    body = q.terms.map((t, ti) => {
+      const ok = a[ti] === q.answer[ti];
+      const mine = a[ti] !== null ? q.defs[a[ti]] : '(none)';
+      const right = q.defs[q.answer[ti]];
+      return `<b>${esc(t)}</b> → <span class="${ok ? 'ok' : 'bad'}">${esc(mine)}</span>` +
+        (ok ? '' : ` &nbsp;(correct: <span class="ok">${esc(right)}</span>)`);
+    }).join('<br>');
+  } else if (q.type === 'order') {
+    const correctSeq = q.items.map((it, pos) => `${pos + 1}. ${esc(it)}`).join('<br>');
+    const mine = a.length
+      ? a.map((itemIdx, pos) => `${pos + 1}. ${esc(q.items[itemIdx])}${itemIdx === pos ? '' : ' ✗'}`).join('<br>')
+      : '(none)';
+    const okAll = pts === 1;
+    body = `Your sequence:<br><span class="${okAll ? 'ok' : 'bad'}">${mine}</span>` +
+      (okAll ? '' : `<br>Correct sequence:<br><span class="ok">${correctSeq}</span>`);
+  }
+  return `
+    <div class="qhead">
+      <span class="q"><b>Q${i + 1}.</b> ${esc(q.q)}</span>
+      <span class="pts">${pts.toFixed(2)} / 1 pt</span>
+    </div>
+    <div class="a">${body}<br><br>${esc(q.why)}</div>`;
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Questions' : 'Hide Review';
+}
+</script>
+</body>
+</html>

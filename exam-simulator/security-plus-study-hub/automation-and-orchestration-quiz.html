@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Automation and Orchestration Quiz · SY0-701 (Section 26)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+<style id="iphone-optimizations">
+/* iPhone / touch optimizations */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: rgba(88,166,255,.25); }
+button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-size: 16px; }
+.q-text, .screen p { overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .container, .wrap { padding-left: 12px; padding-right: 12px; }
+  .screen { padding: 24px 16px; }
+  .exam-facts { flex-wrap: wrap; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 26</div>
+    <h1>Automation and Orchestration — Practice Quiz</h1>
+    <p>37 questions across the automation and orchestration lessons — when to automate, the seven benefits, ticket and onboarding automation, security automation, CI/CD, and integrations/APIs. Pick an answer to see why.</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+{ lesson: "248 - Automation and Orchestration", q: "Automation is best defined as:", options: ["Coordinating multiple automated tasks into a workflow", "Automatically executing tasks without manual intervention", "Hiring more staff", "Manual scripting only"], answer: 1, why: "Automation = individual tasks run autonomously via software/scripts." },
+{ lesson: "248 - Automation and Orchestration", q: "Orchestration differs from automation in that orchestration:", options: ["Runs a single script", "Coordinates and sequences multiple automated tasks toward a broader outcome, managing order and dependencies", "Requires no software", "Only applies to networks"], answer: 1, why: "Orchestration is the big picture: chaining automated tasks in the right order." },
+{ lesson: "248 - Automation and Orchestration", q: "SOAR stands for:", options: ["Security Orchestration, Automation, and Response", "Systems Operations and Recovery", "Secure Orchestrated Access Rules", "Standard Operating Architecture Reference"], answer: 0, why: "SOAR = Security Orchestration, Automation, and Response — think 'SIEM 2.0'." },
+{ lesson: "248 - Automation and Orchestration", q: "The course describes SOAR as 'SIEM 2.0' primarily because SOAR:", options: ["Replaces firewalls", "Integrates with the SIEM to add orchestration, automated playbooks, and data enrichment for IR and threat hunting", "Only does antivirus", "Is a hardware appliance"], answer: 1, why: "SIEM + SOAR = next-generation SIEM with automated response workflows." },
+{ lesson: "248 - Automation and Orchestration", q: "A playbook is:", options: ["A hardware firewall", "A checklist of actions to detect and respond to a specific incident type", "An employee handbook", "A type of encryption"], answer: 1, why: "Playbooks list the steps for handling a given incident (e.g. phishing click)." },
+{ lesson: "248 - Automation and Orchestration", q: "A runbook differs from a playbook in that a runbook is:", options: ["Always manual", "An automated version of a playbook with clearly defined points for human analysis", "A hiring document", "A network diagram"], answer: 1, why: "Runbooks automate playbook steps but pause at defined human decision points." },
+{ lesson: "249 - When to Automate and Orchestrate", q: "Which factor asks: does the process warrant the time, money, and resources to automate?", options: ["Complexity", "Color", "Location", "Weather"], answer: 0, why: "Somewhat-complex repetitive tasks give positive ROI; trivial one-offs don't." },
+{ lesson: "249 - When to Automate and Orchestrate", q: "Nightly server backups are a good candidate for:", options: ["Orchestration across many systems", "Simple automation", "Manual processing only", "No action"], answer: 1, why: "A single repetitive task = automation; multi-step IR workflows need orchestration." },
+{ lesson: "249 - When to Automate and Orchestrate", q: "A single point of failure in automation is best mitigated by:", options: ["Ignoring it", "Redundancy, failover mechanisms, and manual fallback processes", "More marketing", "Removing logging"], answer: 1, why: "If everything relies on automation, its failure stops the business — keep manual fallbacks." },
+{ lesson: "249 - When to Automate and Orchestrate", q: "Technical debt refers to:", options: ["Money owed on servers", "The accumulated cost and complexity of suboptimal or hastily implemented solutions that must eventually be refactored", "Employee training costs", "Cloud subscription fees"], answer: 1, why: "Quick-and-dirty automation accumulates debt — schedule regular reviews and refactoring." },
+{ lesson: "249 - When to Automate and Orchestrate", q: "An outsourced one-time automation build often stops working later chiefly because:", options: ["APIs/webhooks change when vendors update or replace their systems", "Electricity prices rise", "Users quit", "It was too well documented"], answer: 0, why: "Vendor system updates break API connections — ongoing in-house supportability is essential." },
+{ lesson: "249 - When to Automate and Orchestrate", q: "The BEST automation candidates are processes that are:", options: ["One-off and unique", "Repeatable and stable over time", "Constantly changing", "Secret"], answer: 1, why: "Repeatable, consistent processes yield the time/resource savings; variable tasks stay manual." },
+{ lesson: "249 - When to Automate and Orchestrate", q: "A task performed once every few years taking 30 minutes manually should usually be:", options: ["Automated over 4–5 hours of coding", "Done manually — automation isn't worth it", "Outsourced to five vendors", "Escalated to the board"], answer: 1, why: "Low-frequency, low-effort tasks don't justify automation cost." },
+{ lesson: "250 - Benefits of Automation and Orchestration", q: "Which is NOT one of the seven cited benefits of automation and orchestration?", options: ["Enforcing baselines", "Scaling in a more secure manner", "Increased employee retention", "Guaranteed elimination of all breaches"], answer: 3, why: "The seven: efficiency/time savings, baseline enforcement, standard configs, secure scaling, retention, faster reaction, workforce multiplier." },
+{ lesson: "250 - Benefits of Automation and Orchestration", q: "Automation improving employee retention works by:", options: ["Replacing all staff", "Removing mundane repetitive work so employees focus on strategic, fulfilling tasks — reducing burnout", "Increasing overtime", "Removing vacations"], answer: 1, why: "Happier staff doing meaningful work stay longer — a less-obvious but real benefit." },
+{ lesson: "250 - Benefits of Automation and Orchestration", q: "A 'workforce multiplier' means:", options: ["Hiring twice as many people", "A smaller team can manage and secure a larger, more complex infrastructure", "Replacing managers with scripts", "Longer meetings"], answer: 1, why: "Automation augments staff capability; labor is the biggest expense, so this saves money over time." },
+{ lesson: "250 - Benefits of Automation and Orchestration", q: "Automation enabling a breach to be contained 'within minutes instead of hours or days' demonstrates which benefit?", options: ["Standard configurations", "Faster reaction times", "Employee retention", "Technical debt"], answer: 1, why: "Automated detection + orchestrated response slashes reaction time — often the difference between a mitigated threat and a breach." },
+{ lesson: "251 - Automating Support Tickets", q: "The six-step automated ticket creation process ends with:", options: ["Deleting the ticket", "Sending an automated notification to the relevant support team/technician", "Closing the account", "Rebooting the server"], answer: 1, why: "Submit → generate → capture info → categorize → assign priority → notify team." },
+{ lesson: "251 - Automating Support Tickets", q: "Automated ticket escalation actions can include:", options: ["Notifying a supervisor, reassigning to a higher-level expert, and raising priority", "Ignoring urgent tickets", "Closing all tickets", "Deleting the SLA"], answer: 0, why: "Escalation automation triggers supervisor alerts, reassignment, and priority changes, then monitors to closure." },
+{ lesson: "251 - Automating Support Tickets", q: "Escalation criteria are defined based on:", options: ["The nature of the issue, its urgency, and the service level agreement", "Employee birthdays", "Office locations", "Coin flips"], answer: 0, why: "Issue type + urgency + SLA drive when a ticket escalates (e.g. 24/48-hour rules)." },
+{ lesson: "252 - Automating Onboarding", q: "User provisioning automation typically performs all of the following EXCEPT:", options: ["Creating accounts across systems", "Assigning roles and access by department/position", "Sending notifications and confirmations", "Deciding the company's annual strategy"], answer: 3, why: "User provisioning: collect info → create accounts → assign RBAC-based access → notify → keep synchronized." },
+{ lesson: "252 - Automating Onboarding", q: "The five resource-provisioning steps are:", options: ["Requirements analysis, allocation, configuration/customization, verification and auditing, feedback", "Hiring, firing, retiring, auditing, logging", "Plan, blame, close, forget, repeat", "Purchase, lose, replace, ignore, bill"], answer: 0, why: "Analyze needs → allocate/procure → configure for the role → verify + audit (inventory/compliance) → gather feedback." },
+{ lesson: "252 - Automating Onboarding", q: "When an employee is promoted or changes departments, provisioning automation should:", options: ["Do nothing", "Automatically synchronize their accounts and access permissions to reflect the change", "Delete their account", "Lock the building"], answer: 1, why: "Continuous synchronization keeps access aligned with the current role — join/move/leave." },
+{ lesson: "253 - Automating Security", q: "Guardrails are best described as:", options: ["Physical fences", "Automated safety controls that prevent insecure configurations and auto-correct detected violations", "Employee handbooks", "Antivirus signatures"], answer: 1, why: "Guardrails enforce security policies automatically — alerts plus corrective action (revoke perms, reconfigure, isolate host)." },
+{ lesson: "253 - Automating Security", q: "In cloud environments, security groups function as:", options: ["A virtual firewall controlling inbound/outbound traffic for instances", "A payroll system", "A disk defragmenter", "A hiring pipeline"], answer: 0, why: "Security groups define allowed traffic; automation assigns instances and adjusts rules dynamically." },
+{ lesson: "253 - Automating Security", q: "Scheduling a rarely needed service to run only when required primarily:", options: ["Increases attack surface", "Reduces the window of opportunity for attacks", "Breaks compliance", "Slows the network"], answer: 1, why: "A service can only be attacked while running — schedule off when unused." },
+{ lesson: "253 - Automating Security", q: "Automated RBAC permissions management ensures:", options: ["Everyone is admin", "Rights are granted by role and updated automatically as users join, move, or leave", "Passwords never expire", "Firewalls are removed"], answer: 1, why: "Auto provisioning/deprovisioning by role prevents unauthorized access and stale permissions." },
+{ lesson: "254 - Automating Application Development", q: "Continuous Integration means developers:", options: ["Merge code into a central repository multiple times per day, with automated builds and tests verifying each check-in", "Ship code once a year", "Stop testing", "Work in silos"], answer: 0, why: "CI = frequent merges + automated verification, catching integration problems early." },
+{ lesson: "254 - Automating Application Development", q: "The key difference between continuous delivery and continuous deployment:", options: ["No difference", "Delivery keeps production deployment as a MANUAL decision; deployment pushes to production automatically with no human intervention", "Delivery is older", "Deployment skips testing"], answer: 1, why: "Both automate build/test; delivery stops before production (human go/no-go), deployment goes all the way automatically with rollback." },
+{ lesson: "254 - Automating Application Development", q: "Release differs from deployment in that a release:", options: ["Installs software onto servers", "Finalizes/prepares software and makes it available for installation, while deployment installs it into the target environment", "Deletes code", "Tests code"], answer: 1, why: "Release = 'ready and available'; deployment = 'installed and operational' in the environment." },
+{ lesson: "254 - Automating Application Development", q: "A critical safety feature of continuous deployment is:", options: ["Automated rollback to the previous known state on failure", "Manual backups only", "Disabling monitoring", "Weekly releases"], answer: 0, why: "Automated rollback maintains continuity when a deployment fails." },
+{ lesson: "254 - Automating Application Development", q: "Flickr releasing updates up to 10 times per day illustrates:", options: ["Waterfall methodology", "The velocity possible with CI/CD automation", "Manual deployment", "Change avoidance"], answer: 1, why: "High-velocity CI/CD enables many reliable releases per day." },
+{ lesson: "255 - Integrations and APIs", q: "An API is best defined as:", options: ["A hardware chip", "A set of rules and protocols that lets one product/service talk to another in a controlled environment with a specific data format", "A firewall rule", "A database"], answer: 1, why: "APIs enable controlled programmatic interconnection (the backbone of microservices)." },
+{ lesson: "255 - Integrations and APIs", q: "REST APIs typically use which data format and style?", options: ["XML only, stateful", "JSON, stateless, standard HTTP methods", "Binary proprietary", "Fax"], answer: 1, why: "REST = stateless architectural style over HTTP, usually JSON, lightweight." },
+{ lesson: "255 - Integrations and APIs", q: "SOAP differs from REST in that SOAP:", options: ["Uses JSON and no security", "Uses strict XML messages with header+body, offering more security features and transaction compliance", "Is a hardware protocol", "Cannot be used by enterprises"], answer: 1, why: "SOAP = robust, secure, transaction-compliant — preferred for enterprise/regulated services." },
+{ lesson: "255 - Integrations and APIs", q: "The tool the course recommends for testing an API from the command line:", options: ["cURL (e.g. curl --data ...)", "Photoshop", "ping", "Excel"], answer: 0, why: "cURL ships with Linux/Mac and tests APIs over HTTP/HTTPS, returning responses (often JSON)." },
+{ lesson: "255 - Integrations and APIs", q: "Dion Training's Udemy-to-Freshdesk ticket sync is an example of:", options: ["Manual retyping", "An API integration between two SaaS products (Udemy API + Freshdesk API)", "A hardware upgrade", "A legal hold"], answer: 1, why: "Less than 150 lines of Python calling both vendors' APIs — integrations glue services together." }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"automation-and-orchestration-quiz.html",title:"Automation and Orchestration Quiz \u00b7 SY0-701 (Section 26)"};</script><script src="analytics.js"></script>
+</body>
+</html>

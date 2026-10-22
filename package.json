@@ -1,0 +1,10 @@
+{
+  "name": "security-plus-prep",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Security+ SY0-701 prep pack (recovered from USB backup)",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  }
+}

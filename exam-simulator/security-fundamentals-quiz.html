@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security+ Fundamentals Quiz · SY0-701 (Section 02)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+<style id="iphone-optimizations">
+/* iPhone / touch optimizations */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: rgba(88,166,255,.25); }
+button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-size: 16px; }
+.q-text, .screen p { overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .container, .wrap { padding-left: 12px; padding-right: 12px; }
+  .screen { padding: 24px 16px; }
+  .exam-facts { flex-wrap: wrap; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 02</div>
+    <h1>Fundamentals of Security — Practice Quiz</h1>
+    <p>27 questions across all 13 lessons: the CIA(N)(A) model, threats &amp; risk, confidentiality, integrity, availability, non-repudiation, AAA, security controls, Zero Trust, and gap analysis.</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 27</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  // ---- 04 · Fundamentals of Security ----
+  {
+    lesson: "Lesson 04 · Fundamentals of Security",
+    q: "Throughout the course, the instructor returns to one 'delicate balance' that security professionals constantly manage. What is it?",
+    options: [
+      "Security vs. cost",
+      "Security vs. usability (convenience)",
+      "Speed vs. encryption strength",
+      "Prevention vs. detection"
+    ],
+    answer: 1,
+    why: "People want things easy and convenient; as convenience increases, the security posture loosens. Tighten security too much and users find ways around it. The sweet spot is convenient for users but hard for threat actors."
+  },
+  {
+    lesson: "Lesson 04 · Fundamentals of Security",
+    q: "Your colleague says her team is responsible for protecting the servers, network devices, and smartphones that hold company data. Which term describes this focus?",
+    options: [
+      "Information security",
+      "Information system security",
+      "Data governance",
+      "Non-repudiation"
+    ],
+    answer: 1,
+    why: "Information system security protects the systems that hold and process critical data (computers, servers, network devices, smartphones). Information security, by contrast, is about protecting the data itself."
+  },
+  {
+    lesson: "Lesson 04 · Fundamentals of Security",
+    q: "The CIA triad has grown into 'CIANA' — described as a pentagon rather than a triad. Which two elements were added?",
+    options: [
+      "Authorization and accounting",
+      "Non-repudiation and authentication",
+      "Auditing and availability",
+      "Integrity and authentication"
+    ],
+    answer: 1,
+    why: "In recent years the classic Confidentiality-Integrity-Availability triad gained an N and an A: Non-repudiation and Authentication, giving five pillars — C.I.A.N.A."
+  },
+  // ---- 05 · Threats and Vulnerabilities ----
+  {
+    lesson: "Lesson 05 · Threats & Vulnerabilities",
+    q: "Which statement about threats and vulnerabilities is TRUE?",
+    options: [
+      "A threat alone, with no matching vulnerability, still creates risk",
+      "Risk exists where a threat and a matching vulnerability intersect",
+      "Vulnerabilities come from external factors and are out of our control",
+      "Threats are always internal, while vulnerabilities are external"
+    ],
+    answer: 1,
+    why: "Risk lies where threats and vulnerabilities intersect. A threat with no matching vulnerability = no risk, and a vulnerability with no matching threat = no risk. Vulnerabilities are internal weaknesses we can control; threats (like natural disasters or attackers) are largely external."
+  },
+  {
+    lesson: "Lesson 05 · Threats & Vulnerabilities",
+    q: "A company decides to buy cyber insurance instead of fixing every weakness in its legacy systems. Which risk management option is this?",
+    options: [
+      "Mitigation",
+      "Avoidance",
+      "Transfer",
+      "Acceptance"
+    ],
+    answer: 2,
+    why: "The four ways to handle risk are mitigate, transfer, avoid, or accept. Shifting the financial impact to an insurance company is risk transfer."
+  },
+  // ---- 06 · Confidentiality ----
+  {
+    lesson: "Lesson 06 · Confidentiality",
+    q: "A support agent's screen shows a customer's credit card as **** **** **** 4821 — the first 12 digits are hidden but the record stays usable. Which confidentiality method is this?",
+    options: [
+      "Encryption",
+      "Access control",
+      "Data masking",
+      "Steganography"
+    ],
+    answer: 2,
+    why: "Data masking obscures specific data within a database so it's inaccessible to unauthorized users while retaining the real data's authenticity for authorized users — e.g., showing only the last 4 of 16 card digits."
+  },
+  {
+    lesson: "Lesson 06 · Confidentiality",
+    q: "The instructor wants you to mentally link confidentiality with one method above all others. Which one?",
+    options: [
+      "Hashing",
+      "Encryption",
+      "Checksums",
+      "Redundancy"
+    ],
+    answer: 1,
+    why: "When you hear confidentiality, think 'protecting data from being seen by unauthorized users' — most commonly achieved with encryption. (Hashing and checksums belong to integrity; redundancy to availability.)"
+  },
+  // ---- 07 · Integrity ----
+  {
+    lesson: "Lesson 07 · Integrity",
+    q: "A hash digest is best described as which of the following for a piece of data?",
+    options: [
+      "A compressed copy of the data",
+      "A digital fingerprint",
+      "An encrypted backup",
+      "A digital certificate"
+    ],
+    answer: 1,
+    why: "Hashing converts data into a fixed-size value; even a tiny change produces a dramatically different hash. The result — the hash digest — acts like a digital fingerprint proving integrity."
+  },
+  {
+    lesson: "Lesson 07 · Integrity",
+    q: "To digitally sign a file, what happens to the file's hash digest?",
+    options: [
+      "It is sent to a certificate authority for storage",
+      "It is encrypted with the user's private key",
+      "It is appended to the file in plain text",
+      "It is deleted after the signature is created"
+    ],
+    answer: 1,
+    why: "Digital signatures use encryption to ensure integrity and authenticity: the file is hashed, then the hash digest is encrypted with the user's private key. Any alteration changes the hash and invalidates the signature."
+  },
+  // ---- 08 · Availability ----
+  {
+    lesson: "Lesson 08 · Availability",
+    q: "Your provider advertises 'three nines' of availability. What does that allow in a 365-day year?",
+    options: [
+      "About 8.76 hours of downtime",
+      "About 5.26 minutes of downtime",
+      "About 3.5 days of downtime",
+      "Zero downtime of any kind"
+    ],
+    answer: 0,
+    why: "Three nines = 99.9% uptime. With 8,760 hours in a year, that permits up to 8.76 hours of downtime. (Five nines — the gold standard — allows only ~5.26 minutes, while 99% allows over 3.5 days.)"
+  },
+  {
+    lesson: "Lesson 08 · Availability",
+    q: "An office has a microwave link, a cable modem, and a cellular modem that automatically take over for each other during outages. This is an example of which redundancy type?",
+    options: [
+      "Server redundancy",
+      "Data redundancy",
+      "Network redundancy",
+      "Power redundancy"
+    ],
+    answer: 2,
+    why: "Network redundancy ensures that if one network path fails, data can still travel another route. (Server redundancy = load balancing/failover servers; data redundancy = multiple storage sites/RAID; power redundancy = generators and UPS systems.)"
+  },
+  // ---- 09 · Non-repudiation ----
+  {
+    lesson: "Lesson 09 · Non-repudiation",
+    q: "A stockbroker receives a digitally signed email instructing him to sell all shares. Why can the sender not later deny sending it?",
+    options: [
+      "The email was encrypted with the broker's public key",
+      "Only the sender possesses the private key that created the signature",
+      "The email provider keeps a copy of every message",
+      "Digital signatures are registered with the government"
+    ],
+    answer: 1,
+    why: "A digital signature is an encrypted hash digest created with the sender's private key. Since only the sender has that private key, the signature is undeniable proof of origin — non-repudiation."
+  },
+  {
+    lesson: "Lesson 09 · Non-repudiation",
+    q: "In the medieval analogy, a king's signet ring pressed into wax is the historical equivalent of what modern mechanism?",
+    options: [
+      "A password",
+      "A digital signature",
+      "A firewall rule",
+      "An access badge"
+    ],
+    answer: 1,
+    why: "Like a signet ring seal, a digital signature is unique to each user and provides undeniable evidence that a document or transaction is authentic and came from that specific person."
+  },
+  // ---- 10 · Authentication ----
+  {
+    lesson: "Lesson 10 · Authentication",
+    q: "Unlocking your laptop with a fingerprint reader is which type of authentication factor?",
+    options: [
+      "Knowledge factor",
+      "Possession factor",
+      "Inherence factor",
+      "Action factor"
+    ],
+    answer: 2,
+    why: "'Something you are' is the inherence factor — a unique physical or behavioral characteristic, commonly called biometrics (fingerprints, facial recognition)."
+  },
+  {
+    lesson: "Lesson 10 · Authentication",
+    q: "A door unlocks only when your phone is within 20 feet of the house. Which factor is at work?",
+    options: [
+      "Location factor",
+      "Possession factor",
+      "Knowledge factor",
+      "Action factor"
+    ],
+    answer: 0,
+    why: "'Somewhere you are' is the location factor — access is granted based on the user being in a certain geographic location (geofencing)."
+  },
+  {
+    lesson: "Lesson 10 · Authentication",
+    q: "Password + one-time text message code to your smartphone is considered true multi-factor authentication because…",
+    options: [
+      "It uses two different passwords",
+      "It combines two different factor types (knowledge + possession)",
+      "The code changes every time",
+      "The phone encrypts the login session"
+    ],
+    answer: 1,
+    why: "MFA requires two or more different factor types: something you know (password — knowledge), something you have (phone — possession), something you are (inherence), something you do (action), or somewhere you are (location). Two of the SAME type (e.g., two passwords) is not MFA."
+  },
+  // ---- 11 · Authorization ----
+  {
+    lesson: "Lesson 11 · Authorization",
+    q: "Which statement best separates authentication from authorization?",
+    options: [
+      "Authentication grants permissions; authorization verifies identity",
+      "Authentication verifies who you are; authorization decides what you're allowed to do",
+      "They are two names for the same process",
+      "Authentication applies to users; authorization applies only to devices"
+    ],
+    answer: 1,
+    why: "Authentication = verifying identity (e.g., swiping an access card to enter the building). Authorization = determining what that identity may access (which rooms or floors you may enter). The system says: 'Now that I know who you are, here's what you're allowed to do.'"
+  },
+  // ---- 12 · Accounting ----
+  {
+    lesson: "Lesson 12 · Accounting",
+    q: "After a breach, your team uses detailed event logs to reconstruct what happened, how it happened, and how to prevent it. This is an accounting benefit known as…",
+    options: [
+      "Resource optimization",
+      "Forensic analysis",
+      "Threat scope reduction",
+      "Data masking"
+    ],
+    answer: 1,
+    why: "Accounting (logging/monitoring) supports five goals: audit trail, regulatory compliance, forensic analysis, resource optimization, and user accountability. Reconstructing a breach from logs is forensic analysis."
+  },
+  {
+    lesson: "Lesson 12 · Accounting",
+    q: "Which tool provides real-time analysis of security alerts generated by hardware and software across the organization?",
+    options: [
+      "A syslog server",
+      "Wireshark",
+      "A SIEM system",
+      "A password manager"
+    ],
+    answer: 2,
+    why: "A SIEM (Security Information and Event Management) system provides real-time analysis of security alerts. Syslog servers aggregate logs, and network analyzers like Wireshark capture traffic — but real-time alert analysis is the SIEM's job."
+  },
+  // ---- 13 · Control Categories ----
+  {
+    lesson: "Lesson 13 · Security Control Categories",
+    q: "Before migrating to cloud storage, management conducts a risk assessment and updates security policies. Which control category is this?",
+    options: [
+      "Technical",
+      "Managerial (administrative)",
+      "Operational",
+      "Physical"
+    ],
+    answer: 1,
+    why: "Managerial controls cover strategic planning and governance: risk assessments, security policies, training programs, and incident response strategies. Technical = hardware/software (firewalls, antivirus); operational = day-to-day procedures (90-day password changes, backups); physical = tangible measures (locks, guards, cameras)."
+  },
+  // ---- 14 · Control Types ----
+  {
+    lesson: "Lesson 14 · Security Control Types",
+    q: "In the instructor's home example, the yard sign warning of surveillance and an alarm system is which control type? (Hint: the sign itself, not the alarm.)",
+    options: [
+      "Preventative",
+      "Deterrent",
+      "Detective",
+      "Corrective"
+    ],
+    answer: 1,
+    why: "Deterrent controls discourage attackers by making the effort seem less appealing — like warning signs and banners. The sign deters; the alarm/cameras prevent and detect."
+  },
+  {
+    lesson: "Lesson 14 · Security Control Types",
+    q: "Your organization's Acceptable Use Policy (AUP), which sets standards for how employees may use company IT assets, is which control type?",
+    options: [
+      "Directive",
+      "Compensating",
+      "Corrective",
+      "Deterrent"
+    ],
+    answer: 0,
+    why: "Directive controls guide, inform, or mandate actions and are rooted in policy or documentation. Rule of thumb from the course: if it's a policy, it's a directive control."
+  },
+  {
+    lesson: "Lesson 14 · Security Control Types",
+    q: "A legacy system can't support WPA3, so you run WPA2 plus a VPN from the endpoint to internal servers. The VPN layer is which control type?",
+    options: [
+      "Preventative",
+      "Directive",
+      "Compensating",
+      "Detective"
+    ],
+    answer: 2,
+    why: "Compensating controls are alternative measures used when the primary (ideal) control isn't feasible or effective — here, adding a VPN on top of weaker WPA2 to make up for the lack of WPA3."
+  },
+  // ---- 15 · Zero Trust ----
+  {
+    lesson: "Lesson 15 · Zero Trust",
+    q: "How does the Zero Trust mantra go beyond Reagan's 'Trust but verify'?",
+    options: [
+      "'Trust nothing and verify everything'",
+      "'Verify once, trust always'",
+      "'Trust insiders, verify outsiders'",
+      "'Encrypt first, ask questions later'"
+    ],
+    answer: 0,
+    why: "Zero Trust demands verification for every device, every user, and every transaction within the network regardless of origin — 'Trust nothing and verify everything' — whether the request comes from inside the office or remotely."
+  },
+  {
+    lesson: "Lesson 15 · Zero Trust",
+    q: "In a Zero Trust architecture, where is the final access grant/deny decision actually executed?",
+    options: [
+      "The policy engine",
+      "The policy administrator",
+      "The policy enforcement point",
+      "The adaptive identity store"
+    ],
+    answer: 2,
+    why: "The control plane sets policy (adaptive identity, threat scope reduction, policy-driven access control, secured zones), with the policy engine as the 'rule book' and the policy administrator managing policies. The data plane's policy enforcement point is the gatekeeper that executes the final allow/deny decision."
+  },
+  // ---- 16 · Gap Analysis ----
+  {
+    lesson: "Lesson 16 · Gap Analysis",
+    q: "Put the gap analysis steps in the correct order.",
+    options: [
+      "Gather data → define scope → develop a plan → analyze gaps",
+      "Define scope → gather data → analyze for gaps → develop a plan",
+      "Develop a plan → gather data → define scope → analyze gaps",
+      "Analyze gaps → define scope → gather data → develop a plan"
+    ],
+    answer: 1,
+    why: "The sequence is: (1) define the scope and desired outcome, (2) gather data on the current state via surveys/interviews, (3) analyze the data to identify where current performance falls short of desired, (4) develop a plan — with goals, objectives, and a timeline — to bridge the gap."
+  },
+  {
+    lesson: "Lesson 16 · Gap Analysis",
+    q: "Weekly vulnerability scans produce more findings than your team can fix at once. Which document outlines the specific remediation measures, resource allocations, and timelines?",
+    options: [
+      "A risk register",
+      "A POA&M (Plan of Action and Milestones)",
+      "An acceptable use policy",
+      "A business impact analysis"
+    ],
+    answer: 1,
+    why: "A POA&M (Plan of Action and Milestones) outlines the specific measures to address each vulnerability, allocates resources, and sets timelines — an actionable path from the current state to the desired state identified by the gap analysis."
+  }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security+ SY0-701 — Analytics</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; color: #e8eaf0; background: #0d1117; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  .sub { color: #9aa4b2; margin-bottom: 24px; }
+  .sub a { color: #7fb0ff; text-decoration: none; }
+  h2 { font-size: 18px; margin: 36px 0 14px; border-bottom: 1px solid #2d333b; padding-bottom: 8px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .card { background: #161b22; border: 1px solid #2d333b; border-radius: 12px; padding: 18px 20px; }
+  .card .k { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: #9aa4b2; margin-bottom: 6px; }
+  .card .v { font-size: 26px; font-weight: 700; }
+  .card .s { font-size: 13px; color: #9aa4b2; margin-top: 4px; }
+  .verdict-big { font-size: 22px; font-weight: 700; margin: 6px 0 2px; }
+  .ready { color: #3fb950; } .likely { color: #7ee787; } .borderline { color: #d29922; } .notyet { color: #f85149; }
+  .bar-track { background: #21262e; border-radius: 999px; height: 12px; overflow: hidden; margin-top: 10px; position: relative; }
+  .bar-fill { height: 100%; border-radius: 999px; background: #3fb950; transition: width .4s; }
+  .pass-mark { position: absolute; top: -3px; bottom: -3px; width: 2px; background: #d29922; }
+  .scale-labels { display: flex; justify-content: space-between; font-size: 12px; color: #9aa4b2; margin-top: 6px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid #21262e; }
+  thead th { color: #9aa4b2; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  tbody tr:hover { background: #161b22; }
+  .num { color: #6e7681; width: 40px; }
+  .pctcell { width: 220px; }
+  .mini-track { background: #21262e; border-radius: 999px; height: 8px; overflow: hidden; }
+  .mini-fill { height: 100%; }
+  .strong { color: #3fb950; } .ok { color: #d29922; } .weak { color: #f85149; }
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid #30363d; color: #9aa4b2; margin-left: 6px; }
+  a { color: #7fb0ff; text-decoration: none; } a:hover { text-decoration: underline; }
+  .links a { margin-right: 10px; font-size: 13px; }
+  .rec { background: #161b22; border: 1px solid #2d333b; border-left: 3px solid #d29922; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; font-size: 14px; line-height: 1.55; }
+  .empty { text-align: center; padding: 60px 20px; background: #161b22; border: 1px solid #2d333b; border-radius: 12px; }
+  .empty p { color: #9aa4b2; margin: 8px 0 18px; }
+  .btn { display: inline-block; padding: 10px 22px; border-radius: 8px; border: none; background: #238636; color: #fff; font-size: 14px; cursor: pointer; text-decoration: none; }
+  .btn.ghost { background: transparent; border: 1px solid #30363d; color: #9aa4b2; }
+  .btn:hover { filter: brightness(1.1); text-decoration: none; }
+  .muted { color: #9aa4b2; font-size: 13px; }
+  .trend-bar { display: inline-block; width: 90px; height: 10px; background: #21262e; border-radius: 4px; overflow: hidden; vertical-align: middle; margin-right: 8px; }
+  .trend-fill { height: 100%; }
+</style>
+<style id="iphone-optimizations">
+/* iPhone / touch optimizations */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: rgba(88,166,255,.25); }
+button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-size: 16px; }
+.q-text, .screen p { overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .container, .wrap { padding-left: 12px; padding-right: 12px; }
+  .screen { padding: 24px 16px; }
+  .exam-facts { flex-wrap: wrap; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Security+ SY0-701 — Analytics</h1>
+  <div class="sub"><a href="library.html">&larr; Back to library</a> · results from every full exam, mega exam, and section final you finish</div>
+  <div id="app"><div class="empty"><p>Loading…</p></div></div>
+</div>
+
+<script>
+const KEY = 'secplus_results_v1';
+const SECTIONS = [
+  {num:0,slug:'exam-tips'},{num:2,slug:'threat-actors'},{num:3,slug:'physical-security'},
+  {num:4,slug:'social-engineering'},{num:5,slug:'malware'},{num:6,slug:'data-protection'},
+  {num:7,slug:'cryptographic-solutions'},{num:8,slug:'risk-management'},{num:9,slug:'third-party-vendor-risks'},
+  {num:10,slug:'governance-and-compliance'},{num:11,slug:'asset-and-change-management'},{num:12,slug:'audits-and-assessments'},
+  {num:13,slug:'cyber-resilience'},{num:14,slug:'security-architecture'},{num:15,slug:'security-infrastructure'},
+  {num:16,slug:'identity-and-access-management'},{num:17,slug:'vulnerabilities-and-attacks'},{num:18,slug:'malicious-activity'},
+  {num:19,slug:'hardening'},{num:20,slug:'security-techniques'},{num:21,slug:'vulnerability-management'},
+  {num:22,slug:'alerting-and-monitoring'},{num:23,slug:'incident-response'},{num:24,slug:'investigating-an-incident'},
+  {num:25,slug:'automation-and-orchestration'},{num:26,slug:'security-awareness'},{num:27,slug:'exam-readiness'},
+  {num:28,slug:'conclusion'}
+];
+const NOTES_OVERRIDE = { 'cyber-resilience': 'cyber-resilience-and-redundancy-study-notes.md' };
+function titleize(s){ const small=new Set(['and','of','the','for','in','a','an','to']); return s.split('-').map((w,i)=> i>0&&small.has(w) ? w : w[0].toUpperCase()+w.slice(1)).join(' '); }
+function pct(x){ return Math.round(x*100); }
+function load(){
+  try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch(e){ return []; }
+}
+function scaledOf(p){ return Math.round(100 + 800*p); }
+function fmtDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined,{month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+}
+function fmtLeft(s){
+  if (s == null) return '—';
+  const m = Math.floor(s/60), ss = Math.floor(s%60);
+  return m + ':' + String(ss).padStart(2,'0');
+}
+
+const attempts = load().sort((a,b)=>new Date(a.date)-new Date(b.date));
+const app = document.getElementById('app');
+
+if (!attempts.length) {
+  app.innerHTML = `<div class="empty">
+    <h2 style="border:none;margin:0">No exam data yet</h2>
+    <p>Finish any timed exam (CompTIA-style full exam, mega exam, or section final)<br>and your results will appear here — strengths, weaknesses, readiness, predicted score.</p>
+    <a class="btn" href="exam-simulator/SY0-701-comptia-full-exam-1-foundations.html">Take CompTIA-Style Exam 1 (Foundations)</a>
+  </div>`;
+} else {
+  // recency-weighted performance
+  let wsum=0, w=0;
+  attempts.forEach((a,i)=>{ const wi=i+1; wsum+=wi*a.pct; w+=wi; });
+  const wpct = wsum/w;
+  const scaled = scaledOf(wpct);
+  const passed = scaled >= 750;
+
+  let tier, tclass, tlabel;
+  if (wpct >= 0.85)      { tier='Exam-ready';           tclass='ready';      tlabel='You are ready — book the exam.'; }
+  else if (wpct >= 0.8125){ tier='Likely to pass';       tclass='likely';    tlabel='On track — polish the weak sections below.'; }
+  else if (wpct >= 0.72) { tier='Borderline';            tclass='borderline'; tlabel='Close, but below the 750 pass line. Focused study on weaknesses could tip you over.'; }
+  else if (wpct >= 0.60) { tier='Not yet';               tclass='notyet';    tlabel='Below passing level right now. Work the plan below and re-test.'; }
+  else                   { tier='Early stages';          tclass='notyet';    tlabel='Build fundamentals first — start with the topic quizzes in weak sections.'; }
+
+  const best = Math.max(...attempts.map(a=>a.pct));
+  const avg = attempts.reduce((s,a)=>s+a.pct,0)/attempts.length;
+  const last = attempts[attempts.length-1];
+
+  // per-section aggregation
+  const secAgg = {};
+  attempts.forEach(a=>{
+    Object.entries(a.sections||{}).forEach(([slug,v])=>{
+      if(!secAgg[slug]) secAgg[slug]={c:0,t:0};
+      secAgg[slug].c+=v.c; secAgg[slug].t+=v.t;
+    });
+  });
+  const secRows = Object.entries(secAgg).map(([slug,v])=>({slug, pct:v.c/v.t, t:v.t}))
+    .filter(r=>r.slug!=='mixed').sort((a,b)=>b.pct-a.pct);
+  const strengths = secRows.filter(r=>r.t>=3 && r.pct>=0.8).slice(0,5);
+  const weaknesses = secRows.slice(-5).reverse().filter(r=>r.pct<0.85);
+
+  function secLinks(slug){
+    const meta = SECTIONS.find(s=>s.slug===slug);
+    const notes = NOTES_OVERRIDE[slug] || (slug+'-study-notes.md');
+    let h = `<a href="exam-simulator/${slug}-quiz.html">Quiz</a>`;
+    h += `<a href="exam-simulator/${encodeURIComponent(notes)}">Notes</a>`;
+    if (meta) { const nn = meta.num === 0 ? '00' : String(meta.num); h += `<a href="exam-simulator/SY0-701-exam-simulator-${nn}-${slug}.html">Simulator</a>`; }
+    h += `<a href="exam-simulator/SY0-701-final-exam-${slug}.html">Final</a>`;
+    return h;
+  }
+  function barColor(p){ return p>=0.85 ? '#3fb950' : p>=0.7 ? '#d29922' : '#f85149'; }
+  function clsOf(p){ return p>=0.85 ? 'strong' : p>=0.7 ? 'ok' : 'weak'; }
+  function labelOf(p){ return p>=0.85 ? 'Strong' : p>=0.7 ? 'Developing' : 'Weak'; }
+
+  // predicted band
+  const lo = Math.max(100, scaledOf(wpct) - 25), hi = Math.min(900, scaledOf(wpct) + 25);
+  let plabel;
+  if (wpct>=0.875) plabel='Very likely to pass';
+  else if (wpct>=0.8125) plabel='More likely than not to pass';
+  else if (wpct>=0.75) plabel='A coin flip around the pass line';
+  else if (wpct>=0.65) plabel='Unlikely to pass';
+  else plabel='Very unlikely to pass';
+
+  let html = '';
+
+  // readiness card
+  html += `<div class="card" style="margin-bottom:14px">
+    <div class="k">Exam readiness — weighted by recency, ${attempts.length} attempt${attempts.length>1?'s':''}</div>
+    <div class="verdict-big ${tclass}">${tier} · predicted score ≈ ${scaled} / 900</div>
+    <div class="muted">If you sat the real SY0-701 today, based on your tracked performance you'd most likely land in the <b style="color:var(--text)">${lo}–${hi}</b> band (pass mark 750) — ${plabel}.</div>
+    <div class="bar-track"><div class="bar-fill" style="width:${((scaled-100)/800*100).toFixed(1)}%;background:${barColor(wpct)}"></div><div class="pass-mark" style="left:${((750-100)/800*100).toFixed(1)}%"></div></div>
+    <div class="scale-labels"><span>100</span><span style="color:var(--gold)">750 pass</span><span>900</span></div>
+    <div style="margin-top:10px" class="muted">${tlabel}</div>
+  </div>`;
+
+  // stats
+  html += `<div class="grid">
+    <div class="card"><div class="k">Latest</div><div class="v">${pct(last.pct)}%</div><div class="s">${scaledOf(last.pct)} / 900 · ${fmtDate(last.date)}</div></div>
+    <div class="card"><div class="k">Average</div><div class="v">${pct(avg)}%</div><div class="s">${attempts.length} exam${attempts.length>1?'s':''} taken</div></div>
+    <div class="card"><div class="k">Best</div><div class="v">${pct(best)}%</div><div class="s">${scaledOf(best)} / 900</div></div>
+    <div class="card"><div class="k">Pass mark</div><div class="v">≈ 81%</div><div class="s">750 of 900 scaled</div></div>
+  </div>`;
+
+  // attempts history
+  html += `<h2>Attempt history</h2><table><thead><tr><th>When</th><th>Exam</th><th>Score</th><th>Trend</th><th>Scaled</th><th>Verdict</th><th>Time left</th></tr></thead><tbody>`;
+  attempts.slice().reverse().forEach(a=>{
+    const s = scaledOf(a.pct), p = a.pct>=1; // unused guard
+    html += `<tr>
+      <td class="muted">${fmtDate(a.date)}</td>
+      <td><a href="exam-simulator/${encodeURIComponent(a.file)}">${a.exam.replace('CompTIA Security+ SY0-701 · ','').replace(' — CompTIA Security+ SY0-701','')}</a></td>
+      <td>${pct(a.pct)}% <span class="muted">(${(+a.points).toFixed(1)}/${a.total})</span></td>
+      <td class="pctcell"><span class="trend-bar"><span class="trend-fill" style="display:block;width:${pct(a.pct)}%;background:${barColor(a.pct)}"></span></span></td>
+      <td>${s}</td>
+      <td class="${s>=750?'strong':'weak'}">${s>=750?'PASS':'Below'}</td>
+      <td class="muted">${fmtLeft(a.timeLeft)}</td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+
+  // strengths & weaknesses
+  html += `<h2>Strengths &amp; weaknesses by section</h2>`;
+  if (secRows.length){
+    html += `<table><thead><tr><th>#</th><th>Section</th><th>Mastery</th><th>Level</th><th>Questions</th><th>Study</th></tr></thead><tbody>`;
+    secRows.forEach(r=>{
+      const meta = SECTIONS.find(s=>s.slug===r.slug);
+      html += `<tr>
+        <td class="num">${meta?meta.num:'—'}</td>
+        <td>${titleize(r.slug)}</td>
+        <td class="pctcell"><span class="trend-bar" style="width:140px"><span class="trend-fill" style="display:block;width:${pct(r.pct)}%;background:${barColor(r.pct)}"></span></span> <b class="${clsOf(r.pct)}">${pct(r.pct)}%</b></td>
+        <td class="${clsOf(r.pct)}">${labelOf(r.pct)}</td>
+        <td class="muted">${r.t}</td>
+        <td class="links">${secLinks(r.slug)}</td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+  } else {
+    html += `<p class="muted">No per-section data yet.</p>`;
+  }
+
+  // what to work on
+  const work = (weaknesses.length ? weaknesses : secRows.slice(-5).reverse()).filter(r=>r.pct<0.9).slice(0,5);
+  html += `<h2>What to work on</h2>`;
+  if (work.length){
+    work.forEach((r,i)=>{
+      const gap = Math.max(0, 0.85 - r.pct);
+      const q = gap > 0.25 ? 'Start with the study notes, then the topic simulator, then retake the section final.'
+              : gap > 0.10 ? 'Re-do the topic quiz, review the study notes, then retake the section final.'
+              : 'One more pass over the study notes and a quiz should lock this in.';
+      html += `<div class="rec"><b>${i+1}. ${titleize(r.slug)}</b> — scoring ${pct(r.pct)}% over ${r.t} question${r.t>1?'s':''}. ${q}
+        <div class="links" style="margin-top:6px">${secLinks(r.slug)}</div></div>`;
+    });
+  } else {
+    html += `<div class="rec">Nothing glaring — every tracked section is at or above 85%. Take CompTIA-Style Exam 3 (Expert) to confirm under harder conditions.</div>`;
+  }
+
+  // strengths callout
+  if (strengths.length){
+    html += `<h2>Strongest areas</h2><p class="muted" style="margin-top:-6px">` +
+      strengths.map(r=>`<b class="strong">${titleize(r.slug)}</b> (${pct(r.pct)}%)`).join(' · ') +
+      `</p>`;
+  } else {
+    html += `<h2>Strongest areas</h2><p class="muted" style="margin-top:-6px">No section is solidly above 80% yet — your strengths will surface as you take more exams.</p>`;
+  }
+
+  html += `<div style="margin-top:36px"><button class="btn ghost" onclick="if(confirm('Delete all tracked results?')){localStorage.removeItem('${KEY}');location.reload();}">Clear all data</button></div>`;
+
+  app.innerHTML = html;
+}
+</script>
+</body>
+</html>

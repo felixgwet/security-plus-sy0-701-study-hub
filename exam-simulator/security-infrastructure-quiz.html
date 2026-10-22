@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Infrastructure Quiz · SY0-701 (Section 16)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+<style id="iphone-optimizations">
+/* iPhone / touch optimizations */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: rgba(88,166,255,.25); }
+button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-size: 16px; }
+.q-text, .screen p { overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .container, .wrap { padding-left: 12px; padding-right: 12px; }
+  .screen { padding: 24px 16px; }
+  .exam-facts { flex-wrap: wrap; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 16</div>
+    <h1>Security Infrastructure — Practice Quiz</h1>
+    <p>42 questions across all 11 lessons (OBJ 3.2 & 4.5): the full ports-and-protocols table (well-known, registered and dynamic ranges; TCP vs UDP), firewall types from packet-filtering to NGFW, UTM and WAF plus ACL rule construction, IDS vs IPS (NIDS/HIDS/WIDS, signature vs anomaly detection), network appliances (load balancers, proxies, sensors, jump servers), port security with 802.1x and the EAP variants, VPNs (full vs split tunnel, TLS/DTLS, IPSec modes, AH vs ESP), SD-WAN and SASE, infrastructure considerations (screened subnets, attack surface, inline vs tap, fail-open vs fail-closed), and selecting infrastructure controls.</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+{ lesson: "146 - Ports and Protocols", q: "Which port does HTTPS use, and with which transport protocol?",
+  options: ["80, TCP", "443, TCP", "445, UDP", "636, TCP"],
+  answer: 1, why: "HTTPS = HTTP over SSL/TLS on port 443 TCP. Port 80 is plain HTTP; 445 is SMB; 636 is LDAPS." },
+{ lesson: "146 - Ports and Protocols", q: "A company still allows Telnet for managing network devices. Which port should be closed and what should replace it?",
+  options: ["Port 23 closed; replace with SSH on port 22", "Port 22 closed; replace with Telnet on port 23", "Port 21 closed; replace with SFTP on port 69", "Port 80 closed; replace with HTTPS on port 443"],
+  answer: 0, why: "Telnet (23) is unencrypted and insecure — the classic exam fix is close 23, open SSH (22)." },
+{ lesson: "146 - Ports and Protocols", q: "Which port range is reserved for dynamic/private ports used by clients for temporary outbound connections?",
+  options: ["0–1023", "1024–49,151", "49,152–65,535", "65,536–131,071"],
+  answer: 2, why: "Dynamic/private = 49,152–65,535 — the random high ports clients open for outbound sessions. 0–1023 well-known; 1024–49,151 registered." },
+{ lesson: "146 - Ports and Protocols", q: "Microsoft SQL Server communicates over which registered port?",
+  options: ["1433", "3389", "389", "514"],
+  answer: 0, why: "MS SQL = 1433 TCP. 3389 is RDP, 389 LDAP, 514 Syslog." },
+{ lesson: "146 - Ports and Protocols", q: "Which pairing of protocol and transport is correct?",
+  options: ["TFTP — TCP", "SNMP — TCP", "Kerberos — UDP", "DNS — TCP only"],
+  answer: 2, why: "TFTP (69) and SNMP (161) and Syslog (514) are UDP; Kerberos (88) is UDP; DNS uses BOTH TCP and UDP." },
+{ lesson: "146 - Ports and Protocols", q: "RADIUS authentication is most commonly associated with which ports?",
+  options: ["1645/1646 over TCP, or 1812/1813 over UDP", "1433/1434 over TCP", "80/443 over TCP", "137/139 over UDP"],
+  answer: 0, why: "RADIUS: TCP 1645/1646 or (more commonly) UDP 1812/1813." },
+{ lesson: "147 - Firewalls", q: "A packet-filtering firewall makes decisions based on:",
+  options: ["The packet payload content", "The packet header — source/destination IP and port number", "The user's identity", "The application layer data"],
+  answer: 1, why: "Packet filters inspect only the header (IP + port) = Layer 4 firewall. Fastest type, but blind to payload attacks." },
+{ lesson: "147 - Firewalls", q: "Which firewall type remembers outbound requests and automatically permits the corresponding return traffic?",
+  options: ["Packet-filtering", "Stateful", "Circuit-level proxy", "Kernel proxy"],
+  answer: 1, why: "Stateful firewalls track connection state — they know you asked for the web page, so the reply is allowed in." },
+{ lesson: "147 - Firewalls", q: "An application-level proxy firewall is also known as a:",
+  options: ["Layer 4 firewall", "Layer 7 firewall", "Layer 2 firewall", "Stateless firewall"],
+  answer: 1, why: "Application-level proxies do deep per-application inspection at Layer 7 (e.g. HTTP filtered differently than FTP)." },
+{ lesson: "147 - Firewalls", q: "The biggest single drawback of a UTM (Unified Threat Management) device is:",
+  options: ["It cannot do intrusion prevention", "It becomes a single point of failure for the entire security stack", "It requires one appliance per security function", "It only works with Cisco equipment"],
+  answer: 1, why: "UTM consolidates firewall, IPS, AV, VPN, filtering, DLP in one box — lose the box, lose everything. Lower cost is the trade-off benefit." },
+{ lesson: "147 - Firewalls", q: "A Web Application Firewall's rule sets primarily defend against:",
+  options: ["Routing loops", "Cross-site scripting and SQL injection", "MAC flooding", "Power surges"],
+  answer: 1, why: "WAFs inspect HTTP/HTTPS and use rulesets against web app attacks like XSS and SQLi." },
+{ lesson: "147 - Firewalls", q: "A WAF installed out-of-band on a mirrored port can do what?",
+  options: ["Block live attacks inline", "Only monitor and alert — it cannot block traffic", "Encrypt all web traffic", "Replace the network firewall"],
+  answer: 1, why: "Out-of-band = sees a copy of traffic (like an IDS): can alert but not block. Inline WAFs block but add latency and can false-positive." },
+{ lesson: "147 - Firewalls", q: "Which firewall type performs full inspection of every packet layer while minimizing performance impact, and is called a fifth-generation firewall?",
+  options: ["Stateful firewall", "Kernel proxy firewall", "Packet-filtering firewall", "Circuit-level firewall"],
+  answer: 1, why: "Kernel proxy = fifth-gen: inspects every layer with minimal performance hit; place close to the protected system." },
+{ lesson: "148 - Configuring Firewalls", q: "ACL rules on a firewall are processed:",
+  options: ["Bottom-up", "Top-down, first match wins — so specific rules go first, generic near the bottom", "In random order", "Alphabetically"],
+  answer: 1, why: "Top-down order, first match applies and processing stops. Specific permits/denies on top; always end with an explicit deny all (implied deny isn't guaranteed)." },
+{ lesson: "148 - Configuring Firewalls", q: "A complete ACL rule specifies:",
+  options: ["Only the port number", "Traffic type, source, destination, and the action to take", "Only the action", "The MAC address only"],
+  answer: 1, why: "Rules = type of traffic + source + destination + action (permit/deny). Log all actions, including denies." },
+{ lesson: "149 - IDS and IPS", q: "The key difference between an IDS and an IPS is that an IPS:",
+  options: ["Only logs events", "Takes action — blocking traffic, stopping applications, or kicking devices off the network", "Costs less", "Works only wirelessly"],
+  answer: 1, why: "IDS = detect/log/alert only. IPS = detect AND react (block, prevent, disconnect)." },
+{ lesson: "149 - IDS and IPS", q: "A NIDS is typically connected:",
+  options: ["Inline between the firewall and the Internet", "To a SPAN/mirrored port on the backbone switch, receiving a copy of all traffic", "Directly to the domain controller", "Inside each workstation"],
+  answer: 1, why: "NIDS = passive, on a mirror/SPAN port so it sees copies of everything without affecting flow. A NIPS goes inline behind the firewall where it can block." },
+{ lesson: "149 - IDS and IPS", q: "Signature-based IDS is weak against which attack class?",
+  options: ["Port scans", "Zero-day attacks it has never seen before", "Known malware", "Repeated login failures"],
+  answer: 1, why: "Signatures only match known attacks in the database — zero-days have no signature yet. Anomaly/behavioral detection covers them (at the cost of more false positives)." },
+{ lesson: "149 - IDS and IPS", q: "Pattern-matching vs stateful-matching: which is more common in host-based IDSs?",
+  options: ["Pattern-matching", "Stateful-matching (baseline of the system, report state changes)", "Neither works on hosts", "Both equally"],
+  answer: 1, why: "Stateful-matching (compare to known system baseline) is common in HIDS; pattern-matching is common in NIDS/WIDS." },
+{ lesson: "149 - IDS and IPS", q: "A WIDS is specifically tuned to detect:",
+  options: ["SQL injection", "Wireless attacks like deauthentication frames, disassociation attacks, and authentication flooding", "Viruses on endpoints", "Rogue USB devices"],
+  answer: 1, why: "WIDS watches the wireless domain: DoS attempts, deauth/disassociation floods, evil twin activity." },
+{ lesson: "150 - Network Appliances", q: "An advanced load balancer that adds SSL termination, HTTP compression and content caching is called:",
+  options: ["A proxy server", "An application delivery controller (ADC)", "A jump server", "A sensor"],
+  answer: 1, why: "ADC = load balancer plus SSL termination, compression, caching." },
+{ lesson: "150 - Network Appliances", q: "A jump server's main security purpose is:",
+  options: ["Blocking DDoS attacks", "A single hardened, monitored gateway through which admins reach devices in other security zones", "Caching web content", "Balancing traffic"],
+  answer: 1, why: "Jump boxes concentrate admin access into one controlled, logged entry point — reducing attack surface and aiding forensic review." },
+{ lesson: "150 - Network Appliances", q: "Which appliance masks internal endpoints from attackers so DDoS and direct attacks hit it instead of the real servers?",
+  options: ["Load balancer", "Proxy server", "Sensor", "Jump server"],
+  answer: 1, why: "The proxy's intermediary role hides true internal endpoints — attacks point at the proxy layer. Proxies also cache content and filter requests." },
+{ lesson: "151 - Port Security", q: "MAC flooding attacks a switch by:",
+  options: ["Overheating the power supply", "Overflowing the CAM table with randomized MACs until the switch fails open and behaves like a hub", "Cracking the admin password", "Spoofing IP addresses at Layer 3"],
+  answer: 1, why: "Flood random MACs → CAM table overflows → switch fails open, rebroadcasting all traffic to every port (hub mode), losing its privacy advantage." },
+{ lesson: "151 - Port Security", q: "Sticky MAC (persistent MAC learning) does what?",
+  options: ["Glues the switch to the rack", "Dynamically learns the first MAC seen on a port and treats it as the authorized address", "Encrypts MAC addresses", "Blocks all MAC addresses"],
+  answer: 1, why: "Sticky MAC auto-learns the first device on a port as authorized — saving admins from manually entering every MAC." },
+{ lesson: "151 - Port Security", q: "802.1x defines which three roles?",
+  options: ["Client, server, firewall", "Supplicant, authenticator, authentication server", "Sender, receiver, router", "Root, admin, guest"],
+  answer: 1, why: "Supplicant = device requesting access; authenticator = switch/WAP/VPN concentrator; authentication server = RADIUS/TACACS+." },
+{ lesson: "151 - Port Security", q: "EAP-TLS is considered the strongest common EAP variant because it:",
+  options: ["Uses passwords on both sides", "Uses digital certificates on both the client and the server, providing mutual authentication and immunity to password attacks", "Is Cisco proprietary", "Requires no configuration"],
+  answer: 1, why: "EAP-TLS = certs both sides = mutual auth. EAP-TTLS = server cert + client password. EAP-MD5 = one-way password (weakest). LEAP = Cisco proprietary." },
+{ lesson: "151 - Port Security", q: "RADIUS vs TACACS+: which statement is true?",
+  options: ["TACACS+ is cross-platform and uses UDP", "RADIUS is cross-platform (usually UDP 1812/1813); TACACS+ is Cisco-only, TCP-based, and separates authentication, authorization and accounting", "RADIUS only works on Cisco gear", "Neither supports 802.1x"],
+  answer: 1, why: "Mixed-vendor network → RADIUS. All-Cisco → TACACS+ (TCP, slower, separates AAA functions)." },
+{ lesson: "152 - Securing Network Communications", q: "A split tunnel VPN:",
+  options: ["Routes all traffic through the corporate VPN", "Sends only corporate-bound traffic through the VPN and the rest directly to the Internet", "Splits traffic across two VPN providers", "Requires no encryption"],
+  answer: 1, why: "Split tunnel = performance (Internet traffic goes direct) at the cost of security. On untrusted networks, use full tunnel instead." },
+{ lesson: "152 - Securing Network Communications", q: "DTLS differs from TLS in that DTLS:",
+  options: ["Is less secure", "Runs over UDP, providing the same security with less overhead — good for streaming", "Only works on LANs", "Cannot encrypt"],
+  answer: 1, why: "DTLS = Datagram TLS, the UDP flavor: same security level as TLS but faster — ideal for video/voice streaming." },
+{ lesson: "152 - Securing Network Communications", q: "In IPSec, IKE Phase 1 is responsible for:",
+  options: ["Transferring user data", "Authenticating the parties and establishing a secure channel for negotiation (the ISAKMP tunnel)", "Terminating the tunnel", "Encrypting the payload"],
+  answer: 1, why: "5 steps: key-exchange request → IKE Phase 1 (authenticate + secure negotiation channel) → IKE Phase 2 (negotiate SAs, establish tunnel) → data transfer → termination." },
+{ lesson: "152 - Securing Network Communications", q: "Tunneling mode vs transport mode: which pairing is correct?",
+  options: ["Transport = site-to-site; tunneling = client-to-site", "Transport = client-to-site (original header, no size increase); tunneling = site-to-site (new header encapsulates whole packet)", "Both identical", "Tunneling mode cannot encrypt"],
+  answer: 1, why: "Transport keeps the original IP header (client-to-site, MTU-friendly). Tunneling wraps the entire packet in a new header (site-to-site) — watch the 1,500-byte MTU." },
+{ lesson: "152 - Securing Network Communications", q: "The IPSec Authentication Header (AH) provides integrity and origin authentication but NOT:",
+  options: ["Anti-replay protection", "Confidentiality (it carries no encryption)", "Hash digests", "Connectionless integrity"],
+  answer: 1, why: "AH = integrity + authentication + anti-replay, no confidentiality. ESP adds payload encryption (confidentiality)." },
+{ lesson: "153 - SD-WAN and SASE", q: "SD-WAN's main advantage over traditional WAN for a multi-branch company is:",
+  options: ["It requires MPLS everywhere", "Centralized software control intelligently routes per-application traffic across any mix of transports, removing the hairpin-through-HQ bottleneck", "It eliminates the need for encryption", "It only works with one ISP"],
+  answer: 1, why: "SD-WAN virtualizes the WAN: control in software, any transport (broadband, cellular, MPLS, microwave), intelligent per-app routing from a central point." },
+{ lesson: "153 - SD-WAN and SASE", q: "SASE combines which elements into a cloud-native service?",
+  options: ["Only firewalls", "Networking (SD-WAN) plus security services like firewall, secure web gateway, ZTNA, CASB and VPN", "Only storage and backup", "Email and calendaring"],
+  answer: 1, why: "SASE = network + security convergence in the cloud: FW, SWG, VPN, ZTNA, CASB + SD-WAN, policy-driven for users anywhere." },
+{ lesson: "154 - Infrastructure Considerations", q: "For the SY0-701 exam, the modern term for a DMZ is:",
+  options: ["Perimeter net", "Screened subnet", "Safe zone", "Trust boundary"],
+  answer: 1, why: "Devices may still say DMZ, but the exam term is screened subnet — a buffer hosting public services between the untrusted Internet and the trusted internal network." },
+{ lesson: "154 - Infrastructure Considerations", q: "An inline IPS fails and begins passing all traffic uninspected. It is configured as:",
+  options: ["Fail-closed", "Fail-open", "Passive", "Span mode"],
+  answer: 1, why: "Fail-open = traffic keeps flowing without inspection on failure (continuity over security). Fail-closed = all traffic blocked on failure (security over availability)." },
+{ lesson: "154 - Infrastructure Considerations", q: "A network tap/monitor differs from an inline device because a tap:",
+  options: ["Can block malicious packets", "Sits out of the traffic path and only listens/captures copies — no disruption risk, but no blocking ability", "Is always faster than inline", "Requires no power"],
+  answer: 1, why: "Taps/monitors passively observe copies of traffic (like a NIDS); inline devices can influence/block but introduce a failure point." },
+{ lesson: "154 - Infrastructure Considerations", q: "The attack surface of a network is:",
+  options: ["The physical size of the server room", "The sum of all points where an attacker could enter or extract data — every device, app, open port and weak control", "Only the external firewall ports", "The number of employees"],
+  answer: 1, why: "Attack surface = all potential entry/exit and vulnerability points; it grows with every added device/app/service — minimize it continuously." },
+{ lesson: "155 - Selecting Infrastructure Controls", q: "Which is NOT one of the five key control-selection principles from the course?",
+  options: ["Least privilege", "Defense in depth", "Security through obscurity", "Open design"],
+  answer: 2, why: "The five: least privilege, defense in depth, risk-based approach, lifecycle management, open design. Obscurity is the opposite of open design." },
+{ lesson: "155 - Selecting Infrastructure Controls", q: "The control-selection methodology sequence taught is:",
+  options: ["Buy first, assess later", "Assess current state → gap analysis → set objectives → benchmarking → cost-benefit analysis → stakeholder involvement → monitoring and feedback loops", "Benchmark → buy → install → forget", "Train → retire → repeat"],
+  answer: 1, why: "Structured methodology: know your baseline, find the gaps, set objectives, benchmark against industry, weigh costs, involve stakeholders, then monitor and loop." },
+{ lesson: "155 - Selecting Infrastructure Controls", q: "Risk assessments in control selection should be:",
+  options: ["One-time only", "A recurring process repeated whenever the infrastructure or business changes significantly", "Optional for small companies", "Delegated to vendors"],
+  answer: 1, why: "Best practice: recurring risk assessments, aligned to frameworks (NIST CSF/RMF, ISO), customized to the org, with stakeholder engagement and training." }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+</body>
+</html>

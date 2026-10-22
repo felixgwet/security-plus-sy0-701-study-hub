@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SY0-701 Practice Exam 5 · Instant Feedback (Section 06)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #3fb950;
+    --accent-dim: rgba(63,185,80,.12);
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+    --blue: #58a6ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 860px; }
+
+  /* ---------- Start / Result ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 36px;
+  }
+  .center { text-align: center; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(63,185,80,.4);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 14px; }
+  .screen p { color: var(--muted); line-height: 1.65; margin-bottom: 10px; font-size: 15px; }
+  .exam-facts { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin: 22px 0 6px; }
+  .fact {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .fact b { display: block; color: var(--text); font-size: 17px; margin-bottom: 2px; }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 32px;
+    cursor: pointer;
+    margin-top: 22px;
+    transition: filter .15s;
+  }
+  .btn:hover:not(:disabled) { filter: brightness(1.12); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); margin-left: 8px; }
+  .btn.nav-btn { margin-top: 0; padding: 10px 24px; }
+  .score-big { font-size: 60px; font-weight: 700; margin: 10px 0 2px; }
+  .pass-line { color: var(--muted); font-size: 14px; margin-bottom: 4px; }
+  .verdict { font-size: 18px; font-weight: 600; margin: 8px 0 2px; }
+  .verdict.pass { color: var(--green); }
+  .verdict.fail { color: var(--red); }
+  .scale-track {
+    position: relative; height: 10px; background: var(--border);
+    border-radius: 5px; margin: 26px auto 6px; max-width: 560px;
+  }
+  .scale-pass-mark { position: absolute; left: 81.25%; top: -5px; bottom: -5px; width: 2px; background: var(--gold); }
+  .scale-fill {
+    height: 100%; border-radius: 5px; width: 0%;
+    background: linear-gradient(90deg, var(--red), var(--gold) 70%, var(--green));
+    transition: width 1s ease;
+  }
+  .scale-labels { display: flex; justify-content: space-between; max-width: 560px; margin: 0 auto; font-size: 12px; color: var(--muted); }
+  .review { text-align: left; margin-top: 30px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; font-size: 14px; }
+  .review-item .qhead { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  .review-item .pts { color: var(--muted); white-space: nowrap; }
+  .review-item .q { line-height: 1.5; margin-bottom: 6px; }
+  .review-item .a { color: var(--muted); line-height: 1.55; }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+
+  /* ---------- Question screen ---------- */
+  .exam-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 14px; color: var(--muted); }
+  .qtype-tag {
+    display: inline-block; font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--accent); background: var(--accent-dim);
+    border: 1px solid rgba(63,185,80,.35); border-radius: 4px; padding: 2px 8px; margin-bottom: 10px;
+  }
+  .q-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 26px 28px; }
+  .q-text { font-size: 17px; line-height: 1.55; margin-bottom: 20px; }
+  .pick-hint { font-size: 13px; color: var(--gold); margin: -12px 0 16px; font-weight: 600; }
+
+  .option {
+    display: block; width: 100%; text-align: left;
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; font-size: 15px; margin-bottom: 9px;
+    cursor: pointer; transition: border-color .15s, background .15s; user-select: none;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.selected { border-color: var(--accent); background: var(--accent-dim); }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter { display: inline-block; width: 22px; font-weight: 700; color: var(--muted); }
+
+  .match-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .match-term {
+    min-width: 190px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; font-size: 14px; font-weight: 600;
+  }
+  .match-term.good { border-color: var(--green); background: rgba(63,185,80,.1); }
+  .match-term.bad { border-color: var(--red); background: rgba(248,81,73,.1); }
+  .match-arrow { color: var(--muted); }
+  select.match-select {
+    flex: 1; min-width: 220px; background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 14px;
+  }
+  select.match-select.selected { border-color: var(--accent); }
+  select.match-select:disabled { opacity: .85; }
+
+  .order-seq-label { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .order-seq { border: 1px dashed var(--border); border-radius: 8px; padding: 12px; min-height: 54px; margin-bottom: 16px; }
+  .order-seq .placeholder { color: var(--muted); font-size: 13px; }
+  .order-item {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 9px 14px; font-size: 14px; margin: 4px 6px 4px 0; cursor: pointer; user-select: none;
+  }
+  .order-item:hover:not(.used) { border-color: var(--accent); }
+  .order-item .num {
+    display: inline-block; width: 20px; height: 20px; line-height: 20px; text-align: center;
+    background: var(--accent); color: #0d1117; border-radius: 50%; font-size: 12px; font-weight: 700;
+  }
+  .order-item .num.good { background: var(--green); }
+  .order-item .num.bad { background: var(--red); }
+  .order-item.used { opacity: .35; pointer-events: none; }
+  .order-reset { background: none; border: none; color: var(--blue); font-size: 13px; cursor: pointer; margin-bottom: 8px; }
+
+  .feedback {
+    display: none; margin-top: 18px; border-radius: 8px; padding: 14px 16px;
+    font-size: 14px; line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback.part { background: rgba(210,153,34,.08); border: 1px solid rgba(210,153,34,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+
+  .check-btn { margin-top: 6px; width: 100%; }
+  .exam-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; gap: 10px; flex-wrap: wrap; }
+
+  .palette { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-top: 18px; }
+  .palette h3 { font-size: 13px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
+  .pal-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pal-btn {
+    width: 34px; height: 34px; background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px; font-size: 13px; cursor: pointer; position: relative;
+  }
+  .pal-btn.current { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .pal-btn.answered::after {
+    content: ''; position: absolute; right: 3px; top: 3px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  }
+  .legend { display: flex; gap: 16px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+  .legend span::before { content: '● '; }
+  .legend .l-ans::before { color: var(--green); }
+
+  .hidden { display: none !important; }
+</style>
+<style id="iphone-optimizations">
+/* iPhone / touch optimizations */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: rgba(88,166,255,.25); }
+button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-size: 16px; }
+.q-text, .screen p { overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .container, .wrap { padding-left: 12px; padding-right: 12px; }
+  .screen { padding: 24px 16px; }
+  .exam-facts { flex-wrap: wrap; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen center">
+    <div class="badge">CompTIA Security+ SY0-701 · Feedback Mode</div>
+    <h1>Practice Exam 5 — Instant Feedback</h1>
+    <p><b style="color:var(--text)">Same exam-paper question styles as the simulator</b> — single-answer multiple choice, multiple-response, and performance-based matching &amp; ordering tasks — but in study mode: after each answer you immediately see whether you're right, your points, and an explanation. A completely new question set on Malware.</p>
+    <div class="exam-facts">
+      <div class="fact"><b id="fact-q">20</b>All-new questions</div>
+      <div class="fact"><b id="fact-t">—</b>Timer</div>
+      <div class="fact"><b>750 / 900</b>Passing score</div>
+      <div class="fact"><b>Instant</b>Feedback</div>
+    </div>
+    <p style="margin-top:16px">The clock counts up (no pressure) and records your total time. Answer every question, then get a full CompTIA-style score report with review.</p>
+    <button class="btn" onclick="beginExam()">Start Practice Exam</button>
+  </div>
+
+  <!-- EXAM -->
+  <div id="exam-screen" class="hidden">
+    <div class="exam-top">
+      <span id="exam-pos">Question 1 of 20</span>
+      <span>Score: <b id="live-score">0.00</b> / 20 &nbsp;·&nbsp; ⏱ <span id="timer">00:00</span></span>
+    </div>
+    <div class="q-card">
+      <div class="qtype-tag" id="q-type"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-body"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn check-btn" id="check-btn" onclick="checkAnswer()">Check Answer</button>
+      <div class="exam-footer">
+        <button class="btn ghost nav-btn" id="prev-btn" onclick="gotoQuestion(current-1)">← Previous</button>
+        <button class="btn nav-btn" id="next-btn" onclick="gotoQuestion(current+1)">Next →</button>
+      </div>
+    </div>
+    <div class="palette">
+      <h3>Question Summary</h3>
+      <div class="pal-grid" id="palette"></div>
+      <div class="legend"><span class="l-ans">Answered</span></div>
+      <div style="margin-top:14px">
+        <button class="btn" style="margin-top:0" onclick="finishExam()">Finish &amp; See Score Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen center hidden">
+    <div class="badge">Exam Score Report</div>
+    <div class="score-big" id="scaled-score">—</div>
+    <div class="pass-line">Scale: 100 – 900 · Passing score: 750</div>
+    <div class="verdict" id="verdict"></div>
+    <p id="raw-line" style="margin-top:10px"></p>
+    <div class="scale-track">
+      <div class="scale-fill" id="scale-fill"></div>
+      <div class="scale-pass-mark"></div>
+    </div>
+    <div class="scale-labels"><span>100</span><span style="color:var(--gold)">750 ▲</span><span>900</span></div>
+    <div>
+      <button class="btn" onclick="beginExam()">Retake Exam</button>
+      <button class="btn ghost" onclick="toggleReview()" id="review-btn">Review Questions</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   PRACTICE EXAM (FEEDBACK MODE) — SY0-701 Section 06 content
+   Domain 2: Threats, Vulnerabilities & Mitigations (Obj 2.4)
+   All-new question set — distinct from the quiz & simulator.
+   ============================================================ */
+const EXAM = [
+// ---------- Single-answer multiple choice ----------
+  {
+    type: 'mcq',
+    q: "An employee downloads a free 'PDF converter' that works perfectly, but the security team later finds it opened a persistent connection allowing an outsider to browse files and take screenshots. Which malware type is this?",
+    options: [
+      "A worm",
+      "A Remote Access Trojan (RAT) — a Trojan disguised as desirable software that grants the attacker remote control of the machine",
+      "A boot sector virus",
+      "Bloatware"
+    ],
+    answer: 1,
+    why: "The program performed its promised function AND a malicious one — the hallmark of a Trojan. Because it provides remote control (file access, screenshots, webcam), it's specifically a RAT. It doesn't self-replicate like a worm, and it needs the user to install it, which the user happily did."
+  },
+  {
+    type: 'mcq',
+    q: "Why does a RAT's callback connection effectively act like a backdoor?",
+    options: [
+      "It patches the operating system from inside",
+      "The victim's machine initiates an outbound connection to the attacker, bypassing the system's normal authentication and default security posture so the attacker can return anytime",
+      "It encrypts all traffic so firewalls cannot log it",
+      "It duplicates the user's password hash"
+    ],
+    answer: 1,
+    why: "After a user clicks a malicious link, the malware creates a callback connection from the victim's system to the attacker's. This bypasses the system's default security posture and normal authentication — the same covert-access function as a backdoor — letting the attacker connect at will. RATs are the modern successor to vendor-built backdoors."
+  },
+  {
+    type: 'mcq',
+    q: "A finance clerk receives an emailed 'invoice.xlsm' that says 'This document was created in an older version of Office. Enable content to view.' Seconds after enabling, the EDR flags process injection. Which virus type was delivered?",
+    options: [
+      "A boot sector virus",
+      "A macro virus — malicious code embedded in an Office document, activated when social engineering tricks the user into enabling macros",
+      "An armored virus",
+      "A multipartite virus"
+    ],
+    answer: 1,
+    why: "Macros are legitimate Office automation features in Word, Excel, and PowerPoint. Attackers embed malicious code in documents and use social engineering prompts ('enable content to view') to get users to activate it — the signature delivery of a macro virus. The .xlsm extension itself signals a macro-enabled workbook."
+  },
+  {
+    type: 'mcq',
+    q: "A malware sample frustrates every attempt at reverse engineering: debuggers crash, disassemblies show garbage, and analysis tools report inconsistent results. Which virus characteristic is this?",
+    options: [
+      "Hoax",
+      "Armored — a protective layer designed to confuse analysts and programs trying to analyze the malware",
+      "Encrypted — it hides only its payload as ciphertext",
+      "Multipartite"
+    ],
+    answer: 1,
+    why: "An armored virus wraps itself in a protective layer specifically intended to confuse analysts and analysis programs — breaking debuggers and foiling disassembly. Encryption, by contrast, hides the payload from AV signatures; armor hides the virus from people studying it."
+  },
+  {
+    type: 'mcq',
+    q: "Why does the course call ransomware 'the digital equivalent of kidnapping'?",
+    options: [
+      "Because attackers physically steal the server hardware",
+      "Because instead of holding a person hostage, the malware holds digital data hostage — encrypting it and demanding payment for the decryption key",
+      "Because it targets only family members of executives",
+      "Because the ransom is always paid in person"
+    ],
+    answer: 1,
+    why: "Kidnapping works because victims pay to free a hostage. Ransomware applies the same model to data: it encrypts files so the owner can't reach them, then demands money — from a few hundred dollars for individuals to multi-millions for organizations — in exchange for the decryption key."
+  },
+  {
+    type: 'mcq',
+    q: "Which facts about the 2021 Colonial Pipeline ransomware attack are correct?",
+    options: [
+      "The attackers were known as DarkSide, the pipeline carried nearly half the US East Coast fuel supply, operations stopped for five days, and about $4.4 million in Bitcoin ransom was paid",
+      "The attackers were Anonymous, no ransom was paid, and operations never stopped",
+      "The attack destroyed the pipeline physically and it never reopened",
+      "The ransom demand was $4.4 thousand and was refused"
+    ],
+    answer: 0,
+    why: "DarkSide's ransomware took down Colonial Pipeline for five days; since the pipeline carries nearly half the East Coast's fuel, the shutdown caused shortages, panic buying, and price spikes. Approximately $4.4 million in Bitcoin was paid for the decryption key, although repercussions lasted weeks. It remains the landmark critical-infrastructure ransomware case."
+  },
+  {
+    type: 'mcq',
+    q: "In botnet terminology, what is a 'zombie'?",
+    options: [
+      "The attacker's master control workstation",
+      "A single compromised computer or device that is part of a botnet and performs tasks via remote commands from the attacker without the user's knowledge",
+      "An antivirus quarantine folder",
+      "A honeypot designed to trap botnets"
+    ],
+    answer: 1,
+    why: "A botnet is a network of compromised machines controlled remotely. Each individual compromised device in it is a zombie — it executes the attacker's commands (DDoS requests, spam runs, mining) while its owner remains unaware. The attacker issues commands through a command-and-control (C2) node."
+  },
+  {
+    type: 'mcq',
+    q: "Attackers route their intrusion traffic through a compromised home user's PC so the attack appears to originate from that user. Which botnet capability are they exploiting?",
+    options: [
+      "Crypto mining",
+      "Using the zombie as a pivot point — attacking through it so the traffic looks like it comes from the victim instead of the real attacker",
+      "DLL injection",
+      "Process hollowing"
+    ],
+    answer: 1,
+    why: "A pivot point lets the attacker reach new victims THROUGH a compromised machine. Commands flow from the C2 node to the zombie, which carries out the attack — so logs and investigators see the zombie's innocent owner as the source. Botnets also use zombies to store illegal content and disguise spam campaigns."
+  },
+  {
+    type: 'mcq',
+    q: "In the protection rings model, ring 0 is also known as:",
+    options: [
+      "User mode, where standard accounts operate",
+      "Kernel mode — the innermost, most trusted and powerful ring, controlling device drivers and hardware access",
+      "Network mode, where firewalls operate",
+      "Guest mode, where browsers run"
+    ],
+    answer: 1,
+    why: "Rings run from 3 (outermost, user mode — where regular accounts operate) through 1 (admin/root permissions) down to ring 0: kernel mode, the most trusted and powerful level, which controls device drivers, the sound card, video, and so on. Rootkits try to reach ring 0 because proximity to the kernel means maximum permissions and maximum concealment."
+  },
+  {
+    type: 'mcq',
+    q: "Which definition of a shim is correct?",
+    options: [
+      "A hardware device that records keystrokes",
+      "A piece of software code placed between two components that intercepts the calls between them and can redirect them — the technique rootkits use to hide inside DLL communications",
+      "A type of ransomware demand",
+      "A boot sector repair utility"
+    ],
+    answer: 1,
+    why: "A shim sits between two components, intercepting and redirecting their calls. Rootkits use shims to intercept communications between Windows and its dynamic-link libraries, redirecting the calls through malicious code that loads at every boot — which is why the OS itself may never know the rootkit is there."
+  },
+  {
+    type: 'mcq',
+    q: "Why were backdoors originally built into applications in the 1980s–1990s, and what is their status today?",
+    options: [
+      "They were Easter eggs for entertainment; today they are encouraged",
+      "Manufacturers and programmers added them to re-enter their own systems for maintenance without normal authentication or firewalls — today they are considered a breach of secure coding best practices",
+      "They were required by law; today they are still mandatory",
+      "They improved performance; today they are a licensing feature"
+    ],
+    answer: 1,
+    why: "Backdoors let vendors bypass authentication and security layers to service their own software quickly. Modern secure coding standards reject them outright — yet the functionality survives in the form of RATs, which attackers install to regain covert access whenever they want. Applications should be scanned to ensure none of these covert paths exist."
+  },
+  {
+    type: 'mcq',
+    q: "A user's new free photo-editor quietly installs a second application that continuously logs browsing habits and sends them to a marketing server, slowing the PC. Which malware type is the hidden application?",
+    options: [
+      "Bloatware",
+      "Spyware — installed via bundling, it gathers and transmits information about the user without their knowledge or consent",
+      "A boot sector virus",
+      "An armored virus"
+    ],
+    answer: 1,
+    why: "Spyware arrives bundled with other software (or via malicious sites and deceptive pop-ups) and then monitors the user — browsing habits, software usage, passwords, card numbers — transmitting it all to a third party without consent. Its constant monitoring also degrades performance. Reading the EULA and downloading only from trusted sources are the prescribed defenses."
+  },
+  // ---------- Multiple response ----------
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which of the following are ACTUAL virus types from the course's list of ten? (Select THREE.)",
+    options: [
+      "Boot sector",
+      "Multipartite",
+      "Polymorphic",
+      "Gradient",
+      "Sandbox",
+      "Quantum"
+    ],
+    answer: [0, 1, 2],
+    why: "The ten virus types: boot sector, macro, program, multipartite, encrypted, polymorphic, metamorphic, stealth, armored, and hoax. 'Gradient,' 'sandbox,' and 'quantum' viruses don't exist — CompTIA loves invented distractors alongside genuine list items."
+  },
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which actions are part of the course's recommended response to a ransomware attack? (Select THREE.)",
+    options: [
+      "Refuse to pay the ransom",
+      "Disconnect the infected machine from the network",
+      "Restore data from known-good backups after the malware is fully removed",
+      "Pay quickly while the decryption price is still low",
+      "Keep the infected system online so the attackers can deliver the key",
+      "Restore backups immediately onto the still-infected system"
+    ],
+    answer: [0, 1, 2],
+    why: "Correct response: never pay (no guarantee of recovery; funds future attacks; marks you as a payer), disconnect to stop the spread, and restore from clean offline backups ONLY after complete removal. Paying quickly, staying online for the 'key delivery,' and restoring onto an infected box are all traps — the restored data would just be encrypted again."
+  },
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which activities does the course list as common uses of botnets? (Select THREE.)",
+    options: [
+      "Launching Distributed Denial-of-Service (DDoS) attacks",
+      "Distributing spam and phishing campaigns",
+      "Mining cryptocurrency using the zombies' processing power",
+      "Patching vulnerable systems for their owners",
+      "Performing off-site backups",
+      "Conducting security awareness training"
+    ],
+    answer: [0, 1, 2],
+    why: "Botnets exist for exploitation: DDoS floods (the most common use), spam/phishing distribution, crypto mining, brute-forcing encryption, storing illegal content, and pivoting through victims. Patching, backups, and training are defensive operations — the opposite of what an attacker's botnet does."
+  },
+  {
+    type: 'multi',
+    pick: 3,
+    q: "Which methods does the course give for removing BLOATWARE? (Select THREE.)",
+    options: [
+      "Manually uninstall unwanted programs via Control Panel or device settings",
+      "Use third-party bloatware removal tools",
+      "Perform a clean operating system installation on a new device",
+      "Pay the manufacturer a decryption fee",
+      "Run the bloatware at 20% CPU to keep it quiet",
+      "Forward the bloatware to authorities"
+    ],
+    answer: [0, 1, 2],
+    why: "Bloatware removal options: manual uninstallation (Programs and Features, or the app settings on mobile), dedicated removal tools that find pre-installed junk more comprehensively, and — the instructor's preference — a clean OS installation on a new device so only wanted software is ever present. The other options confuse bloatware with ransomware or botnets."
+  },
+  // ---------- Performance-based: matching ----------
+  {
+    type: 'match',
+    q: "PBQ — Match each malware deployment term to its definition. Each definition may be used once; not all definitions will be used.",
+    terms: ["Dropper", "Downloader", "Shell code", "C2 node"],
+    defs: [
+      "Malware designed to initiate or run other malware forms within a payload on an infected host",
+      "Retrieves additional tools after the initial infection facilitated by another component",
+      "Lightweight code meant to execute an exploit on a given target",
+      "The command-and-control point an attacker uses to issue orders to botnet zombies",
+      "A hidden novelty inserted into software as an inside joke",
+      "Software pre-installed by the manufacturer that the user did not request"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "Dropper = launches other malware forms. Downloader = fetches more tools post-infection. Shell code = lightweight exploit-executing code, typically the stage-one payload. C2 node = the command-and-control hub directing zombies. The joke definition is an Easter egg and the pre-installed software is bloatware — both distractors."
+  },
+  {
+    type: 'match',
+    q: "PBQ — Match each scenario to the malware or insecure-code issue it represents. Each answer may be used once; not all answers will be used.",
+    terms: [
+      "A pop-up tells a Mac user his 'Windows system' is infected and to call a toll-free number",
+      "A free toolbar bundled with a download silently harvests browsing habits and passwords",
+      "A vendor hard-codes a secret account letting its technicians skip authentication for maintenance",
+      "A new laptop ships with three trial antivirus suites and a coupon printer the buyer never asked for"
+    ],
+    defs: [
+      "Hoax",
+      "Spyware",
+      "Backdoor",
+      "Bloatware",
+      "Logic bomb",
+      "Rootkit"
+    ],
+    answer: [0, 1, 2, 3],
+    why: "The impossible 'Windows infection' on a Mac is a hoax — technical social engineering. The harvesting toolbar is spyware. The vendor's secret authentication-skipping account is a backdoor — poor practice even with good intentions. The pre-installed trials are bloatware — not malicious, but wasteful and attack-surface-expanding."
+  },
+  // ---------- Performance-based: ordering ----------
+  {
+    type: 'order',
+    q: "PBQ — A company confirms it is under a ransomware attack. Order the course's recommended response. Click the steps in sequence.",
+    items: [
+      "Do not pay the ransom under any circumstances",
+      "Immediately disconnect the infected machine(s) from the network to stop the spread",
+      "Notify the authorities if that aligns with the organization's incident response policy",
+      "Restore data and systems from known-good backups only after the ransomware is completely removed"
+    ],
+    why: "Sequence: refuse payment first — it guarantees nothing, funds future attacks, and marks you as a payer → isolate the infected systems to halt spread → report the crime through the organization's IR process (some orgs handle incidents internally) → rebuild from clean backups once the environment is verified malware-free, or the new data gets encrypted too."
+  },
+  {
+    type: 'order',
+    q: "PBQ — The WannaCry ransomware attack followed the course's attack-vector model. Order the stages of the attack. Click the stages in sequence.",
+    items: [
+      "Scan the internet for Windows systems missing the MS17-010 security patch",
+      "Exploit the vulnerable SMB file and printer sharing services using EternalBlue",
+      "Gain administrative control of the compromised machines",
+      "Encrypt the victims' files and demand Bitcoin payment for the decryption key"
+    ],
+    why: "WannaCry's attack vector, end to end: scan for unpatched systems (the unpatched MS17-010 flaw was the threat vector) → exploit the SMB vulnerability with EternalBlue → escalate to admin privileges → encrypt files and issue the Bitcoin ransom demand. Patch MS17-010 breaks the chain at its very first link."
+  }
+];
+
+/* ============================================================
+   ENGINE — feedback mode
+   ============================================================ */
+let answers = [];
+let checked = [];
+let points = [];
+let current = 0;
+let elapsed = 0;
+let timerId = null;
+
+const TYPE_LABELS = {
+  mcq: 'Multiple Choice',
+  multi: 'Multiple Response',
+  match: 'Performance-Based · Matching',
+  order: 'Performance-Based · Ordering'
+};
+
+function fmtTime(s) {
+  const m = Math.floor(s / 60), r = s % 60;
+  return `${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`;
+}
+
+function beginExam() {
+  answers = EXAM.map(q => {
+    if (q.type === 'mcq') return null;
+    if (q.type === 'multi') return [];
+    if (q.type === 'match') return q.terms.map(() => null);
+    if (q.type === 'order') return [];
+    return null;
+  });
+  checked = EXAM.map(() => false);
+  points = EXAM.map(() => 0);
+  current = 0;
+  elapsed = 0;
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('exam-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Questions';
+  document.getElementById('fact-q').textContent = EXAM.length;
+  document.getElementById('fact-t').textContent = 'elapsed';
+  startTimer();
+  renderQuestion();
+  renderPalette();
+}
+
+function startTimer() {
+  clearInterval(timerId);
+  updateTimerDisplay();
+  timerId = setInterval(() => { elapsed++; updateTimerDisplay(); }, 1000);
+}
+
+function updateTimerDisplay() {
+  document.getElementById('timer').textContent = fmtTime(elapsed);
+}
+
+function isAnswered(i) { return checked[i]; }
+
+function isInputComplete(i) {
+  const q = EXAM[i], a = answers[i];
+  if (q.type === 'mcq') return a !== null;
+  if (q.type === 'multi') return a.length > 0;
+  if (q.type === 'match') return a.every(v => v !== null);
+  if (q.type === 'order') return a.length === q.items.length;
+  return false;
+}
+
+function updateLiveScore() {
+  const total = points.reduce((s, p) => s + p, 0);
+  document.getElementById('live-score').textContent = total.toFixed(2);
+}
+
+function renderQuestion() {
+  const q = EXAM[current];
+  const done = checked[current];
+  document.getElementById('exam-pos').textContent = `Question ${current + 1} of ${EXAM.length}`;
+  document.getElementById('q-type').textContent = TYPE_LABELS[q.type];
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('prev-btn').disabled = current === 0;
+  document.getElementById('next-btn').textContent = current === EXAM.length - 1 ? 'Last Question' : 'Next →';
+
+  const body = document.getElementById('q-body');
+  body.innerHTML = '';
+  if (q.type === 'mcq') renderMcq(q, body, done);
+  else if (q.type === 'multi') renderMulti(q, body, done);
+  else if (q.type === 'match') renderMatch(q, body, done);
+  else if (q.type === 'order') renderOrder(q, body, done);
+
+  const checkBtn = document.getElementById('check-btn');
+  const fb = document.getElementById('feedback');
+  if (done) {
+    checkBtn.classList.add('hidden');
+    showFeedback(q);
+  } else {
+    checkBtn.classList.remove('hidden');
+    checkBtn.disabled = !isInputComplete(current);
+    checkBtn.textContent = 'Check Answer';
+    fb.className = 'feedback';
+    fb.innerHTML = '';
+  }
+  updateLiveScore();
+  renderPalette();
+}
+
+function renderMcq(q, body, done) {
+  const letters = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    if (done) {
+      btn.disabled = true;
+      if (i === q.answer) btn.classList.add('correct');
+      else if (answers[current] === i) btn.classList.add('wrong');
+    } else {
+      if (answers[current] === i) btn.classList.add('selected');
+      btn.onclick = () => { answers[current] = i; renderQuestion(); };
+    }
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    body.appendChild(btn);
+  });
+}
+
+function renderMulti(q, body, done) {
+  const hint = document.createElement('div');
+  hint.className = 'pick-hint';
+  const names = { 2: 'TWO', 3: 'THREE', 4: 'FOUR' };
+  hint.textContent = `Select ${names[q.pick] || q.pick}.`;
+  body.appendChild(hint);
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    const chosen = answers[current].includes(i);
+    if (done) {
+      btn.disabled = true;
+      if (q.answer.includes(i)) btn.classList.add('correct');
+      else if (chosen) btn.classList.add('wrong');
+    } else {
+      if (chosen) btn.classList.add('selected');
+      btn.onclick = () => {
+        const sel = answers[current];
+        const pos = sel.indexOf(i);
+        if (pos >= 0) sel.splice(pos, 1);
+        else {
+          if (sel.length >= q.pick) sel.shift();
+          sel.push(i);
+        }
+        renderQuestion();
+      };
+    }
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    body.appendChild(btn);
+  });
+}
+
+function renderMatch(q, body, done) {
+  if (!q._defOrder) {
+    q._defOrder = q.defs.map((_, i) => i);
+    for (let i = q._defOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q._defOrder[i], q._defOrder[j]] = [q._defOrder[j], q._defOrder[i]];
+    }
+  }
+  q.terms.forEach((term, ti) => {
+    const row = document.createElement('div');
+    row.className = 'match-row';
+    const label = document.createElement('div');
+    label.className = 'match-term';
+    if (done) label.classList.add(answers[current][ti] === q.answer[ti] ? 'good' : 'bad');
+    label.textContent = term;
+    const arrow = document.createElement('span');
+    arrow.className = 'match-arrow';
+    arrow.textContent = '→';
+    const sel = document.createElement('select');
+    sel.className = 'match-select' + (answers[current][ti] !== null ? ' selected' : '');
+    if (done) sel.disabled = true;
+    const noneOpt = document.createElement('option');
+    noneOpt.value = '';
+    noneOpt.textContent = '— choose a description —';
+    sel.appendChild(noneOpt);
+    q._defOrder.forEach(di => {
+      const o = document.createElement('option');
+      o.value = di;
+      o.textContent = q.defs[di];
+      if (answers[current][ti] === di) o.selected = true;
+      sel.appendChild(o);
+    });
+    if (!done) {
+      sel.onchange = () => {
+        answers[current][ti] = sel.value === '' ? null : parseInt(sel.value, 10);
+        renderQuestion();
+      };
+    }
+    row.appendChild(label); row.appendChild(arrow); row.appendChild(sel);
+    body.appendChild(row);
+  });
+}
+
+function renderOrder(q, body, done) {
+  if (!q._itemOrder) {
+    q._itemOrder = q.items.map((_, i) => i);
+    for (let i = q._itemOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q._itemOrder[i], q._itemOrder[j]] = [q._itemOrder[j], q._itemOrder[i]];
+    }
+  }
+  const seqLabel = document.createElement('div');
+  seqLabel.className = 'order-seq-label';
+  seqLabel.textContent = 'Your answer (in order):';
+  body.appendChild(seqLabel);
+
+  const seq = document.createElement('div');
+  seq.className = 'order-seq';
+  if (answers[current].length === 0) {
+    seq.innerHTML = '<span class="placeholder">Click the items below in the correct sequence…</span>';
+  } else {
+    answers[current].forEach((itemIdx, pos) => {
+      const chip = document.createElement('span');
+      chip.className = 'order-item';
+      const num = document.createElement('span');
+      num.className = 'num';
+      num.textContent = pos + 1;
+      if (done) num.classList.add(itemIdx === pos ? 'good' : 'bad');
+      chip.appendChild(num);
+      chip.appendChild(document.createTextNode(q.items[itemIdx]));
+      if (!done) {
+        chip.onclick = () => { answers[current].splice(pos, 1); renderQuestion(); };
+        chip.title = 'Click to remove';
+      }
+      seq.appendChild(chip);
+    });
+  }
+  body.appendChild(seq);
+
+  if (!done && answers[current].length > 0) {
+    const reset = document.createElement('button');
+    reset.className = 'order-reset';
+    reset.textContent = '↺ Clear sequence';
+    reset.onclick = () => { answers[current] = []; renderQuestion(); };
+    body.appendChild(reset);
+  }
+
+  const poolLabel = document.createElement('div');
+  poolLabel.className = 'order-seq-label';
+  poolLabel.textContent = 'Available items:';
+  body.appendChild(poolLabel);
+
+  const pool = document.createElement('div');
+  pool.className = 'order-pool';
+  q._itemOrder.forEach(itemIdx => {
+    const used = answers[current].includes(itemIdx);
+    const chip = document.createElement('span');
+    chip.className = 'order-item' + (used ? ' used' : '');
+    chip.textContent = q.items[itemIdx];
+    if (!used && !done) {
+      chip.onclick = () => {
+        if (answers[current].length < q.items.length) {
+          answers[current].push(itemIdx);
+          renderQuestion();
+        }
+      };
+    }
+    pool.appendChild(chip);
+  });
+  body.appendChild(pool);
+}
+
+/* ---------- Grading & feedback ---------- */
+function gradeCurrent() {
+  const q = EXAM[current], a = answers[current];
+  if (q.type === 'mcq') return a === q.answer ? 1 : 0;
+  if (q.type === 'multi') {
+    const right = q.answer.slice().sort().join(',');
+    const mine = a.slice().sort().join(',');
+    return right === mine ? 1 : 0;
+  }
+  if (q.type === 'match') {
+    let c = 0;
+    a.forEach((v, i) => { if (v === q.answer[i]) c++; });
+    return c / q.terms.length;
+  }
+  if (q.type === 'order') {
+    if (a.length !== q.items.length) return 0;
+    let c = 0;
+    a.forEach((itemIdx, pos) => { if (itemIdx === pos) c++; });
+    return c / q.items.length;
+  }
+  return 0;
+}
+
+function checkAnswer() {
+  if (checked[current] || !isInputComplete(current)) return;
+  points[current] = gradeCurrent();
+  checked[current] = true;
+  renderQuestion();
+}
+
+function showFeedback(q) {
+  const pts = points[current];
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (pts === 1 ? 'ok' : pts > 0 ? 'part' : 'no');
+  const head = pts === 1 ? '✔ Correct!' : pts > 0 ? `◐ Partially correct — ${pts.toFixed(2)} / 1 point` : '✘ Incorrect';
+  fb.innerHTML = `<strong>${head}</strong>${q.why}`;
+}
+
+/* ---------- Navigation & palette ---------- */
+function renderPalette() {
+  const pal = document.getElementById('palette');
+  pal.innerHTML = '';
+  EXAM.forEach((q, i) => {
+    const b = document.createElement('button');
+    b.className = 'pal-btn' + (i === current ? ' current' : '') + (isAnswered(i) ? ' answered' : '');
+    b.textContent = i + 1;
+    b.onclick = () => gotoQuestion(i);
+    pal.appendChild(b);
+  });
+}
+
+function gotoQuestion(i) {
+  if (i < 0 || i >= EXAM.length) return;
+  current = i;
+  renderQuestion();
+}
+
+/* ---------- Results ---------- */
+function finishExam() {
+  const unchecked = checked.filter(c => !c).length;
+  let msg = `You've answered ${checked.filter(Boolean).length} of ${EXAM.length} questions.`;
+  if (unchecked > 0) msg += `\n\n${unchecked} question(s) haven't been checked yet — they score 0.`;
+  msg += '\n\nFinish and see your score report?';
+  if (!confirm(msg)) return;
+  showResults();
+}
+
+function showResults() {
+  clearInterval(timerId);
+  const total = points.reduce((s, p) => s + p, 0);
+  const pct = total / EXAM.length;
+  const scaled = Math.round(100 + 800 * pct);
+  const passed = scaled >= 750;
+
+  document.getElementById('exam-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('scaled-score').textContent = scaled;
+  const v = document.getElementById('verdict');
+  v.textContent = passed ? 'PASS ✔' : 'BELOW PASSING ✘';
+  v.className = 'verdict ' + (passed ? 'pass' : 'fail');
+  document.getElementById('raw-line').textContent =
+    `${total.toFixed(2)} of ${EXAM.length} points (${Math.round(pct * 100)}%) · Total time: ${fmtTime(elapsed)}`;
+
+  const fill = document.getElementById('scale-fill');
+  fill.style.width = '0%';
+  setTimeout(() => { fill.style.width = ((scaled - 100) / 800 * 100) + '%'; }, 60);
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Question Review</h2>';
+  EXAM.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = reviewItemHtml(q, answers[i], points[i], i);
+    review.appendChild(div);
+  });
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function reviewItemHtml(q, a, pts, i) {
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  let body = '';
+  if (!checked[i]) {
+    body = '<span class="bad">Not answered.</span>';
+  } else if (q.type === 'mcq') {
+    const ok = a === q.answer;
+    body = `Your answer: <span class="${ok ? 'ok' : 'bad'}">${letters[a]}. ${esc(q.options[a])}</span>` +
+      (ok ? '' : `<br>Correct answer: <span class="ok">${letters[q.answer]}. ${esc(q.options[q.answer])}</span>`);
+  } else if (q.type === 'multi') {
+    const ok = pts === 1;
+    const mine = a.map(x => letters[x] + '. ' + esc(q.options[x])).join('<br>') || '(none)';
+    const right = q.answer.map(x => letters[x] + '. ' + esc(q.options[x])).join('<br>');
+    body = `Your selections:<br><span class="${ok ? 'ok' : 'bad'}">${mine}</span>` +
+      (ok ? '' : `<br>Correct selections:<br><span class="ok">${right}</span>`);
+  } else if (q.type === 'match') {
+    body = q.terms.map((t, ti) => {
+      const ok = a[ti] === q.answer[ti];
+      const mine = a[ti] !== null ? q.defs[a[ti]] : '(none)';
+      const right = q.defs[q.answer[ti]];
+      return `<b>${esc(t)}</b> → <span class="${ok ? 'ok' : 'bad'}">${esc(mine)}</span>` +
+        (ok ? '' : ` &nbsp;(correct: <span class="ok">${esc(right)}</span>)`);
+    }).join('<br>');
+  } else if (q.type === 'order') {
+    const correctSeq = q.items.map((it, pos) => `${pos + 1}. ${esc(it)}`).join('<br>');
+    const mine = a.length
+      ? a.map((itemIdx, pos) => `${pos + 1}. ${esc(q.items[itemIdx])}${itemIdx === pos ? '' : ' ✗'}`).join('<br>')
+      : '(none)';
+    const okAll = pts === 1;
+    body = `Your sequence:<br><span class="${okAll ? 'ok' : 'bad'}">${mine}</span>` +
+      (okAll ? '' : `<br>Correct sequence:<br><span class="ok">${correctSeq}</span>`);
+  }
+  return `
+    <div class="qhead">
+      <span class="q"><b>Q${i + 1}.</b> ${esc(q.q)}</span>
+      <span class="pts">${pts.toFixed(2)} / 1 pt</span>
+    </div>
+    <div class="a">${body}<br><br>${esc(q.why)}</div>`;
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Questions' : 'Hide Review';
+}
+</script>
+</body>
+</html>

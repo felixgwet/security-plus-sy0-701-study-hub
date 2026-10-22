@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Identity and Access Management Quiz · SY0-701 (Section 17)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+<style id="iphone-optimizations">
+/* iPhone / touch optimizations */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: rgba(88,166,255,.25); }
+button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-size: 16px; }
+.q-text, .screen p { overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .container, .wrap { padding-left: 12px; padding-right: 12px; }
+  .screen { padding: 24px 16px; }
+  .exam-facts { flex-wrap: wrap; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 17</div>
+    <h1>Identity and Access Management — Practice Quiz</h1>
+    <p>37 questions across all 10 lessons (OBJ 2.4 & 4.6): the four IAM processes (identification, authentication, authorization, accounting) plus provisioning, deprovisioning, identity proofing and attestation, the five authentication factor categories and true MFA vs single-factor traps, password policy (length, complexity, history, expiration, minimum age) and passwordless options including passkeys, password attacks (brute force, dictionary with leet speak, spraying, hybrid) and salting, SSO with LDAP, OAuth and SAML, federation's six-step assertion flow, PAM (just-in-time permissions, password vaulting, temporal accounts), the five access control models (MAC, DAC, RBAC, rule-based, ABAC), time-of-day restrictions, least privilege and permission creep, and assigning permissions with UAC.</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+{ lesson: "157 - Identity and Access Management (IAM)", q: "The four main IAM processes, in order, are:",
+  options: ["Authorization, authentication, accounting, identification", "Identification, authentication, authorization, accounting", "Authentication, identification, accounting, authorization", "Accounting, authorization, authentication, identification"],
+  answer: 1, why: "Identify (claim) → authenticate (verify) → authorize (permissions) → account/audit (track). The classic order matters." },
+{ lesson: "157 - Identity and Access Management (IAM)", q: "A user typing their username at a login prompt is performing:",
+  options: ["Authentication", "Identification — claiming an identity", "Authorization", "Accounting"],
+  answer: 1, why: "Entering a username = claiming an identity (identification). Verifying the password = authentication." },
+{ lesson: "157 - Identity and Access Management (IAM)", q: "Removing a departing employee's access rights is called:",
+  options: ["Provisioning", "Deprovisioning", "Attestation", "Identity proofing"],
+  answer: 1, why: "Deprovisioning removes access when no longer needed — crucial to stop ex-employee insider threats. Provisioning = creating accounts." },
+{ lesson: "157 - Identity and Access Management (IAM)", q: "Verifying a user's real-world identity with a driver's license or passport BEFORE creating their account is:",
+  options: ["Attestation", "Identity proofing", "Authorization", "Federation"],
+  answer: 1, why: "Identity proofing happens before account creation, checking personal details against trusted sources." },
+{ lesson: "157 - Identity and Access Management (IAM)", q: "Regular reviews confirming that user accounts hold only the minimal access their role requires is called:",
+  options: ["Deprovisioning", "Attestation", "Interoperability", "Provisioning"],
+  answer: 1, why: "Attestation = validating accounts and access rights are correct and up to date via periodic reviews/audits." },
+{ lesson: "158 - Multifactor Authentication", q: "A fingerprint scan is which authentication factor category?",
+  options: ["Something you know", "Something you have", "Something you are (inherence)", "Somewhere you are"],
+  answer: 2, why: "Biometrics = inherence ('something you are'). Possession = something you have; knowledge = something you know; location = somewhere you are." },
+{ lesson: "158 - Multifactor Authentication", q: "Typing speed and keystroke dynamics as an authentication input belong to:",
+  options: ["Something you are", "Something you do (behavior-based)", "Something you have", "Something you know"],
+  answer: 1, why: "Behavior patterns like keystroke dynamics, mouse movement and gait = 'something you do' — usually a secondary factor." },
+{ lesson: "158 - Multifactor Authentication", q: "A user logs in with a password, then answers a security question. This is:",
+  options: ["Two-factor authentication", "Multifactor authentication", "Still single-factor — password and security question are both knowledge factors", "Passkey authentication"],
+  answer: 2, why: "Factors must come from DIFFERENT categories. Password + security question = two knowledge items = single-factor. Real 2FA pairs knowledge with possession or inherence." },
+{ lesson: "158 - Multifactor Authentication", q: "A government employee inserts a smart card and enters a PIN to unlock their laptop. This is:",
+  options: ["Single-factor", "Two-factor: smart card = possession, PIN = knowledge", "Three-factor", "Passwordless"],
+  answer: 1, why: "Smart card (something you have) + PIN (something you know) = classic 2FA." },
+{ lesson: "158 - Multifactor Authentication", q: "Hardware token key fobs typically rotate their codes every:",
+  options: ["5 seconds", "30 to 60 seconds", "30 minutes", "24 hours"],
+  answer: 1, why: "Time-based tokens change every 30–60 seconds; SMS one-time codes stay valid 3–10 minutes." },
+{ lesson: "158 - Multifactor Authentication", q: "Why are passkeys more resistant to server breaches than passwords?",
+  options: ["They are longer", "They use public-key cryptography — the private key never leaves the device; the server only stores the public key, so a breach exposes no usable secret", "They are stored in plain text", "They work only on one website"],
+  answer: 1, why: "Passkeys: private key on device (guarded by biometrics/PIN), public key on server. No server-side secret to steal, and each passkey is unique per service → phishing-resistant." },
+{ lesson: "159 - Password Security", q: "Which password characteristic provides the greatest increase in resistance to brute-force cracking?",
+  options: ["Complexity", "Length — every added character multiplies the search space exponentially", "Frequent expiration", "Writing it down"],
+  answer: 1, why: "Length is the strongest driver: 4-digit PIN = 10,000 combos; 8 digits = 100 million. Recommend 12–16+ characters." },
+{ lesson: "159 - Password Security", q: "NIST's current position on forced password expiration is:",
+  options: ["Expire passwords every 30 days", "It is no longer recommended for most organizations unless password managers are mandated, because forced rotation breeds weak patterns like password1→2→3", "Never allow password changes", "Expiration must be paired with security questions"],
+  answer: 1, why: "Forced expiration causes keyboard-walking and predictable patterns. NIST dropped it unless the org enforces password managers for unique long passwords." },
+{ lesson: "159 - Password Security", q: "The purpose of a MINIMUM password age is to:",
+  options: ["Make users wait before their first login", "Prevent users from rapidly cycling password changes to defeat password history and return to an old password", "Force quarterly changes", "Expire passwords faster"],
+  answer: 1, why: "Min age (e.g. 3 days) + password history (e.g. 24) stops the change-it-five-times trick to recycle an old, possibly-already-cracked password." },
+{ lesson: "159 - Password Security", q: "Which passwordless method sends a single-use link that logs the user in when clicked?",
+  options: ["OTP", "Magic link", "Passkey", "Security question"],
+  answer: 1, why: "Magic links: emailed single-use, short-validity login links. OTPs are codes; passkeys use device-held private keys." },
+{ lesson: "159 - Password Security", q: "Which is a key feature of password managers?",
+  options: ["Storing passwords in plain text", "Secure sharing that lets someone log in without ever seeing the password", "Reusing one password everywhere", "Disabling MFA"],
+  answer: 1, why: "Managers generate unique strong passwords, autofill, share without revealing, and sync cross-platform — one encrypted vault behind a master password." },
+{ lesson: "160 - Password Attacks", q: "Trying every possible character combination until the password is found defines a:",
+  options: ["Dictionary attack", "Brute force attack", "Password spraying attack", "Phishing attack"],
+  answer: 1, why: "Brute force = exhaustive. Dictionary = common-password list. Spraying = few passwords across many accounts. Hybrid = dictionary + generated variations." },
+{ lesson: "160 - Password Attacks", q: "An attacker tries 'Password123' against every user account in the company to avoid account lockout. This is:",
+  options: ["Brute force", "Password spraying — a few common passwords across many accounts", "A hybrid attack", "Credential stuffing"],
+  answer: 1, why: "Spraying reverses brute force: many accounts, few passwords, staying under per-account lockout thresholds. Defeated by unique passwords and MFA." },
+{ lesson: "160 - Password Attacks", q: "A cracking tool starts from a dictionary word and appends brute-forced numbers (word000000–word999999). This is a:",
+  options: ["Pure dictionary attack", "Hybrid attack — dictionary base plus brute-force variation", "Spraying attack", "Rainbow table attack"],
+  answer: 1, why: "Hybrid = dictionary word + dynamically generated variations. When the variation lives inside the list itself it's a dictionary attack; generated on the fly = true hybrid." },
+{ lesson: "160 - Password Attacks", q: "Adding a random string to each password before hashing, defeating lookup tables, is called:",
+  options: ["Peppering", "Salting", "Leet Speak", "Vaulting"],
+  answer: 1, why: "Salts prevent rainbow/lookup table attacks (the John the Ripper demo cracked an unsalted MD5 instantly). Store passwords with strong hashes like SHA-256 + salt — never plain MD5." },
+{ lesson: "161 - Single Sign-On (SSO)", q: "In SSO, the system that creates, maintains and manages identity information and provides authentication services to relying applications is the:",
+  options: ["Service provider", "Identity provider (IdP)", "RADIUS server", "Jump server"],
+  answer: 1, why: "The IdP authenticates the user once; applications with a trusted relationship query it and accept its assertion." },
+{ lesson: "161 - Single Sign-On (SSO)", q: "Which SSO protocol is an open standard for token-based authorization that lets third-party apps access account data WITHOUT exposing the password, using JSON Web Tokens?",
+  options: ["LDAP", "OAuth", "SAML", "Kerberos"],
+  answer: 1, why: "OAuth = token-based (JWT, Base64, signed). SAML = XML assertions for session-based login. LDAP = directory lookups." },
+{ lesson: "161 - Single Sign-On (SSO)", q: "SAML's main contribution to SSO is:",
+  options: ["Storing password hashes", "Logging users into applications based on their authenticated session in another context — the service provider trusts the IdP's assertion instead of authenticating directly", "Encrypting disks", "Blocking ports"],
+  answer: 1, why: "SAML decouples services from identity providers: redirect to IdP, IdP verifies, SAML response/assertion returns, service grants access." },
+{ lesson: "161 - Single Sign-On (SSO)", q: "Which statement about LDAP is correct?",
+  options: ["It only works on Cisco devices", "It accesses and maintains distributed directory information and can serve as the central repository for authentication and group/role authorization data; use LDAPS to encrypt credential traffic", "It is a token-based protocol", "It replaces MFA"],
+  answer: 1, why: "LDAP = directory protocol (users, groups, printers, certs); supports SSO and authorization data. Plain LDAP can transmit cleartext → LDAPS/StartTLS for credentials." },
+{ lesson: "162 - Federation", q: "Federation differs from plain SSO in that federation:",
+  options: ["Works only inside one company", "Lets users authenticate with their HOME organization's credentials to access systems run by DIFFERENT organizations, based on pre-established trust", "Requires shared passwords", "Eliminates the identity provider"],
+  answer: 1, why: "Federation = cross-organization identity sharing (partners, suppliers, customers trust each other's authentication). SSO is often within one org." },
+{ lesson: "162 - Federation", q: "In the federation login flow, the artifact the IdP creates after authenticating the user — containing identity, authentication status and attributes — is the:",
+  options: ["Salt", "Assertion (e.g., a SAML or OpenID Connect token)", "Vault entry", "CAPTCHA"],
+  answer: 1, why: "Six steps: initiate login → redirect to IdP → authenticate → generate assertion → return to service provider → SP verifies assertion and grants access." },
+{ lesson: "163 - Privileged Access Management (PAM)", q: "PAM's three key components are:",
+  options: ["Firewalls, IDS, IPS", "Just-in-time permissions, password vaulting, and temporal accounts", "MAC, DAC, RBAC", "SSO, SAML, OAuth"],
+  answer: 1, why: "JIT = grant admin rights only when needed; vaulting = MFA-protected credential store with checkout logging; temporal accounts = time-limited accounts auto-deleted (e.g., contractors)." },
+{ lesson: "163 - Privileged Access Management (PAM)", q: "A contractor account that automatically deactivates when a project ends exemplifies:",
+  options: ["Password vaulting", "Just-in-time permissions", "A temporal (temporary) account", "Attestation"],
+  answer: 2, why: "Temporal accounts are created for a specific purpose and automatically disabled/deleted after a set period." },
+{ lesson: "164 - Access Control Models", q: "A military system where a Secret-cleared user can read Secret, Confidential and Unclassified files but NOT Top Secret is using:",
+  options: ["DAC", "MAC — mandatory access control with security labels/clearances", "RBAC", "Rule-based AC"],
+  answer: 1, why: "MAC: central authority assigns labels to users AND resources; access requires user level ≥ resource level. Everything not expressly allowed is forbidden. Complex/costly — high-security only." },
+{ lesson: "164 - Access Control Models", q: "The owner of a file personally deciding which coworkers may open it is:",
+  options: ["MAC", "DAC — discretionary access control based on the resource owner", "ABAC", "Rule-based"],
+  answer: 1, why: "DAC = owner discretion, identity/need-to-know based — flexible but hard to govern at scale." },
+{ lesson: "164 - Access Control Models", q: "An org with high turnover assigns permissions to department groups (Accounting, HR, nested Employees) so access follows the job, not the person. This is:",
+  options: ["DAC", "RBAC — role-based access control implemented with groups", "MAC", "ABAC"],
+  answer: 1, why: "RBAC via groups mirroring the org chart: join the role, inherit permissions; leave, lose them. Ideal for turnover." },
+{ lesson: "164 - Access Control Models", q: "Firewall and router ACLs that apply the same policy to every user on a segment are an example of:",
+  options: ["Rule-based access control", "DAC", "ABAC", "MAC"],
+  answer: 0, why: "Rule-based = administrator-defined rules applied network-wide to all users, changeable quickly. Distinct from role-based despite the shared RBAC abbreviation." },
+{ lesson: "164 - Access Control Models", q: "An access decision combining the user's role, the time of access, their location, and the data's sensitivity label is:",
+  options: ["MAC", "DAC", "ABAC — attribute-based access control", "Rule-based"],
+  answer: 2, why: "ABAC evaluates user, environment AND resource attributes together (role, time, location, threat level, file owner, sensitivity)." },
+{ lesson: "164 - Access Control Models", q: "An employee who keeps old permissions from three previous departments after moving roles illustrates:",
+  options: ["Least privilege", "Permission (authorization) creep", "Deprovisioning", "Attestation"],
+  answer: 1, why: "Creep = accumulating rights across moves. Fix: revoke old permissions at transition + periodic attestation reviews." },
+{ lesson: "165 - Assigning Permissions", q: "Windows User Account Control (UAC) exists to:",
+  options: ["Encrypt the hard drive", "Ensure actions requiring administrative rights are explicitly authorized — minimizing malware gaining admin privileges", "Manage passwords", "Block all installs"],
+  answer: 1, why: "UAC = the checkpoint prompt for admin-level actions (shield icon = will prompt). Least privilege on endpoints: work as standard user; elevate deliberately." },
+{ lesson: "165 - Assigning Permissions", q: "For everyday computing, which account type should users normally use, per least privilege?",
+  options: ["Local administrator", "Standard user — administrator only when needed", "Microsoft account", "Temporal account"],
+  answer: 1, why: "Standard users can't change system settings and are confined to their own storage; admin rights are elevated only for specific tasks via UAC." },
+{ lesson: "165 - Assigning Permissions", q: "Setting a folder's permissions so they apply to everything inside it mirrors which hotel-key concept from the lesson?",
+  options: ["One key per guest", "A key that opens a room and everything declared usable inside it", "Master keys", "Keyless entry"],
+  answer: 1, why: "Folder-level permissions inherit to all contents — like granting a guest everything in a room. Grant read/write/execute/full control deliberately, erring toward fewer rights." }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+<script>window.__EXAM_META={id:"identity-and-access-management-quiz.html",title:"Identity and Access Management Quiz \u00b7 SY0-701 (Section 17)"};</script><script src="analytics.js"></script>
+</body>
+</html>

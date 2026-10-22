@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Malicious Activity Quiz · SY0-701 (Section 19)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+<style id="iphone-optimizations">
+/* iPhone / touch optimizations */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: rgba(88,166,255,.25); }
+button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-size: 16px; }
+.q-text, .screen p { overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .container, .wrap { padding-left: 12px; padding-right: 12px; }
+  .screen { padding: 24px 16px; }
+  .exam-facts { flex-wrap: wrap; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 19</div>
+    <h1>Malicious Activity — Practice Quiz</h1>
+    <p>40 questions across all 10 lessons of Section 19 — DoS/DDoS, DNS attacks, directory traversal, escalation, replay, session hijacking, on-path attacks, injection attacks, and indicators of compromise. Pick an answer to reveal the explanation.</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+{ lesson: "178 - Distributed Denial of Service", q: "Which attack floods a target with more packets than it can handle, exhausting its resources?", options: ["Replay attack", "Flood attack", "On-path attack", "Privilege escalation"], answer: 1, why: "A flood attack is a specialized DoS that overwhelms a single server or host with traffic." },
+{ lesson: "178 - Distributed Denial of Service", q: "An attacker sends thousands of ICMP echo requests to overwhelm a server. This is a:", options: ["SYN flood", "Ping flood", "Fork bomb", "DNS amplification"], answer: 1, why: "A ping flood uses ICMP echo requests (pings). Many organizations simply drop echo replies at the firewall." },
+{ lesson: "178 - Distributed Denial of Service", q: "Which attack starts many TCP sessions but never completes the three-way handshake, leaving the server holding half-open connections?", options: ["Ping flood", "Replay attack", "SYN flood", "Domain hijacking"], answer: 2, why: "The SYN flood sends SYNs (often from spoofed IPs) and never answers the SYN-ACK, exhausting the server's connection table." },
+{ lesson: "178 - Distributed Denial of Service", q: "Which device or feature detects a SYN flood and blocks the requests at the network boundary?", options: ["A load balancer", "A flood guard", "A DNS resolver", "A proxy server"], answer: 1, why: "Flood guards (standalone devices or router/firewall features) detect and block flood attacks; half-open timeouts and IPS detection also help." },
+{ lesson: "178 - Distributed Denial of Service", q: "An attack re-flashes a router's firmware so it can never boot again, requiring a full firmware reload. This is:", options: ["A fork bomb", "A permanent denial of service (PDoS)", "DNS tunneling", "A replay attack"], answer: 1, why: "PDoS permanently bricks the device by overwriting its firmware — a reboot does not recover it." },
+{ lesson: "178 - Distributed Denial of Service", q: "Why is a fork bomb NOT considered a worm?", options: ["It does not use the network or infect programs — it only consumes resources on a single machine", "It only targets Linux", "It requires a botnet", "It is a type of rootkit"], answer: 0, why: "Fork bombs self-replicate only inside one processor (forking processes); they do not infect programs or spread over a network." },
+{ lesson: "178 - Distributed Denial of Service", q: "Hundreds of compromised zombie machines in a botnet simultaneously attack one target. This is:", options: ["A DoS attack", "A DDoS attack", "An on-path attack", "A directory traversal"], answer: 1, why: "DDoS = distributed — many machines (bots/zombies) attack a single victim at once. GitHub 2018 peaked at ~1.35 Tbps." },
+{ lesson: "178 - Distributed Denial of Service", q: "Blackholing (sinkholing) defends against DDoS by:", options: ["Rebooting the target server", "Routing attacking IP addresses to a null interface so their traffic is dropped", "Decrypting the attack traffic", "Increasing the attacker's bandwidth"], answer: 1, why: "Blackholing redirects attacker IPs to a non-existent server (null interface). It is temporary — attackers can switch IPs." },
+{ lesson: "178 - Distributed Denial of Service", q: "Which mitigation rides out a large DDoS by absorbing/filtering attack traffic through providers such as Cloudflare or Akamai?", options: ["Blackholing", "A specialized DDoS-protection/content-distribution service with web application filtering", "Disabling ICMP echo replies", "Shortening session timeouts"], answer: 1, why: "Elastic cloud scaling works but is costly; Cloudflare/Akamai add WAF filtering and content distribution layers designed to absorb huge attacks." },
+{ lesson: "179 - DNS Attacks", q: "An attacker corrupts a DNS resolver's cache so bank customers are redirected to a fake website. This is:", options: ["DNS tunneling", "DNS cache poisoning (DNS spoofing)", "A DNS zone transfer attack", "Domain hijacking"], answer: 1, why: "Cache poisoning inserts false records into a resolver's cache, redirecting users to attacker-controlled IPs." },
+{ lesson: "179 - DNS Attacks", q: "Which control adds digital signatures to DNS data to defeat cache poisoning?", options: ["DNSSEC", "WPA3", "ASLR", "TLS 1.3"], answer: 0, why: "DNSSEC (Domain Name System Security Extensions) authenticates the integrity and origin of DNS records." },
+{ lesson: "179 - DNS Attacks", q: "An attacker sends small DNS queries with a spoofed victim IP to open resolvers, and the large responses flood the victim. This is:", options: ["DNS tunneling", "DNS amplification", "Domain hijacking", "SSL stripping"], answer: 1, why: "DNS amplification abuses the asymmetry: tiny query, huge response, spoofed source IP — the victim gets flooded. Rate-limiting response size/traffic mitigates it." },
+{ lesson: "179 - DNS Attacks", q: "Malware is seen exfiltrating data inside DNS queries on port 53 to bypass the firewall. This technique is:", options: ["DNS amplification", "DNS tunneling", "DNS cache poisoning", "A zone transfer"], answer: 1, why: "DNS tunneling encapsulates non-DNS traffic (HTTP/SSH) over port 53, evading firewall inspection for C2 and exfiltration. Watch DNS logs for anomalies." },
+{ lesson: "179 - DNS Attacks", q: "An attacker changes the registration of a company's domain without permission, seizing control of the website. This is:", options: ["DNS cache poisoning", "Domain hijacking (domain theft)", "A SYN flood", "Process injection"], answer: 1, why: "Domain hijacking = unauthorized change of domain registration. Defenses: secure the registrar account and use domain registry lock services." },
+{ lesson: "179 - DNS Attacks", q: "An attacker pretending to be an authorized server requests a copy of an entire DNS zone to map the target's infrastructure. This is:", options: ["A DNS zone transfer attack", "DNS tunneling", "A fork bomb", "Cookie poisoning"], answer: 0, why: "Zone transfer attacks steal the complete zone file (all records) for reconnaissance. Restrict zone transfers to authorized servers only." },
+{ lesson: "180 - Directory Traversal Attack", q: "A proxy log shows a request for site.com/../../../../etc/shadow. This indicates:", options: ["An SQL injection", "A directory (path) traversal attack", "A replay attack", "DNS amplification"], answer: 1, why: "The ../ sequences climb above the web document root to reach files like /etc/shadow. Seeing ../ means directory traversal or local file inclusion." },
+{ lesson: "180 - Directory Traversal Attack", q: "Which encoded string equals ../ and may be used to hide a traversal attempt from filters?", options: ["%20%20%20", "%2e%2e%2f", "%41%42%43", "%3c%3e%3f"], answer: 1, why: "%2e = dot, %2f = forward slash. Attackers URL-encode ../ (%2e%2e%2f) to evade naive filters." },
+{ lesson: "180 - Directory Traversal Attack", q: "A vulnerable app loads and executes a script hosted at an attacker's remote URL via a parameter. This is:", options: ["A local file inclusion", "A remote file inclusion (RFI)", "DNS tunneling", "A fork bomb"], answer: 1, why: "RFI makes the app include/execute a file from a remote location (e.g., ?user=http://evil/malicious.php). LFI uses files already on the server." },
+{ lesson: "180 - Directory Traversal Attack", q: "In an LFI attempt, what is the purpose of appending %00 to the request?", options: ["It compresses the payload", "It inserts a null character to truncate appended extensions (like a forced .php) so the intended file executes", "It encrypts the URL", "It authenticates the request"], answer: 1, why: "The URL-encoded null byte (%00) terminates the string, bypassing mechanisms that append their own extension." },
+{ lesson: "181 - Execution and Escalation Attack", q: "What is the difference between arbitrary code execution and remote code execution?", options: ["They are identical terms", "Arbitrary = run attacker's code on the target; remote = do it over the network from a distant host", "Remote only works on Linux", "Arbitrary requires admin rights first"], answer: 1, why: "RCE is a network-delivered form of arbitrary code execution: load my software on your machine (arbitrary) vs. doing it over the internet (remote)." },
+{ lesson: "181 - Execution and Escalation Attack", q: "An attacker exploits a flaw to go from a standard user account to full administrator rights. This is:", options: ["Horizontal privilege escalation", "Vertical privilege escalation", "A replay attack", "DNS amplification"], answer: 1, why: "Vertical escalation = moving UP privilege levels (user to admin/root). Domain admin is the holy grail." },
+{ lesson: "181 - Execution and Escalation Attack", q: "A user exploits an app to read another user's files on a shared drive, both having the same permission level. This is:", options: ["Vertical privilege escalation", "Horizontal privilege escalation", "Remote code execution", "A rootkit"], answer: 1, why: "Horizontal escalation = accessing someone else's same-level resources (e.g., George's files, or running as George)." },
+{ lesson: "181 - Execution and Escalation Attack", q: "Why does compromising a service that runs as SYSTEM matter so much?", options: ["SYSTEM processes are faster", "Injected code inherits the privileges of the process it runs in — SYSTEM-level code execution", "SYSTEM cannot be monitored", "It disables the firewall"], answer: 1, why: "Code executes with the hosting process's identity. Breaking a system-account service means your arbitrary code runs as SYSTEM." },
+{ lesson: "181 - Execution and Escalation Attack", q: "Which malware class modifies system files, often at the kernel level, to hide its presence and maintain persistence?", options: ["A rootkit", "A fork bomb", "Adware", "A worm"], answer: 0, why: "Rootkits conceal themselves in the OS (often the kernel), survive reboots/logoffs, and can install further malware." },
+{ lesson: "181 - Execution and Escalation Attack", q: "Which type of rootkit is the MOST dangerous and why?", options: ["User mode — it uses the registry", "Kernel mode — it lives at ring 0 with the most privileged access, giving complete control", "Application mode — it hides in browsers", "Network mode — it hides in packets"], answer: 1, why: "Ring 0 is the kernel — the center of the system. Kernel-mode rootkits gain complete control; user-mode rootkits persist via OS features like the registry and Task Scheduler." },
+{ lesson: "182 - Replay Attacks", q: "Which attack captures a valid data transmission and fraudulently retransmits it later to gain unauthorized access?", options: ["Session hijacking", "A replay attack", "A SYN flood", "An LDAP injection"], answer: 1, why: "Replay = rebroadcast/repeat/delay of valid data. Unlike session hijacking, the attacker does not modify traffic in real time — they reuse captured data later." },
+{ lesson: "182 - Replay Attacks", q: "Which TWO controls most directly defeat credential replay attacks?", options: ["Session tokens and MFA with rotating one-time codes", "Longer passwords and screen locks", "Bigger firewalls and NAT", "Antivirus and spam filters"], answer: 0, why: "Per-session tokens make captured sessions invalid, and MFA one-time codes (30–60 s rotation) make replayed credentials useless. WPA3 also helps on wireless." },
+{ lesson: "183 - Session Hijacking", q: "Session hijacking most commonly occurs through:", options: ["Re-flashing firmware", "Theft or modification of session cookies", "DNS amplification", "Fork bombs"], answer: 1, why: "Stealing or modifying the session cookie lets the attacker take over the authenticated session and impersonate the user." },
+{ lesson: "183 - Session Hijacking", q: "Which cookie type is deleted automatically when the browser instance closes?", options: ["A persistent cookie", "A session (non-persistent) cookie", "A third-party cookie", "A signed cookie"], answer: 1, why: "Session cookies live in memory only; persistent cookies stay in the browser cache until expiry or manual deletion." },
+{ lesson: "183 - Session Hijacking", q: "Modifying a cookie's contents after it was issued to exploit the web application is called:", options: ["Session prediction", "Cookie poisoning", "DNS tunneling", "Process hollowing"], answer: 1, why: "Cookie poisoning tampers with the cookie to exploit the app. Defenses: input validation, encrypting cookies in transit and at rest, and deleting them when the session ends." },
+{ lesson: "184 - On-Path Attacks", q: "Which attack places the attacker's workstation logically between two hosts to transparently capture, monitor, and relay their communications?", options: ["An on-path attack", "A fork bomb", "A PDoS attack", "An LDAP injection"], answer: 0, why: "On-path (MITM) puts the attacker between client and server. Enablers: ARP poisoning, DNS poisoning, rogue wireless APs, rogue switches." },
+{ lesson: "184 - On-Path Attacks", q: "An on-path attacker tricks a browser into using plain HTTP instead of HTTPS so traffic can be read. This is:", options: ["A downgrade attack", "SSL stripping", "DNS tunneling", "A replay attack"], answer: 1, why: "SSL stripping downgrades the connection from HTTPS to HTTP, exposing plaintext. A downgrade attack instead negotiates a weaker-but-compatible encryption (e.g., SSL 2.0 instead of TLS 1.3)." },
+{ lesson: "185 - Injection Attacks", q: "Entering a wildcard (*) into a login field of an LDAP-backed application dumps all user accounts. This is:", options: ["An SQL injection", "An LDAP injection", "A command injection", "An XXE attack"], answer: 1, why: "LDAP injection fabricates directory search statements from user input, e.g., a * wildcard returning every user. Prevention: input validation and sanitization." },
+{ lesson: "185 - Injection Attacks", q: "A web form pings a user-supplied host. An attacker enters host.com && hostname and the server also runs hostname. This is:", options: ["A replay attack", "A command injection", "An on-path attack", "A zone transfer"], answer: 1, why: "Command injection appends arbitrary shell commands to a legitimate command via a vulnerable app. Validate input — only allow the expected format." },
+{ lesson: "185 - Injection Attacks", q: "Process injection's biggest advantage to an attacker is that it:", options: ["Encrypts the payload", "Runs code under a legitimate live process, inheriting its resources/privileges and evading detection", "Disables logging permanently", "Requires no vulnerability"], answer: 1, why: "Injecting into another process (DLL injection, process hollowing, doppelganging, APCs) masks execution under a trusted process and may inherit elevated privileges." },
+{ lesson: "186 - Indicators of Compromise (IoC)", q: "An account logs in from New York and then London 30 minutes later. Which IoC is this?", options: ["Impossible travel", "A fork bomb", "SSL stripping", "Horizontal escalation"], answer: 0, why: "Impossible travel = logins from geographically distant locations within a timeframe physical travel cannot bridge — a strong compromise indicator." },
+{ lesson: "186 - Indicators of Compromise (IoC)", q: "A workstation shows 90% GPU usage while the user is only browsing the web. What is the most likely IoC?", options: ["The user is multitasking", "The machine is a crypto-mining zombie", "DNS cache poisoning", "A SYN flood"], answer: 1, why: "Abnormal resource consumption (CPU/memory/bandwidth/GPU spikes) can indicate malware, DDoS participation, or crypto-mining." },
+{ lesson: "186 - Indicators of Compromise (IoC)", q: "Log entries show administrative activity every night at 3:00 AM when the office is closed. This IoC is called:", options: ["Out-of-cycle logging", "Missing logs", "Impossible travel", "Blocked content"], answer: 0, why: "Out-of-cycle logging = activity at unusual times (nights/weekends), suggesting attackers hiding in off-hours. Missing logs/gaps suggest tampering to cover tracks." },
+{ lesson: "186 - Indicators of Compromise (IoC)", q: "A user suddenly cannot open any files and finds a ransom note. Which IoC and attack does this indicate?", options: ["Resource inaccessibility — ransomware", "Account lockout — brute force", "Concurrent sessions — credential sharing", "Blocked content — DLP"], answer: 0, why: "Resource inaccessibility (files/databases suddenly unreachable) with a ransom note is the classic ransomware IoC." },
+{ lesson: "186 - Indicators of Compromise (IoC)", q: "A system log has a gap of two days with no entries at all. What does this suggest?", options: ["Routine log rotation", "Missing logs — an attacker may have deleted them to cover their tracks", "The server was off", "A DNS amplification attack"], answer: 1, why: "Missing logs or gaps indicate tampering; attackers delete logs to frustrate investigation. Verify against other sources before concluding a breach." },
+{ lesson: "186 - Indicators of Compromise (IoC)", q: "Which statement about indicators of compromise is TRUE?", options: ["Any IoC proves a breach occurred", "IoCs are hints that require investigation — they can be false positives from errors or legitimate activity", "IoCs only appear after an attack ends", "IoCs are only found in DNS logs"], answer: 1, why: "IoCs are clues, not proof. Analysts spend much of their time in event logs deciding whether an indicator is a true compromise or a false positive." }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Awareness Quiz · SY0-701 (Section 27)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+<style id="iphone-optimizations">
+/* iPhone / touch optimizations */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: rgba(88,166,255,.25); }
+button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-size: 16px; }
+.q-text, .screen p { overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .container, .wrap { padding-left: 12px; padding-right: 12px; }
+  .screen { padding: 24px 16px; }
+  .exam-facts { flex-wrap: wrap; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 27</div>
+    <h1>Security Awareness — Practice Quiz</h1>
+    <p>34 questions drawn from the Section 27 lecture on insider threats, password management, social engineering countermeasures, policies and handbooks, remote work, and building a culture of security. Pick an answer to see the explanation.</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+{ lesson: "256 - Security Awareness", q: "Security awareness is best defined as:", options: ["Installing antivirus software", "Knowledge and understanding of potential security threats and the measures to mitigate them", "A firewall feature", "A hiring process"], answer: 1, why: "Awareness = people knowing threats and how to respond — the human layer of defense." },
+{ lesson: "256 - Security Awareness", q: "The course states that one of the most significant vulnerabilities in enterprise networks remains:", options: ["Firewalls", "Human error", "Encryption", "Cloud computing"], answer: 1, why: "Technical defenses are vital, but human error is a top vulnerability — hence awareness training." },
+{ lesson: "257 - Recognizing Insider Threats", q: "An insider threat can originate from all of the following EXCEPT:", options: ["Current employees", "Former employees and contractors", "Business partners", "Random external hackers with no inside knowledge"], answer: 3, why: "Insiders are people with inside knowledge: employees (past/present), contractors, partners." },
+{ lesson: "257 - Recognizing Insider Threats", q: "Which is an example of a lifestyle incongruence red flag?", options: ["An $80K sysadmin driving a $150K sports car and living in a $2M home", "An employee bringing lunch from home", "Someone working overtime", "A worker using a company laptop"], answer: 0, why: "Spending far beyond known income may indicate illicit income — verify discreetly (could be a spouse's income or reported windfall)." },
+{ lesson: "257 - Recognizing Insider Threats", q: "Financial disclosure forms for clearance holders establish:", options: ["A normal financial baseline so unexpected windfalls or spending can be evaluated", "Credit scores for loans", "Tax rates", "Salary bands"], answer: 0, why: "A baseline lets investigators distinguish legitimate windfalls (inheritance, lottery — which must be reported) from suspicious income." },
+{ lesson: "257 - Recognizing Insider Threats", q: "An employee drowning in debt is a security concern mainly because:", options: ["They ask for raises", "Financial pressure can make them susceptible to bribery or selling secrets to competitors", "They work slower", "They use more sick days"], answer: 1, why: "Financial stress = coercion vulnerability; policies may offer financial counseling plus data-access monitoring." },
+{ lesson: "257 - Recognizing Insider Threats", q: "Repeatedly showing up to work in an altered state (drunk/hungover) is a concern because it:", options: ["Is against dress code", "Signals possible personal problems, impaired judgment, and heightened coercion risk", "Saves coffee money", "Improves morale"], answer: 1, why: "Substance issues correlate with poor decisions and vulnerability to nation-state recruitment — clearance holders get flagged." },
+{ lesson: "257 - Recognizing Insider Threats", q: "An employee giving away personal possessions and showing depression should be engaged:", options: ["By firing them immediately", "By management/HR with empathy and support, since distress reduces vigilance and increases exploitability", "By ignoring them", "By public shaming"], answer: 1, why: "Emotional distress → unintentional breaches + exploitation risk. Respond with support, not punishment." },
+{ lesson: "257 - Recognizing Insider Threats", q: "User activity monitoring for insider threats looks for all of the following EXCEPT:", options: ["Unusual access patterns", "Extensive copying or downloading of sensitive data", "Working odd hours", "An employee's favorite pizza toppings"], answer: 3, why: "Monitoring targets data-access anomalies — balanced against employee privacy rights." },
+{ lesson: "258 - Password Management", q: "The biggest danger of reusing passwords across websites is:", options: ["Forgetting them", "One breached site exposes every account sharing that password — and usernames (your email) are usually identical everywhere", "They expire faster", "Browsers reject them"], answer: 1, why: "Breach credentials get replayed across sites (Yahoo/Target-style); reuse = one breach, total compromise." },
+{ lesson: "258 - Password Management", q: "Why does the instructor prefer standalone third-party password managers over browser built-ins?", options: ["They are free of typing", "They are more secure than managers built into browsers", "They block ads", "They speed up the internet"], answer: 1, why: "Browser-integrated managers are convenient but less secure; dedicated tools (Bitwarden, 1Password, Dashlane, LastPass) are preferred." },
+{ lesson: "258 - Password Management", q: "In a password manager, the master password is critical because it:", options: ["Is shared with the company", "Encrypts the entire vault — lose it and all stored passwords are gone", "Expires monthly", "Unlocks the browser only"], answer: 1, why: "The master password is the encryption key; you memorize only this one — everything else is stored." },
+{ lesson: "258 - Password Management", q: "A strong generated password per the Bitwarden demo was at least:", options: ["4 characters", "14 characters with upper/lowercase, numbers, and special characters", "Your birthday", "The word 'password'"], answer: 1, why: "The demo generated 14+ char random passwords (or passphrases) per site — unique and unmemorizable, which is fine." },
+{ lesson: "259 - Avoiding Social Engineering", q: "Situational awareness means:", options: ["Knowing the Wi-Fi password", "Mindfulness of your surroundings, the actions you're asked to perform, and their potential negative consequences", "Memorizing the employee handbook", "Watching security cameras"], answer: 1, why: "Awareness of environment + actions + consequences is the first line of defense against social engineering." },
+{ lesson: "259 - Avoiding Social Engineering", q: "The best defense against shoulder surfing includes:", options: ["Larger monitors", "Privacy screen protectors and avoiding confidential work in public spaces", "Brighter screens", "Talking louder"], answer: 1, why: "Shoulder surfers read your screen over your shoulder — privacy filters and location discipline defeat them." },
+{ lesson: "259 - Avoiding Social Engineering", q: "Eavesdropping defenses include:", options: ["Holding sensitive talks only in secure/soundproofed areas and being wary of smart devices that could record", "Speaking in code words", "Using speakerphones", "Avoiding email"], answer: 0, why: "Smartphones/watches can be hijacked to record — control WHERE and around WHAT devices sensitive talks happen." },
+{ lesson: "259 - Avoiding Social Engineering", q: "Piggybacking/tailgating is best prevented by:", options: ["Faster walking", "Access control vestibules allowing one person at a time plus employee awareness at entry points", "Bigger signs", "Removing badges"], answer: 1, why: "Vestibules (mantraps) physically enforce single-person entry; awareness stops polite door-holding for strangers." },
+{ lesson: "259 - Avoiding Social Engineering", q: "A USB drive found in the parking lot is best handled by:", options: ["Plugging it in to find the owner", "Not connecting it to any computer — it's a classic baiting trap", "Giving it to a friend", "Formatting it first"], answer: 1, why: "Baiting: attackers plant malware-laden USBs hoping curiosity wins. Never plug found media in." },
+{ lesson: "259 - Avoiding Social Engineering", q: "Malicious charging cables in public areas (airports, coffee shops) threaten users via:", options: ["Slow charging", "Malware in the cable firmware that infects connected phones", "Overpriced electricity", "Bad colors"], answer: 1, why: "Baiting evolved from USB drops to rigged cables — carry your own cable and charger." },
+{ lesson: "259 - Avoiding Social Engineering", q: "OPSEC (operational security) in a business context primarily means:", options: ["Guarding the office perimeter", "Safeguarding routine details and sensitive data that adversaries could piece together into an attack narrative", "Encrypting only financial data", "Hiring guards"], answer: 1, why: "Military-origin concept: innocuous fragments (schedule, deals, social posts) assemble into exploitation leverage." },
+{ lesson: "259 - Avoiding Social Engineering", q: "A caller claiming to be IT support demands immediate information to avoid 'legal consequences.' This pressure tactic aims to:", options: ["Verify your identity properly", "Make you act quickly and bypass normal security procedures", "Test the phone system", "Offer a promotion"], answer: 1, why: "Urgency/fear bypasses careful thinking — vishing 101. Verify through official channels instead." },
+{ lesson: "259 - Avoiding Social Engineering", q: "The course recommends testing employees with simulated phishing attacks primarily to:", options: ["Punish clickers", "Identify who needs remedial training so they don't fall for real attacks", "Fill audit logs", "Slow down email"], answer: 1, why: "Simulations + remediation close the human gap proactively rather than reactively." },
+{ lesson: "260 - Policy and Handbooks", q: "A policy differs from a handbook in that a policy is:", options: ["A set of principles/rules guiding decisions and ensuring compliance, while a handbook is a comprehensive reference guide", "Longer than a handbook", "Always secret", "Only for IT"], answer: 0, why: "Policy = rules for decisions; handbook = detailed procedures/best-practice reference (e.g. employee handbook)." },
+{ lesson: "260 - Policy and Handbooks", q: "An organization prints sensitive documents only on pink paper, which must be cross-cut shredded. This is an example of:", options: ["A data destruction policy defeating dumpster diving", "A dress code", "A remote access policy", "A password policy"], answer: 0, why: "Color-coding + mandated shredding = policy-level defense against dumpster diving." },
+{ lesson: "260 - Policy and Handbooks", q: "Policies and handbooks should be reviewed at least:", options: ["Every five years", "Once per year", "Only after a breach", "Never"], answer: 1, why: "Cybersecurity evolves — annual reviews with a one-page summary of significant changes for staff." },
+{ lesson: "260 - Policy and Handbooks", q: "Training employees on the WHY behind policies matters most because:", options: ["It shortens the documents", "They may face situations the policy doesn't cover and must make sound judgment calls", "It reduces printing", "It pleases auditors only"], answer: 1, why: "Policies are guides, not guardrails — understanding principles enables good decisions on novel situations." },
+{ lesson: "261 - Remote and Hybrid Work Environments", q: "Remote work differs from hybrid work in that hybrid:", options: ["Is fully office-based", "Blends traditional in-office work with remote work", "Requires no internet", "Is only for contractors"], answer: 1, why: "Remote = outside the office entirely; hybrid = part office, part remote." },
+{ lesson: "261 - Remote and Hybrid Work Environments", q: "The FIRST-line technical control for protecting data in transit from remote workers is:", options: ["A VPN providing encrypted end-to-end connections", "A bigger monitor", "Paper records", "Public Wi-Fi with a firewall name"], answer: 0, why: "VPNs shield traffic on untrusted home/public networks from interception and modification." },
+{ lesson: "261 - Remote and Hybrid Work Environments", q: "MFA for remote workers primarily protects against:", options: ["Ransomware", "Unauthorized access when login credentials are compromised", "Power outages", "Spam"], answer: 1, why: "Extra verification factors stop attackers even with valid credentials." },
+{ lesson: "261 - Remote and Hybrid Work Environments", q: "BYOD complicates remote-work security chiefly because:", options: ["Personal devices are faster", "The organization doesn't own the device and can't enforce software installs without employee consent", "They have no cameras", "They are immune to malware"], answer: 1, why: "Ownership limits control — vs company-issued, CYOD, or COPE models where the org dictates security tooling." },
+{ lesson: "261 - Remote and Hybrid Work Environments", q: "Selection criteria for remote collaboration tools should include:", options: ["End-to-end encryption, robust admin controls, and compliance with international security standards", "Fun emojis only", "The cheapest option", "No admin controls"], answer: 0, why: "Secure collaboration demands encryption, administration, and standards compliance." },
+{ lesson: "262 - Creating a Culture of Security", q: "Organizational change management for security culture should begin:", options: ["With the newest interns", "At the top, with executive leadership demonstrating commitment", "With the IT help desk", "After the first breach"], answer: 1, why: "Leaders set the tone — security as shared corporate responsibility, not a mandated directive." },
+{ lesson: "262 - Creating a Culture of Security", q: "A culture where staff fear being blamed for reporting incidents is:", options: ["Ideal", "Counterproductive — a no-blame environment that values reporting is the goal", "Required by law", "More secure"], answer: 1, why: "Blame suppresses reporting; encouragement + feedback loops surface issues early." },
+{ lesson: "262 - Creating a Culture of Security", q: "Feedback loops in a security culture ensure:", options: ["Silence between teams", "Insights from monitoring and reporting directly shape future actions — continuous learning", "Annual parties", "Fewer meetings"], answer: 1, why: "Learn-and-adapt cycles keep the program effective against evolving threats." }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+</body>
+</html>

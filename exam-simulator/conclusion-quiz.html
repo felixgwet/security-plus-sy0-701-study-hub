@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conclusion Quiz · SY0-701 (Section 29)</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .container { width: 100%; max-width: 760px; }
+
+  /* ---------- Start / Result screens ---------- */
+  .screen {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .screen h1 { font-size: 26px; margin-bottom: 12px; }
+  .screen p { color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,166,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 36px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    margin-left: 10px;
+  }
+  .score-big { font-size: 56px; font-weight: 700; margin: 12px 0 4px; }
+  .score-msg { font-size: 17px; margin-bottom: 6px; }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .3s ease;
+  }
+  .q-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .q-lesson {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .q-text { font-size: 19px; line-height: 1.5; margin-bottom: 22px; }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option:disabled { cursor: default; opacity: .85; }
+  .option.correct { border-color: var(--green); background: rgba(63,185,80,.12); opacity: 1; }
+  .option.wrong { border-color: var(--red); background: rgba(248,81,73,.12); opacity: 1; }
+  .option .letter {
+    display: inline-block;
+    width: 24px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .feedback {
+    display: none;
+    margin-top: 18px;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: rgba(63,185,80,.1); border: 1px solid rgba(63,185,80,.4); }
+  .feedback.no { background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.4); }
+  .feedback strong { display: block; margin-bottom: 4px; }
+  .next-btn { display: none; margin-top: 20px; width: 100%; }
+  .next-btn.show { display: block; }
+
+  /* ---------- Review list ---------- */
+  .review { text-align: left; margin-top: 28px; }
+  .review h2 { font-size: 17px; margin-bottom: 14px; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .review-item .q { margin-bottom: 6px; line-height: 1.5; }
+  .review-item .a { color: var(--muted); }
+  .review-item .a .ok { color: var(--green); font-weight: 600; }
+  .review-item .a .bad { color: var(--red); font-weight: 600; }
+  .hidden { display: none !important; }
+</style>
+<style id="iphone-optimizations">
+/* iPhone / touch optimizations */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: rgba(88,166,255,.25); }
+button, .btn, .opt, .pal-btn, input, select, textarea { min-height: 44px; font-size: 16px; }
+.q-text, .screen p { overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  .container, .wrap { padding-left: 12px; padding-right: 12px; }
+  .screen { padding: 24px 16px; }
+  .exam-facts { flex-wrap: wrap; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen" class="screen">
+    <div class="badge">CompTIA Security+ SY0-701 · Section 29</div>
+    <h1>Conclusion — Practice Quiz</h1>
+    <p>20 questions on where to go after Security+: the certification ladder (CySA+, PenTest+, CASP+/SecurityX), Linux and process-framework complements, CEU renewal, and turning the cert into a first security role. Pick an answer to see why.</p>
+    <p>You'll get instant feedback with an explanation after each question.</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="quiz-top">
+      <span id="q-counter">Question 1 of 40</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+    <div class="q-card">
+      <div class="q-lesson" id="q-lesson"></div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen" class="screen hidden">
+    <div class="badge">Quiz Complete</div>
+    <div class="score-big" id="final-score"></div>
+    <div class="score-msg" id="final-msg"></div>
+    <div>
+      <button class="btn" onclick="startQuiz()">Retake Quiz</button>
+      <button class="btn secondary" onclick="toggleReview()" id="review-btn">Review Answers</button>
+    </div>
+    <div class="review hidden" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+// Quiz - Section 29 Conclusion
+const QUESTIONS = [
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "What is the most direct next certification after Security+ for someone who wants to focus on defense, detection, and SIEM work?",
+  options: ["PenTest+", "CySA+", "A+", "PRINCE2"],
+  answer: 1,
+  why: "CySA+ (Cybersecurity Analyst) is the defense-side continuation: detection, analysis, and response. PenTest+ is the offense-side option." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "Which certification targets authorized penetration testing and exploitation?",
+  options: ["CySA+", "PenTest+", "ITIL 4", "Network+"],
+  answer: 1,
+  why: "PenTest+ is the offensive counterpart to CySA+: hands-on pentesting methodology and reporting." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "CASP+ (now SecurityX) is best described as:",
+  options: ["An entry-level helpdesk cert", "The advanced, vendor-neutral, hands-on pinnacle of the CompTIA security ladder for experienced practitioners", "A project management cert", "A Linux administration cert"],
+  answer: 1,
+  why: "CASP+/SecurityX is the advanced practitioner cert — practical, performance-based, and aimed at experienced security professionals, not beginners." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "Which foundational cert would most fill networking gaps that make Security+ material easier?",
+  options: ["A+", "Network+", "PRINCE2", "ITIL 4"],
+  answer: 1,
+  why: "Network+ covers the TCP/IP, subnetting, and protocol knowledge that underpins Security Architecture and Security Operations domains." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "Why is Linux knowledge (e.g., LPI Linux Essentials) recommended alongside security certifications?",
+  options: ["It is required to book the Security+ exam", "Most security tooling runs on Linux, and employers expect comfort with it", "It replaces the need for Security+", "It is only for developers"],
+  answer: 1,
+  why: "Security tools — scanners, SIEMs, exploitation frameworks — predominantly run on Linux. Comfort with the shell is a daily-job skill." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "ITIL 4 and PRINCE2 are most useful for someone aiming at which kind of security role?",
+  options: ["SOC analyst", "GRC and security governance/process-heavy roles, or leading security projects", "Malware reverse engineer", "Penetration tester"],
+  answer: 1,
+  why: "ITIL (service management) and PRINCE2 (project management) are process frameworks — they serve governance, compliance, and project-leadership career paths." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "How long is a CompTIA Security+ certification valid before renewal is required?",
+  options: ["1 year", "3 years", "5 years", "Lifetime"],
+  answer: 1,
+  why: "CompTIA certs are valid for 3 years, renewable by earning CEUs or passing a higher-level certification." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "Which activity RENEWS a Security+ certification automatically?",
+  options: ["Attending one webinar", "Passing a higher-level CompTIA certification such as CySA+", "Reading the exam objectives", "Joining a study group"],
+  answer: 1,
+  why: "Earning a higher-level CompTIA cert automatically renews lower certs — the highest-value CE path available." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "CEU stands for:",
+  options: ["Certified Exam Upgrade", "Continuing Education Unit", "Cybersecurity Employment Update", "CompTIA Evaluation Utility"],
+  answer: 1,
+  why: "CEUs are Continuing Education Units — the currency of CompTIA's renewal program, earned through approved training, conferences, publishing, and certifications." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "Which is a typical FIRST job role for a new Security+ holder?",
+  options: ["CISO", "SOC analyst / security analyst", "Chief Architect", "Incident Commander at a Fortune 500"],
+  answer: 1,
+  why: "Entry-level security roles — SOC analyst, security analyst, junior pen tester, GRC analyst — are the realistic first step; leadership roles come with experience." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "Why is Security+ specifically valued for U.S. government and defense contractor jobs?",
+  options: ["It is free for federal employees", "It satisfies the DoD 8570/8140 baseline requirement that appears in most entry-level cyber job postings", "It includes a security clearance", "It is required by law to be listed first on resumes"],
+  answer: 1,
+  why: "Security+ is the DoD 8570/8140-approved baseline certification, which is why it dominates entry-level cybersecurity job requirements." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "Which activity best converts a fresh certification into job offers?",
+  options: ["Adding it to LinkedIn only", "Hands-on practice: home labs, CTFs, and current security-events knowledge", "Printing the certificate", "Waiting for recruiters"],
+  answer: 1,
+  why: "Certifications get interviews; demonstrated skill gets offers. Labs and CTFs prove you can do the work, not just recognize it." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "A CTF is:",
+  options: ["A certification renewal form", "Capture The Flag — hands-on security competitions that build practical offensive and defensive skills", "A type of firewall", "A compliance framework"],
+  answer: 1,
+  why: "CTFs are practical security competitions — one of the best ways to build the hands-on skills employers test in interviews." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "Which pairing of cert → focus area is correct?",
+  options: ["CySA+ → project management", "PenTest+ → offensive security testing", "ITIL 4 → hardware repair", "A+ → penetration testing"],
+  answer: 1,
+  why: "PenTest+ = offensive testing; CySA+ = defense/analysis; ITIL = service management; A+ = hardware/helpdesk fundamentals." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "For CEU earning, which of these typically counts toward renewal?",
+  options: ["Approved training, webinars, and conferences", "Watching movies", "Sleeping 8 hours", "Reading fiction"],
+  answer: 0,
+  why: "CompTIA accepts approved training, conferences, webinars, publishing, teaching, and higher certifications as CEU-earning activities." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "What is the strategic reason to plan your CE path early rather than at the deadline?",
+  options: ["CEUs are cheaper in January", "The next certification (e.g., CySA+) is usually the highest-value renewal move and takes months to earn", "CompTIA offers discounts to planners", "There is no reason"],
+  answer: 1,
+  why: "Earning a higher cert both advances your career AND renews Security+ — but it takes real study time. Starting at the deadline means panic or lapse." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "Which statement about the certification journey is BEST advice?",
+  options: ["Stop after Security+ — it covers everything", "Security+ is the baseline; stack follow-on skills (CySA+/PenTest+, Linux, process frameworks) in the direction of your target role", "Collect every certification available", "Certifications do not matter"],
+  answer: 1,
+  why: "Security+ opens the door; deliberate follow-on study aimed at a target role (defense, offense, or governance) turns it into a career." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "Which role sits on the OFFENSE side of security work?",
+  options: ["SOC analyst", "GRC analyst", "Penetration tester", "Security auditor"],
+  answer: 2,
+  why: "Penetration testers attack systems with authorization to find weaknesses; SOC analysts, auditors, and GRC roles sit on defense/oversight." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "The instructor's final message is best summarized as:",
+  options: ["You are done learning", "Keep studying, keep certifying upward, and keep building toward the next step in your career", "Only buy more courses", "Skip the exam"],
+  answer: 1,
+  why: "The conclusion's theme: certification is a ladder. Security+ is a milestone, not a finish line." },
+{ lesson: "Lesson 265 · Where Do I Go From Here?",
+  q: "Which combination would best prepare someone for a junior SOC analyst role?",
+  options: ["Security+ plus Linux familiarity plus hands-on SIEM/lab practice", "A+ only", "PRINCE2 only", "No certs, just a resume"],
+  answer: 0,
+  why: "Security+ provides the baseline; Linux and hands-on SIEM/lab work provide the practical skills a SOC screens for." }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  results = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('review').classList.add('hidden');
+  document.getElementById('review-btn').textContent = 'Review Answers';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-counter').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('progress').style.width = `${(current / QUESTIONS.length) * 100}%`;
+  document.getElementById('q-lesson').textContent = q.lesson;
+  document.getElementById('q-text').textContent = q.q;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  document.getElementById('next-btn').className = 'btn next-btn';
+  document.getElementById('next-btn').textContent =
+    current === QUESTIONS.length - 1 ? 'See Results' : 'Next Question';
+}
+
+function selectAnswer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('#q-options .option');
+  buttons.forEach(b => b.disabled = true);
+
+  const correct = i === q.answer;
+  if (correct) { score++; btn.classList.add('correct'); }
+  else { btn.classList.add('wrong'); buttons[q.answer].classList.add('correct'); }
+
+  results.push({ q: q.q, chosen: q.options[i], correct: q.options[q.answer], ok: correct, why: q.why, lesson: q.lesson });
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.innerHTML = `<strong>${correct ? '✔ Correct!' : '✘ Not quite.'}</strong>${q.why}`;
+  document.getElementById('q-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUESTIONS.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  document.getElementById('progress').style.width = '100%';
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS.length}`;
+  let msg;
+  if (pct >= 90) msg = 'Excellent — exam-ready on this section. 🎉';
+  else if (pct >= 75) msg = 'Strong work — review the missed topics below.';
+  else if (pct >= 60) msg = 'Getting there — rewatch the lessons you missed.';
+  else msg = 'Time for another pass through the videos — you\'ve got this.';
+  document.getElementById('final-msg').textContent = `${pct}% · ${msg}`;
+
+  const review = document.getElementById('review');
+  review.innerHTML = '<h2>Answer Review</h2>';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="q">${r.ok ? '✅' : '❌'} <em>${r.lesson}</em><br>${r.q}</div>
+      <div class="a">Your answer: <span class="${r.ok ? 'ok' : 'bad'}">${r.chosen}</span>${r.ok ? '' : `<br>Correct answer: <span class="ok">${r.correct}</span>`}<br>${r.why}</div>`;
+    review.appendChild(div);
+  });
+}
+
+function toggleReview() {
+  const review = document.getElementById('review');
+  const btn = document.getElementById('review-btn');
+  review.classList.toggle('hidden');
+  btn.textContent = review.classList.contains('hidden') ? 'Review Answers' : 'Hide Review';
+}
+</script>
+</body>
+</html>
