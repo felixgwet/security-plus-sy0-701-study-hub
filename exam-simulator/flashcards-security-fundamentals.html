@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Fundamentals — Flashcards</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .stats { display: flex; gap: 10px; flex-wrap: wrap; margin: 6px 0 14px; }
+  .stat { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px 18px; text-align: center; flex: 1; min-width: 74px; }
+  .stat b { display: block; font-size: 20px; }
+  .stat span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .controls { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; font-size: 14px; color: var(--muted); }
+  .chk { display: flex; align-items: center; gap: 6px; cursor: pointer; min-height: 32px; }
+  .chk input { width: 18px; height: 18px; accent-color: var(--accent); }
+  .deck { perspective: 1200px; }
+  .card { position: relative; width: 100%; min-height: 300px; cursor: pointer; transform-style: preserve-3d; transition: transform .45s; outline: none; }
+  .card.flipped { transform: rotateY(180deg); }
+  .card-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 22px; display: flex; flex-direction: column; }
+  .card-front { border-top: 3px solid var(--accent); }
+  .card-back { transform: rotateY(180deg); border-top: 3px solid var(--green); }
+  .face-tag { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 10px; }
+  .card-text { font-size: 16.5px; line-height: 1.6; flex: 1; overflow-y: auto; }
+  .card-back .card-text { color: var(--green); font-weight: 600; }
+  .why { font-size: 13.5px; color: var(--muted); line-height: 1.55; border-top: 1px solid var(--border); margin-top: 12px; padding-top: 10px; max-height: 130px; overflow-y: auto; }
+  .why:empty { display: none; }
+  .flip-hint { font-size: 11px; color: #6e7681; text-align: center; margin-top: 10px; }
+  .grade { display: flex; gap: 12px; margin-top: 16px; }
+  .grade .btn { flex: 1; margin: 0; padding: 14px; font-size: 15px; }
+  .g-learn { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+  .g-know { background: transparent; border: 1px solid var(--green); color: var(--green); }
+  .g-learn:hover { background: rgba(210,153,34,.12); filter: none; }
+  .g-know:hover { background: rgba(63,185,80,.12); filter: none; }
+  .deckdone { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 36px 22px; text-align: center; }
+  .score-big { font-size: 56px; font-weight: 700; color: var(--green); margin: 6px 0; }
+  @media (max-width: 600px) { .card { min-height: 340px; } .card-text { font-size: 15.5px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../flashcards.html">&larr; All decks</a>
+    <span class="grow"></span>
+    <select id="deckSel" style="display:none;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;">
+      <option value="0">Security Fundamentals (27 cards)</option>
+    </select>
+  </div>
+  <h1>Security Fundamentals — Flashcards</h1>
+  <p class="sub">Tap the card to flip it, then grade yourself honestly &mdash; the deck remembers what you know and will prioritize your weak cards.</p>
+  <div class="stats">
+    <div class="stat"><b id="stTotal">0</b><span>cards</span></div>
+    <div class="stat"><b id="stKnown" style="color:var(--green)">0</b><span>known</span></div>
+    <div class="stat"><b id="stLearn" style="color:var(--gold)">0</b><span>learning</span></div>
+    <div class="stat"><b id="stPos">0/0</b><span>position</span></div>
+  </div>
+  <div class="controls">
+    <label class="chk"><input type="checkbox" id="shuffle"> Shuffle</label>
+    <label class="chk"><input type="checkbox" id="weakOnly"> Weak cards only</label>
+    <button class="btn ghost" id="restart" style="margin:0;padding:8px 16px;font-size:13px;">Restart deck</button>
+  </div>
+  <div class="deck" id="deck" style="display:none;">
+    <div class="card" id="card" tabindex="0" role="button" aria-label="flashcard — tap to flip">
+      <div class="card-face card-front"><span class="face-tag">Question</span><div class="card-text" id="front"></div><span class="flip-hint">tap to flip</span></div>
+      <div class="card-face card-back"><span class="face-tag">Answer</span><div class="card-text" id="back"></div><div class="why" id="why"></div><span class="flip-hint">tap to flip back</span></div>
+    </div>
+    <div class="grade">
+      <button class="btn g-learn" id="btnLearn">Still learning</button>
+      <button class="btn g-know" id="btnKnow">Know it</button>
+    </div>
+  </div>
+  <div class="deckdone" id="deckDone" style="display:none;">
+    <div class="score-big" id="donePct"></div>
+    <p class="sub" id="doneMsg" style="text-align:center;"></p>
+    <div style="text-align:center;"><button class="btn" id="again">Go again</button></div>
+  </div>
+  <script>
+    var DECKS = [{"label":"Security Fundamentals","cards":[{"id":"1vl8z7o","q":"Throughout the course, the instructor returns to one 'delicate balance' that security professionals constantly manage. What is it?","a":"Security vs. usability (convenience)","why":"People want things easy and convenient; as convenience increases, the security posture loosens. Tighten security too much and users find ways around it. The sweet spot is convenient for users but hard for threat actors.","multi":false},{"id":"1hg68s7","q":"Your colleague says her team is responsible for protecting the servers, network devices, and smartphones that hold company data. Which term describes this focus?","a":"Information system security","why":"Information system security protects the systems that hold and process critical data (computers, servers, network devices, smartphones). Information security, by contrast, is about protecting the data itself.","multi":false},{"id":"h0o274","q":"The CIA triad has grown into 'CIANA' — described as a pentagon rather than a triad. Which two elements were added?","a":"Non-repudiation and authentication","why":"In recent years the classic Confidentiality-Integrity-Availability triad gained an N and an A: Non-repudiation and Authentication, giving five pillars — C.I.A.N.A.","multi":false},{"id":"u5eucj","q":"Which statement about threats and vulnerabilities is TRUE?","a":"Risk exists where a threat and a matching vulnerability intersect","why":"Risk lies where threats and vulnerabilities intersect. A threat with no matching vulnerability = no risk, and a vulnerability with no matching threat = no risk. Vulnerabilities are internal weaknesses we can control; threats (like natural disasters or attackers) are largely external.","multi":false},{"id":"15dpcub","q":"A company decides to buy cyber insurance instead of fixing every weakness in its legacy systems. Which risk management option is this?","a":"Transfer","why":"The four ways to handle risk are mitigate, transfer, avoid, or accept. Shifting the financial impact to an insurance company is risk transfer.","multi":false},{"id":"7ckgd7","q":"A support agent's screen shows a customer's credit card as **** **** **** 4821 — the first 12 digits are hidden but the record stays usable. Which confidentiality method is this?","a":"Data masking","why":"Data masking obscures specific data within a database so it's inaccessible to unauthorized users while retaining the real data's authenticity for authorized users — e.g., showing only the last 4 of 16 card digits.","multi":false},{"id":"nbrkue","q":"The instructor wants you to mentally link confidentiality with one method above all others. Which one?","a":"Encryption","why":"When you hear confidentiality, think 'protecting data from being seen by unauthorized users' — most commonly achieved with encryption. (Hashing and checksums belong to integrity; redundancy to availability.)","multi":false},{"id":"hiyjoj","q":"A hash digest is best described as which of the following for a piece of data?","a":"A digital fingerprint","why":"Hashing converts data into a fixed-size value; even a tiny change produces a dramatically different hash. The result — the hash digest — acts like a digital fingerprint proving integrity.","multi":false},{"id":"rfg7il","q":"To digitally sign a file, what happens to the file's hash digest?","a":"It is encrypted with the user's private key","why":"Digital signatures use encryption to ensure integrity and authenticity: the file is hashed, then the hash digest is encrypted with the user's private key. Any alteration changes the hash and invalidates the signature.","multi":false},{"id":"11l2j4q","q":"Your provider advertises 'three nines' of availability. What does that allow in a 365-day year?","a":"About 8.76 hours of downtime","why":"Three nines = 99.9% uptime. With 8,760 hours in a year, that permits up to 8.76 hours of downtime. (Five nines — the gold standard — allows only ~5.26 minutes, while 99% allows over 3.5 days.)","multi":false},{"id":"1ky15zh","q":"An office has a microwave link, a cable modem, and a cellular modem that automatically take over for each other during outages. This is an example of which redundancy type?","a":"Network redundancy","why":"Network redundancy ensures that if one network path fails, data can still travel another route. (Server redundancy = load balancing/failover servers; data redundancy = multiple storage sites/RAID; power redundancy = generators and UPS systems.)","multi":false},{"id":"p9gqp8","q":"A stockbroker receives a digitally signed email instructing him to sell all shares. Why can the sender not later deny sending it?","a":"Only the sender possesses the private key that created the signature","why":"A digital signature is an encrypted hash digest created with the sender's private key. Since only the sender has that private key, the signature is undeniable proof of origin — non-repudiation.","multi":false},{"id":"1plob8o","q":"In the medieval analogy, a king's signet ring pressed into wax is the historical equivalent of what modern mechanism?","a":"A digital signature","why":"Like a signet ring seal, a digital signature is unique to each user and provides undeniable evidence that a document or transaction is authentic and came from that specific person.","multi":false},{"id":"11alz1m","q":"Unlocking your laptop with a fingerprint reader is which type of authentication factor?","a":"Inherence factor","why":"'Something you are' is the inherence factor — a unique physical or behavioral characteristic, commonly called biometrics (fingerprints, facial recognition).","multi":false},{"id":"1j0j4t4","q":"A door unlocks only when your phone is within 20 feet of the house. Which factor is at work?","a":"Location factor","why":"'Somewhere you are' is the location factor — access is granted based on the user being in a certain geographic location (geofencing).","multi":false},{"id":"1vs9b6y","q":"Password + one-time text message code to your smartphone is considered true multi-factor authentication because…","a":"It combines two different factor types (knowledge + possession)","why":"MFA requires two or more different factor types: something you know (password — knowledge), something you have (phone — possession), something you are (inherence), something you do (action), or somewhere you are (location). Two of the SAME type (e.g., two passwords) is not MFA.","multi":false},{"id":"quqc7b","q":"Which statement best separates authentication from authorization?","a":"Authentication verifies who you are; authorization decides what you're allowed to do","why":"Authentication = verifying identity (e.g., swiping an access card to enter the building). Authorization = determining what that identity may access (which rooms or floors you may enter). The system says: 'Now that I know who you are, here's what you're allowed to do.'","multi":false},{"id":"1ud309j","q":"After a breach, your team uses detailed event logs to reconstruct what happened, how it happened, and how to prevent it. This is an accounting benefit known as…","a":"Forensic analysis","why":"Accounting (logging/monitoring) supports five goals: audit trail, regulatory compliance, forensic analysis, resource optimization, and user accountability. Reconstructing a breach from logs is forensic analysis.","multi":false},{"id":"15jhi0k","q":"Which tool provides real-time analysis of security alerts generated by hardware and software across the organization?","a":"A SIEM system","why":"A SIEM (Security Information and Event Management) system provides real-time analysis of security alerts. Syslog servers aggregate logs, and network analyzers like Wireshark capture traffic — but real-time alert analysis is the SIEM's job.","multi":false},{"id":"dxlqrl","q":"Before migrating to cloud storage, management conducts a risk assessment and updates security policies. Which control category is this?","a":"Managerial (administrative)","why":"Managerial controls cover strategic planning and governance: risk assessments, security policies, training programs, and incident response strategies. Technical = hardware/software (firewalls, antivirus); operational = day-to-day procedures (90-day password changes, backups); physical = tangible measures (locks, guards, cameras).","multi":false},{"id":"1y3k85g","q":"In the instructor's home example, the yard sign warning of surveillance and an alarm system is which control type? (Hint: the sign itself, not the alarm.)","a":"Deterrent","why":"Deterrent controls discourage attackers by making the effort seem less appealing — like warning signs and banners. The sign deters; the alarm/cameras prevent and detect.","multi":false},{"id":"t6l7kt","q":"Your organization's Acceptable Use Policy (AUP), which sets standards for how employees may use company IT assets, is which control type?","a":"Directive","why":"Directive controls guide, inform, or mandate actions and are rooted in policy or documentation. Rule of thumb from the course: if it's a policy, it's a directive control.","multi":false},{"id":"1rb9jxl","q":"A legacy system can't support WPA3, so you run WPA2 plus a VPN from the endpoint to internal servers. The VPN layer is which control type?","a":"Compensating","why":"Compensating controls are alternative measures used when the primary (ideal) control isn't feasible or effective — here, adding a VPN on top of weaker WPA2 to make up for the lack of WPA3.","multi":false},{"id":"4bmcxe","q":"How does the Zero Trust mantra go beyond Reagan's 'Trust but verify'?","a":"'Trust nothing and verify everything'","why":"Zero Trust demands verification for every device, every user, and every transaction within the network regardless of origin — 'Trust nothing and verify everything' — whether the request comes from inside the office or remotely.","multi":false},{"id":"1llhduo","q":"In a Zero Trust architecture, where is the final access grant/deny decision actually executed?","a":"The policy enforcement point","why":"The control plane sets policy (adaptive identity, threat scope reduction, policy-driven access control, secured zones), with the policy engine as the 'rule book' and the policy administrator managing policies. The data plane's policy enforcement point is the gatekeeper that executes the final allow/deny decision.","multi":false},{"id":"14td9xa","q":"Put the gap analysis steps in the correct order.","a":"Define scope → gather data → analyze for gaps → develop a plan","why":"The sequence is: (1) define the scope and desired outcome, (2) gather data on the current state via surveys/interviews, (3) analyze the data to identify where current performance falls short of desired, (4) develop a plan — with goals, objectives, and a timeline — to bridge the gap.","multi":false},{"id":"132t4q0","q":"Weekly vulnerability scans produce more findings than your team can fix at once. Which document outlines the specific remediation measures, resource allocations, and timelines?","a":"A POA&M (Plan of Action and Milestones)","why":"A POA&M (Plan of Action and Milestones) outlines the specific measures to address each vulnerability, allocates resources, and sets timelines — an actionable path from the current state to the desired state identified by the gap analysis.","multi":false}]}];
+    var KEY = 'secplus_cards_v1';
+    var deckIdx = 0, order = [], pos = 0, flipped = false;
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function saveState(s){ localStorage.setItem(KEY, JSON.stringify(s)); }
+    function deck(){ return DECKS[deckIdx]; }
+    function state(){ var s = loadState(); return s[deck().label] || {}; }
+    function setState(st){ var s = loadState(); s[deck().label] = st; saveState(s); }
+    function isWeak(c){ return state()[c.id] !== 'known'; }
+    function buildOrder(){
+      var cards = deck().cards.slice();
+      if (document.getElementById('weakOnly').checked) {
+        cards = cards.filter(isWeak);
+        if (!cards.length) cards = deck().cards.slice();
+      }
+      if (document.getElementById('shuffle').checked) {
+        for (var i = cards.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = cards[i]; cards[i] = cards[j]; cards[j] = t; }
+      } else {
+        cards.sort(function(a, b){ return (state()[a.id] === 'known') - (state()[b.id] === 'known'); });
+      }
+      order = cards; pos = 0;
+    }
+    function paintStats(){
+      var st = state(), k = 0;
+      deck().cards.forEach(function(c){ if (st[c.id] === 'known') k++; });
+      document.getElementById('stTotal').textContent = deck().cards.length;
+      document.getElementById('stKnown').textContent = k;
+      document.getElementById('stLearn').textContent = deck().cards.length - k;
+      document.getElementById('stPos').textContent = order.length ? (pos + 1) + '/' + order.length : '0/0';
+    }
+    function show(){
+      flipped = false;
+      var card = document.getElementById('card');
+      card.classList.remove('flipped');
+      if (pos >= order.length) { finish(); return; }
+      document.getElementById('deck').style.display = '';
+      document.getElementById('deckDone').style.display = 'none';
+      var c = order[pos];
+      document.getElementById('front').textContent = c.q;
+      document.getElementById('back').textContent = c.a;
+      document.getElementById('why').textContent = c.why || '';
+      paintStats();
+    }
+    function finish(){
+      document.getElementById('deck').style.display = 'none';
+      document.getElementById('deckDone').style.display = '';
+      var st = state(), k = 0;
+      deck().cards.forEach(function(c){ if (st[c.id] === 'known') k++; });
+      var pct = deck().cards.length ? Math.round(100 * k / deck().cards.length) : 0;
+      document.getElementById('donePct').textContent = pct + '%';
+      document.getElementById('donePct').style.color = pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--gold)' : 'var(--red)';
+      document.getElementById('doneMsg').textContent = pct >= 80 ? 'Deck mastered — well done. Come back before exam day to keep it fresh.' : pct >= 50 ? 'Good progress. Run "Weak cards only" until this hits 80%.' : 'Keep drilling — mark honestly and the deck will carry you.';
+      paintStats();
+    }
+    function flip(){ flipped = !flipped; document.getElementById('card').classList.toggle('flipped', flipped); }
+    function grade(known){
+      var st = state();
+      st[order[pos].id] = known ? 'known' : 'learning';
+      setState(st);
+      pos++;
+      show();
+    }
+    document.getElementById('card').addEventListener('click', flip);
+    document.getElementById('card').addEventListener('keydown', function(e){ if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flip(); } });
+    document.getElementById('btnKnow').addEventListener('click', function(){ grade(true); });
+    document.getElementById('btnLearn').addEventListener('click', function(){ grade(false); });
+    document.getElementById('shuffle').addEventListener('change', function(){ buildOrder(); show(); });
+    document.getElementById('weakOnly').addEventListener('change', function(){ buildOrder(); show(); });
+    document.getElementById('restart').addEventListener('click', function(){ pos = 0; show(); });
+    document.getElementById('again').addEventListener('click', function(){ buildOrder(); show(); });
+    document.getElementById('deckSel').addEventListener('change', function(){ deckIdx = parseInt(this.value, 10); buildOrder(); show(); });
+    document.addEventListener('keydown', function(e){ if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return; if (e.key === ' ') { e.preventDefault(); flip(); } if (e.key === 'ArrowRight') grade(true); if (e.key === 'ArrowLeft') grade(false); });
+    buildOrder(); show();
+  </script>
+</div>
+</body>
+</html>

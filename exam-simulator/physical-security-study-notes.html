@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 3 · Physical Security — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 3 · Physical Security &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  <div class="banner"><strong>Maps to exam objectives:</strong> 1.2 (compare &amp; contrast types of security controls — the <strong>physical controls</strong> family) and 2.4 (given a scenario, analyze indicators of malicious activity).<br>Physical security shows up on SY0-701 as <strong>definition discrimination</strong> (&quot;Which control stops a vehicle-borne threat?&quot;) and <strong>scenario questions</strong> (&quot;A guard finds a rug thrown over the fence — which brute-force technique is this?&quot;). The single most-tested distinction in this whole section is <strong>piggybacking vs. tailgating</strong> — know it cold.</div>
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><details class="topic" open><summary><span class="t-name">1. Perimeter Controls: Fencing &amp; Bollards (Obj 1.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<h3>Fencing — three purposes</h3>
+<ul class="mdlist"><li><strong>Visual deterrent / boundary</strong> — marks where public space ends and private space begins.</li><li><strong>Physical barrier</strong> — must be climbed, cut, or dug under; slows an intruder down.</li><li><strong>Delay</strong> — buys time for detection and response. Fencing is <strong>adaptable for large perimeters</strong>.</li></ul>
+<h3>Fence countermeasures — match the attack to the defense (classic exam table)</h3>
+<div class="tblwrap"><table><thead><tr><th>Attack against fence</th><th>Countermeasure</th></tr></thead><tbody><tr><td><strong>Climbing</strong></td><td>Taller fence, <strong>electrification</strong>, <strong>barbed wire</strong> at the top</td></tr><tr><td><strong>Cutting</strong></td><td>More <strong>robust materials</strong>, <strong>monitoring</strong> (cameras/sensors/guards)</td></tr><tr><td><strong>Digging under</strong></td><td><strong>Underground portion</strong> of the fence or <strong>buried mesh</strong></td></tr></tbody></table></div>
+<h3>Bollards</h3>
+<ul class="mdlist"><li><strong>Definition:</strong> short, sturdy vertical posts (steel or concrete) that control <strong>vehicle</strong> access.</li><li><strong>Why they exist:</strong> post-9/11 <strong>anti-terrorism</strong> measure — keep vehicle bombs (IEDs) outside the <strong>blast radius</strong> of a building; also stop <strong>ram raiding</strong> (smashing through storefronts to steal).</li><li>Real-world disguises: <strong>cement planters</strong>, the <strong>red balls outside Target</strong>.</li><li>Standard to know: <strong>ASTM F2656-07 M30 P1</strong> — stops a <strong>15,000-lb vehicle at 30 mph</strong> with penetration of <strong>less than 1 meter (P1)</strong>. The primary threat bollards address is <strong>direct vehicle impact</strong>.</li><li>⚠️ <strong>Temporary/removable bollards can be tampered with or removed</strong> — a scenario question may ask for the weakness.</li></ul>
+<p><strong>⚠️ Trap — fencing vs. bollards:</strong> fencing = <strong>people/perimeter</strong> threats over large areas; bollards = <strong>vehicular</strong> threats in a <strong>specified area</strong>. &quot;Vehicle-borne threat near the building entrance&quot; → bollards, every time.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">2. Brute Force Attacks (Obj 1.2 / 2.4)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Two meanings you must separate:</strong></p>
+<ul class="mdlist"><li><strong>Cyber/crypto:</strong> trying *every* possible combination until one works. Example from the course: a <strong>4-digit PIN has 10,000 combinations</strong> (0000–9999).</li><li><strong>Physical:</strong> forcible entry. Four forms:</li></ul>
+<div class="tblwrap"><table><thead><tr><th>Physical brute-force form</th><th>What it looks like</th><th>Defense</th></tr></thead><tbody><tr><td><strong>Forcible entry</strong></td><td>Breaking down doors; <strong>glass cutting</strong> to defeat windows</td><td>High-strength doors, <strong>deadbolts</strong>, <strong>metal frames</strong>, <strong>solid-core</strong> doors; <strong>reinforced/laminated</strong> glass</td></tr><tr><td><strong>Tampering with security devices</strong></td><td>Forcing a gate open; <strong>blinding cameras/sensors</strong> with paint, lights, or mirrors; smashing sensors</td><td><strong>Redundancy / multiple layers</strong> of controls</td></tr><tr><td><strong>Confronting security personnel</strong></td><td>Distraction, assault, weapons</td><td>Guard training in <strong>conflict resolution &amp; self-defense</strong>, <strong>quick backup communication</strong></td></tr><tr><td><strong>Ramming barriers with vehicles</strong></td><td>Driving into government/military/bank buildings</td><td><strong>Bollards</strong> and reinforced barriers that <strong>absorb/dissipate energy</strong></td></tr></tbody></table></div>
+<p>⚠️ The course's color details that make great distractors: a <strong>rug thrown over barbed wire</strong> to climb a fence (still brute force — climbing/cutting/ramming fences), and <strong>the lock is the weakest point of a door</strong>.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">3. Surveillance (Obj 1.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Definition:</strong> an organized strategy/setup to <strong>observe and report</strong> activities. Four categories:</p>
+<h3>a) Video surveillance (CCTV)</h3>
+<ul class="mdlist"><li><strong>Wired:</strong> cabled to a monitoring station — harder to interfere with.</li><li><strong>Wireless:</strong> easier to install, but susceptible to <strong>jamming/interference</strong>.</li><li>A <strong>detective control</strong> (records what happened; does not prevent).</li><li>Features: <strong>motion detection, night vision, facial recognition, remote access</strong>; <strong>PTZ (Pan-Tilt-Zoom)</strong> cameras operated from a <strong>central guard station</strong>.</li><li>Placement: <strong>entrances and exits</strong> of critical infrastructure — <strong>data centers, communications closets, building doors</strong>.</li><li>Process: <strong>record + review</strong> footage.</li></ul>
+<h3>b) Security guards</h3>
+<ul class="mdlist"><li>The <strong>most flexible and adaptable</strong> surveillance/control tool.</li><li>Can <strong>detect unusual behavior, respond immediately, make judgment calls</strong>, and act as a <strong>visual deterrent</strong>.</li><li>Roles at checkpoints: <strong>visual deterrent, verification assistance</strong> (e.g., when the badge system fails/offline, visitors without badges → identity check + <strong>temporary badge</strong>), and <strong>immediate response</strong> (confront intruder or initiate emergency protocols).</li></ul>
+<h3>c) Lighting</h3>
+<ul class="mdlist"><li>Crucial because it makes <strong>video and guards more effective</strong>: deters criminals, <strong>reduces shadows/hiding spots</strong>, improves footage quality.</li><li><strong>Motion-activated lights</strong> = deterrent <strong>and</strong> alert in one.</li></ul>
+<h3>d) Sensors — know the four types cold</h3>
+<div class="tblwrap"><table><thead><tr><th>Sensor</th><th>How it works</th><th>Exam hook</th></tr></thead><tbody><tr><td><strong>Infrared</strong></td><td>Detects <strong>warm bodies</strong> / heat</td><td>Excellent in <strong>low light or darkness</strong>; can be <strong>defeated by heating the room</strong></td></tr><tr><td><strong>Pressure</strong></td><td>Detects <strong>weight</strong> on a floor area or mat</td><td>Simple contact/weight trigger</td></tr><tr><td><strong>Microwave</strong></td><td>Emits microwave pulses, measures reflection</td><td>Covers <strong>large areas</strong>; <strong>prone to false alarms at high sensitivity</strong></td></tr><tr><td><strong>Ultrasonic</strong></td><td><strong>Echolocation</strong> (like a bat)</td><td>Used in <strong>automated doors</strong>, indoor use</td></tr></tbody></table></div>
+</div></details>
+<details class="topic" open><summary><span class="t-name">4. Bypassing Security Controls (Obj 2.4)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>⚠️ This is the 2.4 content — &quot;analyze indicators of malicious activity.&quot;</strong> The exam describes an odd observation and asks what attack it indicates.</p>
+<div class="tblwrap"><table><thead><tr><th>Bypass method</th><th>Techniques</th><th>Countermeasure</th></tr></thead><tbody><tr><td><strong>Visual obstruction</strong></td><td><strong>Spray paint, foam, stickers/tape</strong> over a camera lens; <strong>balloons/umbrellas</strong> held over it</td><td>Tamper alarms, guard response</td></tr><tr><td><strong>Blinding sensors/cameras</strong></td><td><strong>Flashlights or lasers</strong> aimed at the lens; <strong>heating the room</strong> to blind <strong>infrared</strong> sensors</td><td>Redundant sensor types, tamper alarms</td></tr><tr><td><strong>Interfering with acoustics</strong></td><td><strong>Loud music, jamming devices, white-noise machines</strong></td><td>—</td></tr><tr><td><strong>Interfering with electromagnetics</strong></td><td><strong>EMI / jamming</strong> wireless setups; EMI generators; targeting the <strong>Wi-Fi band</strong> in a no-wireless facility</td><td><strong>Encrypted frequency hopping</strong> against jamming/eavesdropping</td></tr><tr><td><strong>Attacking the physical environment</strong></td><td><strong>Temperature changes</strong> to trick sensors; <strong>killing the power supply</strong> (unplugging, tampering with power boxes, sabotaging transformers); <strong>arson</strong> as distraction/destruction</td><td><strong>UPS / backup power</strong>, tamper alarms</td></tr><tr><td><strong>Physical tampering</strong></td><td><strong>Cutting wires</strong> (crude but effective; requires close proximity)</td><td>Tamper alarms, layered controls</td></tr></tbody></table></div>
+</div></details>
+<details class="topic" open><summary><span class="t-name">5. Access Control Vestibules &amp; Entry Attacks (Obj 1.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<h3>The vestibule (a.k.a. mantrap)</h3>
+<ul class="mdlist"><li>A <strong>double-door system</strong>, electronically controlled so that <strong>only one door can be open at a time</strong>.</li><li>Creates an <strong>intermediate space between the untrusted outside area and the trusted inner area</strong> — a person who fails verification is <strong>trapped between the doors</strong> until security personnel intervene.</li><li>Often combined with <strong>badges + security guards</strong> for a multi-layered framework.</li><li>Single-person-sized vestibules <strong>prevent piggybacking and tailgating</strong> (no room for two).</li></ul>
+<h3>Piggybacking vs. Tailgating — THE trap of this section</h3>
+<div class="tblwrap"><table><thead><tr><th></th><th><strong>Piggybacking</strong></th><th><strong>Tailgating</strong></th></tr></thead><tbody><tr><td>Who is complicit?</td><td>The <strong>authorized person intentionally allows</strong> the unauthorized one in — through <strong>complicity or negligence</strong></td><td><strong>No consent</strong> — the authorized person doesn't know</td></tr><tr><td>How?</td><td>Usually <strong>social engineering</strong> (course example: pentester dressed as a <strong>delivery driver with boxes</strong> asking an employee to badge him in — worked ~50% of the time)</td><td><strong>Opportunistic</strong> — closely following someone through a door/turnstile without their knowledge</td></tr><tr><td>Nature</td><td>Collaborative/deceptive</td><td>Covert</td></tr></tbody></table></div>
+<h3>Access badges</h3>
+<ul class="mdlist"><li>Embedded tech: <strong>RFID</strong> (radio frequency identification), <strong>NFC</strong> (near-field communication), legacy <strong>magnetic stripe</strong>.</li><li>Cross-referenced against a <strong>centralized database</strong>; grants/denies based on the person's <strong>role-based access level</strong> (course example: NSA — building access ≠ individual office access).</li><li>Every badge use is <strong>logged → audit trail</strong> for breach review.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">6. Door Locks (Obj 1.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Core idea:</strong> all perimeter defenses become useless the moment someone is <strong>inside the building</strong> — interior locks protect the sensitive spaces (server rooms, network closets, offices).</p>
+<h3>Weak vs. strong locks (course timing = great distractors)</h3>
+<ul class="mdlist"><li><strong>Padlock</strong> (basic <strong>pin-and-tumbler</strong>): defeatable in <strong>~15 seconds</strong> with a <strong>lock pick + tension wrench</strong>.</li><li><strong>Privacy door locks</strong> (bedroom/bathroom): pop open with a <strong>slim rod/needle</strong>, or a <strong>flathead screwdriver/coin</strong> on the slotted type.</li><li><strong>Traditional keyed door locks:</strong> defeated in <strong>~30–60 seconds</strong> by skilled attackers.</li></ul>
+<h3>Electronic lock mechanisms</h3>
+<div class="tblwrap"><table><thead><tr><th>Mechanism</th><th>Notes</th></tr></thead><tbody><tr><td><strong>PIN / identification number</strong></td><td>Course example: <strong>8-digit PIN = 1 in 100 million</strong> guess chance; per-person PINs enable <strong>logging/auditing</strong></td></tr><tr><td><strong>Wireless signal</strong></td><td><strong>NFC tap</strong> (smartphone), plus <strong>Wi-Fi, Bluetooth, RFID</strong> locks</td></tr><tr><td><strong>Biometric</strong></td><td>Fingerprint, <strong>retinal scan</strong>, <strong>facial recognition</strong> = <strong>inherence factor — &quot;something you are&quot;</strong></td></tr><tr><td><strong>Cipher lock</strong></td><td>Older <strong>mechanical</strong> push-button <strong>combination</strong> lock; used on <strong>server rooms/network closets</strong>; costs more, higher protection</td></tr></tbody></table></div>
+<h3>Biometric accuracy — FAR / FRR / CER (heavily tested)</h3>
+<ul class="mdlist"><li><strong>FAR (False Acceptance Rate):</strong> system accepts someone who <strong>should NOT</strong> be granted access. Drive toward zero by <strong>increasing sensitivity</strong>.</li><li><strong>FRR (False Rejection Rate):</strong> system <strong>denies someone who SHOULD</strong> have access — just as big a problem (authorized people locked out, half the time in the course example).</li><li><strong>CER / EER (Crossover/Equal Error Rate):</strong> the point where <strong>FAR = FRR</strong>. <strong>The lower the CER, the better the biometric system.</strong> When buying a fingerprint lock, compare CERs.</li></ul>
+<h3>MFA at the door</h3>
+<ul class="mdlist"><li>Badge (something you <strong>have</strong>) + PIN (something you <strong>know</strong>); or <strong>PIN + fingerprint</strong>.</li><li>Example from the course: open lobby → <strong>turnstiles</strong> requiring <strong>badge + PIN</strong> → the lobby/turnstile area itself is an <strong>access control vestibule</strong>.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">7. Access Badge Cloning (Obj 2.4)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<h3>The attack — four steps</h3>
+<ul class="mdlist"><li><strong>Scanning/reading:</strong> handheld RFID/NFC reader captures the badge data — can be <strong>concealed in a backpack</strong>; done <strong>without the owner's knowledge</strong>.</li><ul><li>Ranges: <strong>NFC ~1–2 inches; RFID ~2–10 inches</strong> (stronger antenna can roughly double this — attacker still must get close).</li></ul><li><strong>Data extraction:</strong> pull the <strong>unique identifier / encrypted data</strong> from the capture (can happen later, anywhere).</li><li><strong>Writing:</strong> transfer to a <strong>blank card/device</strong>. Course tool: the <strong>Flipper Zero</strong> — reads <strong>125 kHz RFID</strong>, stores many codes, then <strong>emulates</strong> the badge or writes a physical clone.</li><li><strong>Using:</strong> the clone behaves exactly like the original — building access, systems, even <strong>NFC payment fraud</strong>.</li></ul>
+<p>Why it's dangerous: <strong>easy, cheap, stealthy</strong> (no need to possess the original badge), and compromises physical security at scale.</p>
+<h3>Defenses (six — matching/multi questions love this list)</h3>
+<ul class="mdlist"><li><strong>Advanced encryption</strong> on the badge data (many basic systems use simple identifiers with <strong>no robust encryption</strong>).</li><li><strong>MFA</strong> — badge + PIN/password/biometric; a cloned badge alone is then useless.</li><li><strong>Regularly update protocols/encryption keys</strong> so clones stop working.</li><li><strong>User education</strong> — cautious storage, report suspicious access attempts.</li><li><strong>Shielded wallets/sleeves</strong> (RFID shielding) so the badge can't be read while carried.</li><li><strong>Monitor &amp; audit access logs</strong> — detect <strong>impossible usage</strong> (course example: badge used at the office while the owner is at a conference across the country).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Rapid-Fire Self-Test</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Fence attack: climbing → ? Cutting → ? Digging → ? *(taller/electrified/barbed · robust materials+monitoring · buried portion/mesh)*</li><li>Bollard standard ASTM F2656-07 <strong>M30 P1</strong> means? *(15,000 lb @ 30 mph, &lt;1 m penetration)*</li><li>Fencing vs. bollards — which threat does each address? *(people/perimeter vs. vehicles)*</li><li>A 4-digit PIN = how many combinations? *(10,000)*</li><li>Weakest point of a door? *(the lock)*</li><li>Defense vs. ramming vehicles? *(bollards/reinforced barriers that absorb/dissipate energy)*</li><li>Which sensor uses echolocation, and where do you see it? *(ultrasonic · automated doors)*</li><li>Which sensor covers large areas but false-alarms at high sensitivity? *(microwave)*</li><li>How do you blind an infrared sensor? *(heat up the room)*</li><li>Countermeasure vs. wireless jamming/eavesdropping? *(encrypted frequency hopping)*</li><li>Define a vestibule. *(double doors, only one open at a time)*</li><li>Piggybacking vs. tailgating in one line each. *(authorized person intentionally lets someone in / unauthorized follows without consent)*</li><li>FAR vs. FRR? Which way do you tune sensitivity? *(accepts bad / rejects good · ↑sensitivity lowers FAR, raises FRR)*</li><li>What is the CER and do you want it high or low? *(FAR=FRR crossover · lower is better)*</li><li>NFC vs. RFID cloning ranges? *(1–2 in / 2–10 in)*</li><li>Name the Flipper Zero's two ways to use a captured badge. *(emulate / write to blank card)*</li><li>Clone used while the real owner is across the country — which control catches it? *(access-log monitoring/auditing)*</li><li>A guard station with PTZ cameras — what does PTZ stand for? *(Pan-Tilt-Zoom)*</li><li>Which lock is mechanical, push-button, combination-based? *(cipher lock)*</li><li>Motion-activated lights give you what two benefits? *(deterrent + alert)*</li></ul>
+<p><strong>Passing reminder:</strong> the real SY0-701 needs <strong>750/900</strong> — expect 1.2 physical-control questions and 2.4 &quot;indicator of malicious activity&quot; questions to come largely from Lessons 30, 32, and 35.</p>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="threat-actors-study-notes.html">&larr; Prev: Section 2 · Threat Actors</a> <a class="btn ghost" href="social-engineering-study-notes.html">Next &rarr;: Section 4 · Social Engineering</a></div>
+  <script>
+    var SLUG = "physical-security";
+    var TOTAL = 8;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

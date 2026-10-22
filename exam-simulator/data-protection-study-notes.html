@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 6 · Data Protection — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 6 · Data Protection &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><p class="doc-title">Section 07 — Data Protection · SY0-701 Study Notes</p>
+<p><strong>Exam objective coverage:</strong> 1.4 (cryptographic solutions), 3.3 (compare/contrast data protection concepts &amp; strategies), 4.2 (asset management implications), 4.4 (alerting &amp; monitoring — DLP), 4.5 (DLP configuration), 5.1 (governance) — lessons 59–67. This section is a pure memorization goldmine: classification levels, ownership roles, data states, and DLP types are asked constantly.</p>
+<details class="topic" open><summary><span class="t-name">1. Data Protection &amp; Classification (3.3)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Data protection</strong> = safeguarding important information from corruption, compromise, or loss — ensuring CIA of data.</p>
+<p>Classification is based on: ① value to the organization and ② sensitivity <strong>if disclosed</strong>. <strong>The data owner decides the classification level.</strong></p>
+<p>⚠️ <strong>Overclassifying</strong> data wastes money — you end up protecting everything at the highest level (extra personnel, access controls, technical solutions). Classify properly so higher levels get more resources.</p>
+<p><strong>Commercial (4 levels, lowest → highest):</strong></p>
+<div class="tblwrap"><table><thead><tr><th>Level</th><th>Impact if released</th><th>Examples</th></tr></thead><tbody><tr><td><strong>Public</strong></td><td>None</td><td>Website content, this course</td></tr><tr><td><strong>Sensitive</strong></td><td>Minimal</td><td>Financial data, unreleased course material</td></tr><tr><td><strong>Private</strong></td><td>Internal-only</td><td>Personal records, salary info, SSNs — relates to an individual entity</td></tr><tr><td><strong>Confidential</strong></td><td>Serious</td><td>Trade secrets, IP, source code; approved personnel + third parties under NDA (e.g., CompTIA exam questions)</td></tr></tbody></table></div>
+<p><strong>Critical data</strong> = too valuable to allow any risk if captured; viewing severely restricted (e.g., credit card numbers, access limited to a few trusted individuals).</p>
+<p><strong>Government/Military (5 levels, lowest → highest):</strong></p>
+<div class="tblwrap"><table><thead><tr><th>Level</th><th>Disclosure harm</th><th>Examples</th></tr></thead><tbody><tr><td><strong>Unclassified</strong></td><td>None — releasable to the public, incl. via <strong>FOIA</strong> requests</td><td>Public info</td></tr><tr><td><strong>Sensitive but Unclassified (SBU)</strong></td><td>Won't hurt national security, but harms the individuals in it</td><td>Medical records, personal files of soldiers</td></tr><tr><td><strong>Confidential</strong></td><td>Could <strong>seriously affect</strong> the government</td><td>Trade secrets</td></tr><tr><td><strong>Secret</strong></td><td>Could <strong>seriously damage</strong> national security</td><td>Military deployment plans, defensive postures</td></tr><tr><td><strong>Top Secret</strong></td><td>Could <strong>gravely damage</strong> national security</td><td>Weapon system blueprints</td></tr></tbody></table></div>
+<p>⚠️ Trap: memorize the affect → damage → gravely damage escalation. SBU is the one that protects *individuals* rather than the nation.</p>
+<p><strong>Data lifecycle:</strong> policies must define how data is stored, when, how long, and how it's destroyed. Follow local/state/federal <strong>retention requirements</strong> — some data must legally be kept for set periods.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">2. Data Ownership Roles (4.2 &amp; 5.1) — know every role cold</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Role</th><th>Definition</th><th>Key identifier</th></tr></thead><tbody><tr><td><strong>Data owner</strong></td><td><strong>Senior executive</strong> with ultimate responsibility for CIA of the information asset; labels the asset and mandates controls</td><td>NOT the file creator; NOT IT</td></tr><tr><td><strong>Data controller</strong></td><td>Entity deciding the <strong>purposes and methods</strong> of data collection, storage, usage; guarantees legality; holds <strong>ultimate accountability for privacy breaches — cannot delegate</strong></td><td>The accountable one</td></tr><tr><td><strong>Data processor</strong></td><td>Group/individual <strong>hired by the controller</strong> to collect, store, or analyze data under the controller's direction</td><td>The hired hands</td></tr><tr><td><strong>Data steward</strong></td><td>Works <strong>for the data owner</strong>; ensures data quality and metadata; makes sure labeling/classification actually happens</td><td>Quality + correct labels</td></tr><tr><td><strong>Data custodian</strong></td><td>Manages the <strong>systems</strong> where data is stored (e.g., system administrator); enforces access control, encryption, backup/recovery per the owner's requirements</td><td>IT/sysadmin role</td></tr><tr><td><strong>Data privacy officer</strong></td><td>Oversees all privacy-related data (PII, SPI, PHI); ensures legal/regulatory compliance, purpose limitations, consent, data minimization, sovereignty, retention; <strong>on the hook when a breach exposes user data</strong></td><td>Privacy compliance</td></tr></tbody></table></div>
+<p>⚠️ <strong>Biggest trap:</strong> who should own data? The <strong>business side</strong> (department leaders, CFO for accounting data), never IT — IT knows systems, not data context. IT should be custodians.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">3. Data States (3.3)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>State</th><th>Meaning</th><th>Protection methods</th></tr></thead><tbody><tr><td><strong>Data at rest</strong></td><td>Stored in databases, file systems, storage systems; not moving</td><td><strong>Encryption</strong> + ACLs</td></tr><tr><td><strong>Data in transit</strong> (a.k.a. <strong>in motion</strong>)</td><td>Actively moved across internet/private network</td><td><strong>Communication tunneling</strong>: SSL/TLS, VPN, IPsec</td></tr><tr><td><strong>Data in use</strong></td><td>Being created, retrieved, updated, deleted</td><td>Application-level encryption, access controls, <strong>secure enclaves</strong></td></tr></tbody></table></div>
+<p><strong>At-rest encryption methods (know the granularity ladder):</strong></p>
+<ul class="mdlist"><li><strong>Full disk</strong> — entire hard drive; encrypted when system off, decrypted when logged in</li><li><strong>Partition</strong> — specific partitions only (e.g., the D: drive)</li><li><strong>File</strong> — individual files</li><li><strong>Volume</strong> — a set of selected files/directories</li><li><strong>Database</strong> — at column, row, or table level</li><li><strong>Record</strong> — specific *fields* within a database record (useful when users share one DB with different view rights)</li></ul>
+<p><strong>In-use nuance:</strong> data must be decrypted to be processed — that's why it's hard to protect. <strong>Secure enclaves</strong> (e.g., Intel SGX) encrypt data even while it exists in memory so untrusted processes can't decode it.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">4. Data Types (3.3 &amp; 1.4)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Type</th><th>Definition</th><th>Notes</th></tr></thead><tbody><tr><td><strong>Regulated data</strong></td><td>Controlled by laws/regulations/industry standards</td><td>GDPR (EU), HIPAA (US)</td></tr><tr><td><strong>PII</strong></td><td>Any info identifying an individual: names, SSNs, addresses</td><td>Heavily targeted; privacy laws mandate protection</td></tr><tr><td><strong>PHI</strong></td><td>Health status, healthcare provision, or payment for healthcare linked to an individual</td><td>Protected by <strong>HIPAA</strong></td></tr><tr><td><strong>Trade secrets</strong></td><td>Confidential business info giving competitive edge: manufacturing processes, marketing strategies, proprietary software, customer lists</td><td>Legal protection; severe penalties for disclosure</td></tr><tr><td><strong>IP</strong></td><td>Creations of the mind: inventions, literary/artistic works, designs, symbols</td><td>Protected by patents, copyrights, trademarks</td></tr><tr><td><strong>Legal information</strong></td><td>Legal proceedings, contracts, regulatory compliance data</td><td>Client confidentiality, legal professional privilege</td></tr><tr><td><strong>Financial information</strong></td><td>Sales records, invoices, tax documents, bank statements</td><td>Targeted for fraud/identity theft; <strong>PCI DSS</strong> applies</td></tr><tr><td><strong>Human-readable</strong></td><td>Text documents, spreadsheets</td><td>—</td></tr><tr><td><strong>Non-human readable</strong></td><td>Binary code, machine language</td><td>⚠️ Still needs protection — can contain sensitive info</td></tr></tbody></table></div>
+</div></details>
+<details class="topic" open><summary><span class="t-name">5. Data Sovereignty (3.3)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Data is subject to the <strong>laws of the country where it's collected/processed</strong> — must be managed, stored, and processed per that country's laws.</li><li>Cloud computing made this critical (data centers scattered worldwide).</li><li><strong>GDPR</strong> protects EU citizens while within the EU/EEA borders (protection doesn't follow them outside). Any organization handling EU citizens' data must comply <strong>regardless of the organization's location</strong> — fines are hefty.</li><li><strong>China and Russia</strong> have strict sovereignty laws requiring data to be stored and processed <strong>within national borders</strong> — a challenge for multinationals using cloud.</li><li>Know the <strong>physical locations of your data centers</strong> and cross-border data flows; no illegal transfers from a privacy jurisdiction without consent; cloud services may restrict access from multiple geographies.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">6. Securing Data — the eight methods (3.3)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Method</th><th>One-liner</th></tr></thead><tbody><tr><td><strong>Geographic restrictions (geofencing)</strong></td><td>Virtual boundaries restricting access by location (e.g., ban logins from Asia/Africa when all employees are in the Americas); helps comply with sovereignty laws</td></tr><tr><td><strong>Encryption</strong></td><td>Plaintext → ciphertext with an algorithm + key; reversible with the decryption key; protects data at rest and in transit</td></tr><tr><td><strong>Hashing</strong></td><td>Converts data to a <strong>fixed-size</strong> hash value; <strong>one-way</strong> (cannot be reversed/decrypted); stores passwords, verifies file integrity</td></tr><tr><td><strong>Masking</strong></td><td>Replaces some/all of a field with placeholders (e.g., X), can keep partial data (area code) and the original format; <strong>one-way</strong>; a method of <strong>de-identification</strong></td></tr><tr><td><strong>Tokenization</strong></td><td>Replaces sensitive data with non-sensitive <strong>tokens</strong>; original stored securely in a <strong>separate database</strong>; token is a reference — used in <strong>payment processing to protect credit card numbers</strong></td></tr><tr><td><strong>Obfuscation</strong></td><td>Makes data unclear/unintelligible — via encryption, masking, pseudonyms</td></tr><tr><td><strong>Segmentation</strong></td><td>Divides network into segments, each with own controls; stops <strong>lateral movement</strong>; limits breach damage</td></tr><tr><td><strong>Permission restrictions</strong></td><td>ACLs / <strong>RBAC</strong> — limit access to those who need it (least privilege)</td></tr></tbody></table></div>
+<p>⚠️ Trap trio: <strong>encryption is reversible, hashing and masking are one-way</strong>. Tokenization is reversible only via the token vault (separate DB). Masking vs tokenization: masking permanently replaces (de-identification); tokenization substitutes and keeps the original safe elsewhere.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">7. Data Loss Prevention — DLP (4.4)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>DLP</strong> = a strategy ensuring sensitive/critical information doesn't leave the organization, intentionally or unintentionally — detecting breaches/exfiltration. Why it matters: data theft evolved filing cabinets → laptops → external drives → thumb drives → cloud sync (Dropbox/Google Drive) — data and IP are &quot;the currency of business.&quot;</p>
+<p><strong>The four DLP types (2.4-level memorization):</strong></p>
+<div class="tblwrap"><table><thead><tr><th>Type</th><th>Placement</th><th>Watches</th></tr></thead><tbody><tr><td><strong>Endpoint DLP</strong></td><td>Software installed on workstation/laptop</td><td><strong>Data in use</strong> — blocks or alerts on file transfers per rules (like an IDS/IPS focused on data); detection mode or prevention mode</td></tr><tr><td><strong>Network DLP</strong></td><td>Hardware/software at the <strong>network perimeter</strong></td><td><strong>Data in transit</strong> — all traffic in/out, special focus on <strong>outbound</strong> data that shouldn't leave</td></tr><tr><td><strong>Storage DLP</strong></td><td>Software on servers in the data center</td><td><strong>Data at rest</strong> — inspects stored (often encrypted/watermarked) data; catches odd access like bulk downloads at 2 a.m.</td></tr><tr><td><strong>Cloud-based DLP</strong></td><td>SaaS, part of the cloud service</td><td>Data stored in cloud services (e.g., Google Drive DLP)</td></tr></tbody></table></div>
+</div></details>
+<details class="topic" open><summary><span class="t-name">8. Configuring a DLP (4.5) — from the Google Workspace demo</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Console path (Google Workspace):</strong> admin.google.com → <strong>Security → Access and data control → Data protection</strong>. (Gmail DLP lives separately: Apps → Google Workspace → Gmail → <strong>Compliance → Content compliance</strong>.) Office 365 is a similar process — concepts matter, not clicks.</p>
+<p><strong>Rule-building flow (the exam-relevant skeleton):</strong></p>
+<ul class="mdlist"><li><strong>Name + description</strong> — e.g., &quot;Block SSNs: prevent SSNs from being shared in chat or Drive.&quot;</li><li><strong>Scope</strong> — who the rule applies to (default: everyone; can target groups, e.g., instructors only).</li><li><strong>Apps</strong> — Google Chat (messages + file uploads; <strong>OCR</strong> checks uploaded photos, e.g., a picture of an SSN card) and/or Google Drive.</li><li><strong>Conditions</strong> — what to scan for: <strong>predefined data types</strong> (per-country: US SSN, driver's license, passport…), <strong>text string</strong>, <strong>regular expression</strong>, or <strong>word list</strong> (e.g., codename &quot;Operation Neptune&quot;).</li><li><strong>Likelihood threshold</strong> — where actions kick in. ⚠️ <strong>Low = floods of false positives</strong>; for SSNs/phone numbers set <strong>high or very high</strong>. Also set minimum unique matches / match count.</li><li><strong>Actions (per app)</strong> — Chat: <strong>warn the user / block the message / audit (log + notify admins)</strong>; Drive: <strong>block external sharing / warn / disable download-print-copy</strong> for viewers &amp; commenters; add a custom user message.</li><li><strong>Alerting</strong> — severity (low/medium/high) reported to the security dashboard + alert center; optional email notifications.</li><li><strong>Set to Active.</strong></li></ul>
+<p><strong>Gmail variant:</strong> outbound rule + predefined content (US SSN) + high confidence threshold + action: <strong>quarantine the message</strong> (or modify, route, mark as spam, encrypt, reject) + <strong>notify the sender</strong>.</p>
+<p><strong>Context matters:</strong> DLP engines score *likelihood* using surrounding keywords — &quot;SSN 123-45-6789&quot; = very likely; the bare number 123-45-6789 alone = low/unlikely (could be any ID). A malformed &quot;jason@diontraining&quot; (no TLD) isn't recognized as an email at all. Use the built-in <strong>DLP demo tool</strong> to test what gets caught.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Rapid-Fire Self-Test</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Who decides a data item's classification? *(The data owner)*</li><li>Commercial classification levels low → high? *(Public, sensitive, private, confidential)*</li><li>Government levels low → high? *(Unclassified, SBU, confidential, secret, top secret)*</li><li>Which government level covers a soldier's medical record? *(Sensitive but unclassified)*</li><li>Which level: weapon system blueprints? *(Top secret — gravely damages national security)*</li><li>Which level: military deployment plans? *(Secret — seriously damages)*</li><li>What law releases government unclassified data to the public? *(FOIA)*</li><li>What does overclassifying cost you? *(Money, time, resources — everything protected at high level)*</li><li>Who can NEVER delegate privacy-breach accountability? *(The data controller)*</li><li>Who is hired to process data on the controller's behalf? *(The data processor)*</li><li>Who makes sure data actually gets labeled per policy? *(The data steward)*</li><li>What role is a system administrator? *(Data custodian)*</li><li>Who's on the hook when a breach exposes PII? *(The data privacy officer)*</li><li>Should IT own the data? *(No — the business side owns; IT custodians)*</li><li>Three data states? *(At rest, in transit/in motion, in use)*</li><li>Full disk vs partition vs volume vs record encryption? *(Whole drive / one partition / a set of files &amp; dirs / specific fields in a DB record)*</li><li>Protecting data in transit? *(SSL/TLS, VPN, IPsec tunneling)*</li><li>What protects data in use? *(App-level encryption, access controls, secure enclaves like Intel SGX)*</li><li>PII vs PHI? *(Identifies an individual / health info linked to an individual, HIPAA-protected)*</li><li>Which standard governs cardholder financial data? *(PCI DSS)*</li><li>GDPR protects EU citizens where? *(Within EU/EEA borders)*</li><li>Which two countries demand in-country data storage? *(China and Russia)*</li><li>Hashing vs encryption? *(One-way fixed-size / reversible with key)*</li><li>Tokenization's original data goes where? *(A separate, secure database — used for payment cards)*</li><li>Masking is what kind of process? *(One-way de-identification that can preserve format)*</li><li>Segmentation stops what? *(Lateral movement between network segments)*</li><li>Four DLP types? *(Endpoint, network, storage, cloud-based)*</li><li>Endpoint DLP watches which state? *(Data in use)*</li><li>Storage DLP catches what odd behavior? *(Bulk downloads at 2 a.m. from servers)*</li><li>Why not set DLP threshold to &quot;low&quot;? *(False-positive flood)*</li><li>Gmail DLP lives under which menu? *(Compliance → Content compliance)*</li><li>What raises an SSN match from low to very likely? *(Context keywords like &quot;SSN&quot;)*</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="malware-study-notes.html">&larr; Prev: Section 5 · Malware</a> <a class="btn ghost" href="cryptographic-solutions-study-notes.html">Next &rarr;: Section 7 · Cryptographic Solutions</a></div>
+  <script>
+    var SLUG = "data-protection";
+    var TOTAL = 9;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Resilience and Redundancy — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Cyber Resilience and Redundancy &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><p class="doc-title">Cyber Resilience and Redundancy — SY0-701 Study Notes (Section 14 · OBJ 3.4)</p>
+<p>Exam weighting: Domain 3 (Security Architecture). Objective 3.4: *explain the importance of resilience and recovery in security architecture.* Heavy on RAID levels, power terminology, backup types, site types (hot/warm/cold), and testing methods — expect several questions from this objective.</p>
+<details class="topic" open><summary><span class="t-name">1. Core Definitions (Lesson 122)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Cyber resilience</strong> — the entity's ability to <strong>continuously deliver the intended outcome despite adverse cyber events</strong>.</li><li><strong>Redundancy</strong> — having <strong>additional systems, equipment, or processes</strong> to ensure continued functionality if primary ones fail.</li><li>Redundancy reduces the chance of total system failure: backups take over when primaries fail.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">2. High Availability (Lesson 123)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>High availability (HA)</strong> — a service's ability to be continuously available by minimizing downtime to the lowest amount possible.</p>
+<p><strong>Uptime</strong> — measured as a percentage:</p>
+<ul class="mdlist"><li><strong>Five nines = 99.999%</strong> → max ~<strong>5 minutes downtime/year</strong> (the gold standard)</li><li><strong>Six nines = 99.9999%</strong> → ~<strong>31 seconds/year</strong> (some cloud networks)</li></ul>
+<p><strong>Four HA mechanisms (know the differences):</strong></p>
+<div class="tblwrap"><table><thead><tr><th>Mechanism</th><th>What it does</th></tr></thead><tbody><tr><td><strong>Load balancing</strong></td><td>Distributes workloads across multiple computing resources — optimizes resource use, maximizes throughput, minimizes response time, prevents overloading any single resource. All requests hit the load balancer first; it redirects them.</td></tr><tr><td><strong>Clustering</strong></td><td>Multiple computers/storage devices/network connections working together <strong>as a single system</strong> for availability, reliability, scalability. Focus: <strong>no single point of failure</strong> — keeps an application available even on hardware failure.</td></tr><tr><td><strong>Redundancy</strong></td><td>Duplication of critical components/functions to increase reliability: multiple power supplies, network connections, servers, services, providers.</td></tr><tr><td><strong>Multi-cloud</strong></td><td>Distributing data/apps/services across several cloud environments — mitigates single-provider outage risk, enables cost optimization, <strong>avoids vendor lock-in</strong>. Requires consistent data management, unified threat management, consistent policy enforcement across clouds.</td></tr></tbody></table></div>
+<p><strong>Load balancing vs clustering (classic exam distinction):</strong></p>
+<ul class="mdlist"><li>Load balancing = handles <strong>excess traffic</strong> (performance, distribution)</li><li>Clustering = provides <strong>redundancy on failure</strong> (continuity)</li><li>Combined: load balancer manages resources normally; clustering takes over on component failure.</li></ul>
+<p><strong>Redundancy sub-types:</strong></p>
+<ul class="mdlist"><li><strong>Power supply redundancy</strong> — two PSUs in a server; facility with UPS, generator, or connections to 2+ power grids</li><li><strong>Network redundancy</strong> — multiple cabled connections or cable + wireless</li><li><strong>Server/service redundancy</strong> — load-balanced or clustered; workload shifts seamlessly if an instance fails</li><li><strong>Provider diversity</strong> — 2+ ISPs or service providers (e.g., Stripe + a backup credit card processor; two domain controllers as primary/secondary so one can be patched while the other serves users)</li><li>Caveat: redundant hardware for everything doubles cost — balance with software/cloud redundancy.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">3. Data Redundancy — RAID (Lesson 124)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>RAID</strong> = Redundant Array of Independent Disks — combines multiple physical disks into <strong>one logical device</strong> the OS sees.</p>
+<div class="tblwrap"><table><thead><tr><th>RAID</th><th>Keyword</th><th>Min disks</th><th>Can lose</th><th>Notes</th></tr></thead><tbody><tr><td><strong>RAID 0</strong></td><td><strong>Striping</strong></td><td>2</td><td><strong>0 — NO redundancy</strong></td><td>Pure performance. Only RAID with no fault tolerance. One disk dies = all data lost.</td></tr><tr><td><strong>RAID 1</strong></td><td><strong>Mirroring</strong></td><td>2</td><td>1</td><td>Identical copy on both disks. Least downtime — complete copy ready instantly. 50% storage overhead.</td></tr><tr><td><strong>RAID 5</strong></td><td><strong>Striping with parity</strong></td><td>3</td><td>1</td><td>Parity striped across array; surviving disks reconstruct data (slower until rebuild). Supports <strong>hot swap</strong> — replace failed disk while server runs, then rebuild.</td></tr><tr><td><strong>RAID 6</strong></td><td><strong>Striping with double parity</strong></td><td>4</td><td><strong>2</strong></td><td>&quot;One better than RAID 5&quot; — two parity blocks. Survives two simultaneous disk failures.</td></tr><tr><td><strong>RAID 10 (1+0)</strong></td><td><strong>Striped array of mirrored arrays</strong></td><td>4</td><td>Up to 2*</td><td>RAID 1 sets first, then RAID 0 stripe across them. Performance + fault tolerance. *Only if the two failures are NOT in the same mirrored pair; after one-per-mirror loss it keeps running but has no fault tolerance left — replace drives fast.</td></tr></tbody></table></div>
+<p><strong>Tolerance classifications (know these tiers):</strong></p>
+<ul class="mdlist"><li><strong>Failure-resistant</strong> — withstands hardware malfunctions without losing data, via <strong>mirroring</strong> → RAID 1, RAID 10</li><li><strong>Fault-tolerant</strong> — continues operating <strong>with no downtime</strong> despite hardware failure, via mirroring or striping with parity → RAID 1, 5, 6, 10</li><li><strong>Disaster-tolerant</strong> — protects against <strong>catastrophic events</strong> using <strong>two independent zones</strong> with full access to all data → RAID 1, RAID 10 (full mirrors)</li></ul>
+<h3>RAID Demo (Lesson 125)</h3>
+<ul class="mdlist"><li>Windows Disk Management: <strong>New Striped Volume</strong> = RAID 0 (two 800GB disks → one ~1.6TB drive D &quot;editing&quot;); <strong>New Mirrored Volume</strong> = RAID 1 (two disks → one disk's worth of space, drive R &quot;redundant&quot;, 50% overhead).</li><li>Trade-off in one line: *performance and double space (RAID 0) vs redundancy and half space (RAID 1).*</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">4. Capacity Planning (Lesson 126)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Capacity planning</strong> — strategic planning ensuring the organization is equipped to meet future demands at the right time, cost-effectively. <strong>Four elements:</strong></p>
+<ul class="mdlist"><li><strong>People</strong> — analyze current personnel skills/capacity; forecast hiring, training, downsizing. Right number of people with right skills. (Retail hiring 20 seasonal workers Oct 1, offboarding after Jan 1.)</li><li><strong>Technology</strong> — understand current software/hardware, utilization rates, future demands; can existing tech handle projected growth? Cloud enables scaling up for promotions and back down afterward.</li><li><strong>Infrastructure</strong> — physical space and utilities: offices, warehouses, production facilities, data centers. (Server rack space, power draw, heat calculations; declined on-prem installs that could live in the cloud, saving space for low-latency needs.)</li><li><strong>Processes</strong> — workflows withstand demand fluctuations (up OR down); streamline via automation or outsourcing. (Automating 500 simultaneous user account creations instead of manual onboarding bottleneck.)</li></ul>
+<p>Telemedicine example ties all four: train/hire staff (people), secure compliant platform scaled for traffic (technology), dedicated consultation spaces (infrastructure), new scheduling/follow-up workflows and privacy-aligned data procedures (processes).</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">5. Powering Data Centers (Lesson 127)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Five power conditions (memorize):</strong></p>
+<div class="tblwrap"><table><thead><tr><th>Condition</th><th>What it is</th><th>Example (120V baseline)</th></tr></thead><tbody><tr><td><strong>Surge</strong></td><td>Small, unexpected <strong>increase</strong> in voltage</td><td>125–130V</td></tr><tr><td><strong>Spike</strong></td><td><strong>Short transient</strong> voltage spike — short circuit, tripped breaker, outage, <strong>lightning</strong></td><td>jumps to 150V, 175V+</td></tr><tr><td><strong>Sag</strong></td><td>Small, unexpected <strong>decrease</strong> in voltage, short duration</td><td>120V → 115–117V (may stay online; harms hardware over time)</td></tr><tr><td><strong>Undervoltage</strong> (brownout)</td><td>Voltage reduced to <strong>lower levels for a longer period</strong></td><td>120V → 70–80V (systems go offline)</td></tr><tr><td><strong>Power loss</strong> (blackout)</td><td><strong>Total loss</strong> of power</td><td>complete outage; <strong>restoration can cause a spike</strong></td></tr></tbody></table></div>
+<p><strong>Protection infrastructure:</strong></p>
+<ul class="mdlist"><li><strong>Line conditioner</strong> — smooths minor fluctuations (surges, sags, pronounced undervoltage); delivers clean power at the expected level. Cannot sustain systems through major undervoltage or full power failure.</li><li><strong>UPS (uninterruptible power supply)</strong> — emergency power when normal input fails; provides line-conditioning functions + battery backup. Runtime: typically <strong>15–60 minutes</strong> (rack-mounted ~10–15 min). Buys time — not a long-term solution.</li><li><strong>Generator</strong> — converts mechanical energy into electrical energy (electromagnetic induction). Three varieties:</li><ul><li><strong>Portable gas engine</strong> — cheapest to operate; noisy, high-maintenance; extension-cord powered; small loads only</li><li><strong>Permanently installed</strong> (diesel/propane/natural gas) — backbone of data center emergency power; whole-building power for hours/days/weeks; <strong>auto-starts</strong> in ~30–60 seconds</li><li><strong>Battery inverter</strong> (lead-acid, NiCd, lithium-ion) — quiet, low-maintenance; short duration/low wattage; <strong>bridges the gap</strong> until long-term generators come online</li></ul><li><strong>PDC (power distribution center)</strong> — centralized hub receiving and distributing power; integrated circuit protection, monitoring, load balancing; integrates with UPS and generators for seamless backup transition.</li></ul>
+<p>Typical layered design: utility → PDC (conditioning/load balancing) → rack UPS (battery, 10–15 min) → servers; generators auto-start in 30–60s and take the load from the PDC.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">6. Data Backups (Lesson 128)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Golden rule: <strong>never put all your eggs in one basket.</strong> A backup = duplicate copies of digital information protecting against loss, corruption, unavailability.</p>
+<p><strong>Seven concepts:</strong></p>
+<ul class="mdlist"><li><strong>Onsite vs offsite</strong></li><ul><li><strong>Onsite</strong> — backups in your own facility; fast restores, but destroyed with the building in a fire/flood</li><li><strong>Offsite</strong> — geographically separate copies (cloud, or tapes shipped to a remote facility) — protection against physical disasters. (War example: nightly tape backups, weekly shipment 1,000 miles away, outside missile range.)</li></ul><li><strong>Frequency</strong> — ask: *how much data am I willing to lose?* Set by <strong>RPO</strong> (recovery point objective): RPO of 1 hour → backup at least hourly; RPO of 2 days → daily backups fine. Also weigh data change rate vs time/storage/bandwidth/cost.</li><li><strong>Encryption</strong> — <strong>data-at-rest</strong> (encrypted on the storage device) AND <strong>data-in-transit</strong> (protected while moving to/from the backup destination). Stolen encrypted media stays unintelligible without the key.</li><li><strong>Snapshots</strong> — point-in-time copies recording <strong>only changes since the previous snapshot</strong>; more efficient, quicker, enables rollback to a known-good state. Ideal for databases/file servers where consistency is critical. (Not a full copy like a traditional backup.)</li><li><strong>Recovery</strong> — the ultimate goal. Steps: <strong>select the right backup → initiate recovery → validate data integrity → test the recovery process → document and report → notify stakeholders</strong>. Best practice: <strong>practice recovery at least once per month</strong> — untested backups may be useless.</li><li><strong>Replication</strong> — <strong>real-time or near-real-time</strong> copies; data lives in two places simultaneously. One server crashes, the other continues <strong>without interruption</strong>. For HA environments that can't afford downtime. (Periodic vs continuous is the key distinction from backups.)</li><li><strong>Journaling</strong> (change tracking/logging) — meticulous record of <strong>every change</strong> to data over time; enables precise point-in-time recovery, granular rollback for legal proceedings/compliance audits; valuable in databases for the audit trail. Manage granularity, journal size, retention, and tamper-proofing.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">7. Continuity of Operations Plans (Lesson 129)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Two major terms:</p>
+<ul class="mdlist"><li><strong>BCP (Business Continuity Plan)</strong> — plans/processes for responding to a <strong>disruptive event</strong> (incident); covers non-technical disruptions too (lost merchant account, riots blocking the office). Preventative actions + recovery steps.</li><li><strong>DRP (Disaster Recovery Plan)</strong> — plans/processes for responding to a <strong>disaster</strong>; a <strong>subset of the BCP</strong>. Focus: resuming operations quickly after disasters (hurricanes, fires, floods, earthquakes).</li></ul>
+<p>Selection rule: incident → BCP; disaster → DRP. Often managed together as <strong>BC/DR</strong>.</p>
+<p><strong>Ownership and development:</strong></p>
+<ul class="mdlist"><li><strong>Senior management</strong> owns BCP development — without their support it stalls. They set goals and risk acceptance based on <strong>risk appetite and risk tolerance</strong>.</li><li>Senior management appoints a <strong>business continuity coordinator</strong> who leads the <strong>business continuity committee</strong> — with representatives from <strong>technology, legal, security, communications</strong>, and other departments (NOT just IT — continuity covers the whole business).</li><li>The committee determines recovery priorities, identifies and prioritizes systems needed for continuity, reports to senior management.</li><li><strong>Define scope</strong> to avoid scope creep; large orgs may split the plan by business function or geography, but pieces must operate coherently.</li></ul>
+<p>Real-world patterns: AWS multi-region/multi-AZ hosting for hurricane-prone Orlando; staff split US/Philippines covering for each other's floods and outages (geographic dispersion of people).</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">8. Redundant Site Considerations (Lesson 130)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Four (plus two) site types:</strong></p>
+<div class="tblwrap"><table><thead><tr><th>Site</th><th>What it is</th><th>Switchover</th><th>Cost</th></tr></thead><tbody><tr><td><strong>Hot</strong></td><td>Fully equipped, <strong>up and running continuously</strong>; switch with almost no downtime; data constantly mirrored</td><td>Instant</td><td><strong>Most expensive</strong> — &quot;two of everything&quot;</td></tr><tr><td><strong>Warm</strong></td><td>Fundamentals in place (power, phone lines, network, maybe desks) but no installed computers/phones; equipment bought after disaster</td><td><strong>Days</strong></td><td>Middle</td></tr><tr><td><strong>Cold</strong></td><td>Empty shell — the course example: leased building with bathrooms, tables, chairs; <strong>no network, phones, or computers</strong></td><td><strong>1–2 months</strong></td><td>Cheapest</td></tr><tr><td><strong>Mobile</strong></td><td>Portable units (trailers/tents) delivered to you; can be hot, warm, or cold depending on configuration</td><td>Varies</td><td>Varies</td></tr></tbody></table></div>
+<ul class="mdlist"><li>Hot sites are usually reserved for <strong>mission-critical functions only</strong> (50 essential staff, not 500). Hybrid models: hot for critical, warm/cold for the rest.</li><li><strong>DJC2</strong> (Deployable Joint Command and Control) — US military mobile command center: delivered anywhere in ~<strong>72 hours</strong>, functionality in 24h, full services in ~7 days; powered by generators, portable AC; supports ~200 people. Deployed to Haiti after the 2010 earthquake.</li><li><strong>Virtual sites</strong> — cloud-based versions of hot/warm/cold:</li><ul><li>Virtual hot = fully replicated, instantly accessible cloud environment</li><li>Virtual warm = partially replicated, quickly scaled up</li><li>Virtual cold = critical data/config stored, resources activated only on disaster (minimizes ongoing cost)</li></ul><li><strong>Platform diversity</strong> — different OSes, network equipment, or cloud providers at redundant sites vs primary:</li><ul><li>Same platform everywhere = easier support, lower cost — but a Cisco-specific vulnerability could kill BOTH primary and hot site</li><li>Different platforms = immune to single-vendor flaws; more complexity and support cost</li><li>Cloud provider diversity = spread across providers or regions to survive platform-specific outages; also pricing leverage and geographic reach</li></ul><li><strong>Geographic dispersion</strong> — spread resources across locations for higher redundancy.</li></ul>
+<p>Also from the lesson's example: internet redundancy in layers — microwave link (primary), cable company (secondary), cellular modem ~20 Mbps (tertiary). Failover between them in seconds. Power: solar → battery → generator → grid.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">9. Resilience and Recovery Testing (Lesson 131)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Resilience testing</strong> — assesses a system's ability to <strong>withstand and adapt</strong> to disruptive events.</li><li><strong>Recovery testing</strong> — evaluates a system's capacity to <strong>restore normal operations</strong> after a disruptive event.</li><li>Both are a &quot;fire drill&quot; for networks and operations. Four methods:</li></ul>
+<div class="tblwrap"><table><thead><tr><th>Method</th><th>What it is</th><th>Cost/effort</th></tr></thead><tbody><tr><td><strong>Tabletop exercise</strong></td><td>Scenario-based <strong>discussion</strong> among key stakeholders around a table; a facilitator announces an <strong>exercise inject</strong> (e.g., domain controller compromised by a nation-state actor); teams discuss responses. No real deployment. Gaps become SOPs/playbooks. Low cost, engaging, team-building.</td><td>Lowest</td></tr><tr><td><strong>Failover test</strong></td><td>Controlled experiment <strong>actually cutting over</strong> from primary to backup/secondary (e.g., East Coast DC → West Coast hot site). Verifies the plan truly works. Needs a <strong>rollback plan</strong>. More resources/time/energy.</td><td>High</td></tr><tr><td><strong>Simulation</strong></td><td>Computer-generated/artificial environment mimicking the real system (e.g., cloud replica of the corporate network); red team attacks while blue team detects/responds. Tests people under realistic chaos; observer feedback after.</td><td>Medium-high</td></tr><tr><td><strong>Parallel processing</strong></td><td>Replicate data and processes to a <strong>secondary system and run BOTH simultaneously</strong>; verifies the secondary can handle processing without disrupting operations. Zero-disruption goal — meticulous planning required.</td><td>Medium</td></tr></tbody></table></div>
+<ul class="mdlist"><li>These are <strong>not one-time</strong>: test, adapt, improve routinely. Resilience is an ongoing journey, not a checkbox.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Rapid-Fire Exam Facts</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Five nines = 99.999% = ~5 min/year; six nines ≈ 31 sec/year.</li><li>Load balancing = traffic distribution; clustering = single-system failover; both combine.</li><li>Provider diversity: two ISPs, Stripe + backup processor, primary/secondary domain controllers.</li><li>Multi-cloud avoids vendor lock-in — but demands unified management/policy.</li><li>RAID 0 = striping, no redundancy, 2+ disks, zero loss tolerance.</li><li>RAID 1 = mirroring, 2 disks, lose 1, 50% overhead.</li><li>RAID 5 = striping + parity, 3+ disks, lose 1, hot swap supported.</li><li>RAID 6 = double parity, 4+ disks, lose 2.</li><li>RAID 10 = stripe of mirrors, 4+ disks, lose 2 (not from the same mirror pair).</li><li>Failure-resistant = mirroring (RAID 1/10); fault-tolerant = no downtime (1/5/6/10); disaster-tolerant = two independent full-access zones (RAID 1/10).</li><li>Capacity planning = people, technology, infrastructure, processes.</li><li>Surge = small voltage increase; spike = short transient (lightning); sag = small decrease; undervoltage/brownout = lower voltage, longer time; blackout = total loss (restoration can spike!).</li><li>Line conditioner = clean power, minor fluctuations; UPS = battery 15–60 min (line conditioning included); generators = long-term (portable gas / permanent diesel-propane-gas auto-start 30–60s / battery inverter bridges the gap); PDC = distribution hub with protection, monitoring, load balancing.</li><li>Onsite = fast restore, dies in the fire; offsite = survives the disaster.</li><li>Backup frequency is set by RPO: 1-hour RPO → hourly backups.</li><li>Encrypt backups at rest AND in transit.</li><li>Snapshots record only changes since last snapshot; great for DBs.</li><li>Recovery steps: select → restore → validate → test → document → notify; practice monthly.</li><li>Replication = real-time/near-real-time, two places at once, no interruption.</li><li>Journaling = every-change log for granular rollback and audit trails.</li><li>BCP = disruptive events/incidents (+ non-technical); DRP = disasters; DRP ⊂ BCP; BC/DR together. Senior management owns it; cross-functional committee; watch scope creep.</li><li>Hot = instant, most expensive; warm = days; cold = weeks/months, cheapest; mobile = trailers/tents (DJC2: 72h delivery, 7 days full, 200 people).</li><li>Virtual hot/warm/cold = cloud equivalents.</li><li>Platform diversity: same vendor = easy but shared-vulnerability risk; different = resilient but complex.</li><li>Testing: tabletop (talk), failover (real cutover + rollback plan), simulation (virtual environment, red vs blue), parallel processing (both systems run together). Test routinely, forever.</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="conclusion-study-notes.html">&larr; Prev: Section 28 · Conclusion</a> <a class="btn ghost" href="security-fundamentals-study-notes.html">Next &rarr;: Security Fundamentals</a></div>
+  <script>
+    var SLUG = "cyber-resilience-and-redundancy";
+    var TOTAL = 10;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

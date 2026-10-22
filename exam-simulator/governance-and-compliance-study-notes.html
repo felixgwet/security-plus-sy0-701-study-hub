@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 10 · Governance and Compliance — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 10 · Governance and Compliance &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><p class="doc-title">Governance and Compliance — SY0-701 Study Notes (Section 11)</p>
+<p><strong>Exam weight:</strong> Domain 5.0 (Program Management &amp; Oversight) — OBJ 5.1 (security governance) &amp; OBJ 5.4 (security compliance) <strong>Lessons covered:</strong> 95–103 (Intro · Governance · Governance structures · Policies · Standards · Procedures · Governance considerations · Compliance · Non-compliance consequences)</p>
+<details class="topic" open><summary><span class="t-name">1. Governance Fundamentals (Lesson 96) — HIGH-YIELD</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Governance</strong> = the overall management of the organization's IT infrastructure, policies, procedures, and operations. It is the <strong>first component of the GRC triad</strong> (Governance, Risk, Compliance).</p>
+<ul class="mdlist"><li>Establishes a <strong>strategic framework</strong> aligning IT with business objectives and regulatory requirements — the rules, responsibilities, and practices that guide the organization.</li><li>Key decision areas: <strong>risk management, resource allocation, performance measurement</strong>.</li><li>Governance matters for: <strong>risk management, strategic alignment, resource management, performance measurement</strong>.</li></ul>
+<h3>The document hierarchy (memorize — favorite exam target)</h3>
+<div class="tblwrap"><table><thead><tr><th>Level</th><th>What it is</th><th>Mandatory?</th></tr></thead><tbody><tr><td><strong>Guidelines</strong></td><td>Recommended approach to handling situations</td><td>NOT mandatory</td></tr><tr><td><strong>Policies</strong></td><td>High-level guidelines outlining the org's commitments and intentions (data protection, ethical conduct)</td><td>Direction-setting</td></tr><tr><td><strong>Standards</strong></td><td>Specific, often <strong>mandatory</strong> rules that must be followed to adhere to a policy; often defined by industry/regulatory bodies</td><td>Mandatory</td></tr><tr><td><strong>Procedures</strong></td><td>Detailed <strong>step-by-step</strong> instructions to accomplish specific tasks</td><td>Mandatory in practice</td></tr></tbody></table></div>
+<h3>Monitoring &amp; revision</h3>
+<p>Governance must adapt as <strong>technology, regulations, and industry culture</strong> change.</p>
+<ul class="mdlist"><li><strong>Monitoring</strong> = regularly reviewing/assessing the effectiveness of the framework; identifies gaps and weaknesses.</li><li><strong>Revision</strong> = updating the framework (policies, standards, procedures, infrastructure) to close those gaps.</li><li>TechFirm example: cloud adoption (tech change, 2015) → new data-protection regulations (2018) → remote-work cultural shift — each triggered monitoring and revision.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">2. Governance Structures (Lesson 97)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Structure</th><th>Role</th></tr></thead><tbody><tr><td><strong>Board of directors</strong></td><td>Elected by <strong>shareholders</strong>; sets strategic direction, establishes policies, makes significant decisions</td></tr><tr><td><strong>Committees</strong></td><td>Subgroups of the board with a specific focus: <strong>audit committee</strong> (financial reporting), <strong>governance committee</strong> (board effectiveness), <strong>cybersecurity committee</strong> (cyber risk)</td></tr><tr><td><strong>Government entities</strong></td><td>Establish/enforce laws and regulations — e.g., the <strong>FTC</strong> enforces consumer-protection and competition law</td></tr><tr><td><strong>Centralized</strong></td><td>Decision-making authority concentrated at the <strong>top</strong> → consistent decisions, clear authority, but <strong>slow</strong> to respond to local/departmental needs</td></tr><tr><td><strong>Decentralized</strong></td><td>Authority <strong>distributed</strong> throughout the org → quicker decisions, responsive, innovative — but risk of <strong>inconsistency</strong></td></tr></tbody></table></div>
+</div></details>
+<details class="topic" open><summary><span class="t-name">3. Policies (Lesson 98) — HIGH-YIELD</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Acceptable Use Policy (AUP)</strong> — the do's and don'ts for users of IT systems (no dangerous websites, no unauthorized software, no personal gain).</li><li><strong>Information security policy</strong> — cornerstone of the security posture: data classification, access control, encryption, physical security (CIA).</li><li><strong>Business continuity policy</strong> — how the org continues <strong>critical operations during and after</strong> a disruption.</li><li><strong>Disaster recovery policy</strong> — recovering <strong>IT systems and data</strong> after a disaster: backups, restoration, hardware/software recovery, alternative processing locations.</li><li><strong>Incident response policy</strong> — detect, report, assess, respond to, and <strong>learn from</strong> security incidents (who to notify, containment, prevention of recurrence).</li><li><strong>SDLC policy</strong> — governs software development from requirements → design → coding → testing → deployment → maintenance; includes secure-coding standards and code reviews.</li><li><strong>Change management policy</strong> — changes to IT systems handled in a <strong>controlled, coordinated</strong> manner (request, approve, implement, review).</li></ul>
+<p>&gt; Exam trap: business continuity = keep the *business* running; disaster recovery = restore the *IT systems and data*.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">4. Standards (Lesson 99) — HIGH-YIELD</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Password standards</strong> — min length (8–12+ chars), mixed case + numbers + special characters, changes every <strong>60–90 days</strong>, no reuse; <strong>hashing and salting</strong> so a compromised password database doesn't expose passwords.</li><li><strong>Access control standards</strong> — three models:</li><ul><li><strong>DAC</strong> (Discretionary): the <strong>owner</strong> of the resource decides who can access it.</li><li><strong>MAC</strong> (Mandatory): <strong>labels/classifications</strong> determine access — government/military.</li><li><strong>RBAC</strong> (Role-based): access assigned by <strong>job role</strong> — only what the job requires.</li><li>Plus <strong>least privilege</strong> (minimal access needed) and <strong>separation of duties</strong> (no single person controls a critical process — anti-insider).</li></ul><li><strong>Physical security standards</strong> — perimeter security (fences, gates, guards), surveillance (CCTV), access mechanisms (biometrics, keycards); environmental controls (fire suppression, HVAC, power redundancy); extra protection for secure areas (server rooms, data centers).</li><li><strong>Encryption standards</strong> — <strong>AES</strong> for data <strong>at rest</strong> (strong + efficient); <strong>RSA</strong> for secure communication (<strong>public-key/PKI</strong> nature).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">5. Procedures (Lesson 100)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Change management procedure</strong>: identify need &amp; assess impact → develop plan → implement (often <strong>in stages</strong>) → review lessons learned. Key rules: test significant changes first; always have a <strong>rollback plan</strong>; schedule disruptive changes in a <strong>maintenance window</strong>; evaluate and document afterward.</li><li><strong>Onboarding</strong> — orientation, training, integration (productivity fast).</li><li><strong>Offboarding</strong> — retrieve company property, <strong>disable access</strong>, exit interview (feedback).</li><li><strong>Playbooks</strong> — a <strong>checklist of actions</strong> to <strong>detect and respond to a specific incident type</strong>; step-by-step so tasks are consistent and fast <strong>regardless of who performs them</strong>.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">6. Governance Considerations (Lesson 101) — HIGH-YIELD</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Consideration</th><th>Example</th></tr></thead><tbody><tr><td><strong>Regulatory</strong></td><td><strong>GDPR</strong> (EU) — governs collection/storage/use of EU citizens' personal data; severe penalties for non-compliance</td></tr><tr><td><strong>Legal</strong></td><td>Contract law, intellectual property, corporate law; employment law; <strong>litigation</strong> (breach of contract, product liability, employment disputes)</td></tr><tr><td><strong>Industry</strong></td><td>Standards/best practices not legally binding but expected — e.g., <strong>Agile</strong> (Scrum/Kanban) in software; ignoring them = competitive disadvantage</td></tr><tr><td><strong>Local</strong></td><td>City ordinances, zoning laws</td></tr><tr><td><strong>Regional</strong></td><td><strong>CCPA</strong> (California) — right to <strong>know</strong>, <strong>delete</strong>, <strong>opt out of sale</strong> of personal data</td></tr><tr><td><strong>National</strong></td><td><strong>ADA</strong> (US) — reasonable accommodations for employees, accessibility for customers with disabilities</td></tr><tr><td><strong>Global</strong></td><td>GDPR again — applies <strong>extraterritorially</strong> to any company processing EU citizens' data; <strong>conflict of laws</strong> between jurisdictions must be navigated</td></tr></tbody></table></div>
+</div></details>
+<details class="topic" open><summary><span class="t-name">7. Compliance (Lesson 102) — HIGH-YIELD</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<h3>Compliance reporting</h3>
+<ul class="mdlist"><li><strong>Internal</strong> — collecting/analyzing data to show adherence to <strong>internal policies</strong>; done by the internal audit team or compliance department (e.g., report on transactions above a threshold that required compliance-officer approval).</li><li><strong>External</strong> — demonstrating compliance to <strong>regulatory bodies, auditors, customers</strong>; often <strong>mandated by law or contract</strong> (e.g., pharma companies report GMP adherence to the FDA).</li></ul>
+<h3>Compliance monitoring — four concepts (memorize the pairs)</h3>
+<div class="tblwrap"><table><thead><tr><th>Pair</th><th>Distinction</th></tr></thead><tbody><tr><td><strong>Due diligence</strong></td><td>The <strong>exhaustive review</strong> that identifies potential compliance risks (researching foreign laws before expanding overseas)</td></tr><tr><td><strong>Due care</strong></td><td>The <strong>steps taken to mitigate</strong> those risks (training employees, hiring a local legal advisor)</td></tr><tr><td><strong>Attestation</strong></td><td>A <strong>formal declaration</strong> by a responsible party that processes/controls <strong>are compliant</strong> (developers attest they followed data-security protocols)</td></tr><tr><td><strong>Acknowledgement</strong></td><td><strong>Recognition and acceptance</strong> of the requirements by all relevant parties (signing a compliance agreement)</td></tr><tr><td><strong>Internal monitoring</strong></td><td>Reviewing own operations against <strong>internal policies</strong></td></tr><tr><td><strong>External monitoring</strong></td><td><strong>Third-party reviews/audits</strong> verifying compliance with external regulations/standards (ISO 9001 audit)</td></tr></tbody></table></div>
+<h3>Automation</h3>
+<p>Automated compliance systems streamline data collection, <strong>improve accuracy</strong>, and provide <strong>real-time monitoring</strong> (auto-flag unauthorized patient-record access → HIPAA; auto-generate suspicious-transaction reports → anti-money-laundering).</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">8. Consequences of Non-Compliance (Lesson 103) — HIGH-YIELD NUMBERS</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Consequence</th><th>Key facts</th></tr></thead><tbody><tr><td><strong>Fines</strong></td><td>GDPR: up to <strong>€20 million OR 4% of annual global turnover, whichever is higher</strong>; British Airways fined <strong>£183 million</strong> (2019, UK ICO) for a breach affecting <strong>500,000 customers</strong></td></tr><tr><td><strong>Sanctions</strong></td><td>Restrictions on operations up to outright bans — e.g., China (2017) sanctioned companies for violating its cybersecurity law: warnings, fines, <strong>confiscation of illegal income</strong></td></tr><tr><td><strong>Reputational damage</strong></td><td><strong>Equifax (2017)</strong>: breach exposed <strong>147 million</strong> people; stock dropped <strong>&gt;30%</strong> in weeks</td></tr><tr><td><strong>Loss of license</strong></td><td><strong>2016</strong>: New York State Dept. of Financial Services <strong>revoked a Bitcoin company's license</strong> for failing cybersecurity requirements</td></tr><tr><td><strong>Contractual impacts</strong></td><td>Non-compliance → <strong>breach of contract</strong> → lawsuits, financial penalties, contract <strong>termination</strong></td></tr></tbody></table></div>
+</div></details>
+<details class="topic" open><summary><span class="t-name">9. Rapid-Fire Self-Test (44 items)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>What does GRC stand for? *(governance, risk, compliance)*</li><li>Which triad component is governance? *(the first)*</li><li>Governance definition in one line? *(overall management of IT infra, policies, procedures, operations — strategic framework aligned with business objectives)*</li><li>What are governance's three decision areas? *(risk management, resource allocation, performance measurement)*</li><li>Which document type is NOT mandatory and gives recommended approaches? *(guidelines)*</li><li>Policies = ? *(high-level commitments/intentions)*</li><li>Standards = ? *(specific, often mandatory rules to adhere to a policy)*</li><li>Procedures = ? *(step-by-step task instructions)*</li><li>What are the three triggers for governance revision? *(technology, regulatory, cultural change)*</li><li>Monitoring vs revision? *(review effectiveness/identify gaps vs update framework)*</li><li>Who elects the board of directors? *(shareholders)*</li><li>What does the audit committee oversee? *(financial reporting)*</li><li>What does the FTC enforce? *(consumer protection and competition law)*</li><li>Centralized structure trade-off? *(consistent, clear authority; slow to respond locally)*</li><li>Decentralized structure trade-off? *(fast, responsive, innovative; inconsistency risk)*</li><li>What does an AUP do? *(sets do's/don'ts for IT system use)*</li><li>Business continuity vs disaster recovery? *(keep business running vs restore IT systems/data)*</li><li>What does an incident response policy add beyond response? *(learning — preventing recurrence)*</li><li>SDLC stages? *(requirements, design, coding, testing, deployment, maintenance)*</li><li>Change management policy goal? *(controlled, coordinated changes)*</li><li>Password change interval per the course? *(every 60–90 days)*</li><li>Purpose of hashing and salting? *(compromised DB still doesn't expose passwords)*</li><li>DAC = ? *(resource owner decides access)*</li><li>MAC = ? *(labels/classifications; gov/military)*</li><li>RBAC = ? *(access by job role)*</li><li>Least privilege = ? *(minimal access to perform duties)*</li><li>Separation of duties prevents? *(one person controlling a critical process — insider risk)*</li><li>AES is preferred for? *(data at rest)*</li><li>RSA is preferred for? *(secure communication — public-key/PKI)*</li><li>First stage of the change management procedure? *(identify need, assess impact)*</li><li>Every change should have what? *(a rollback/backup plan)*</li><li>Disruptive changes should be scheduled when? *(maintenance window)*</li><li>Offboarding must include? *(retrieve property, disable access, exit interview)*</li><li>Playbook = ? *(checklist of actions to detect/respond to a specific incident type)*</li><li>GDPR governs data of whom? *(EU citizens — applies extraterritorially)*</li><li>CCPA grants what three rights? *(know, delete, opt out of sale)*</li><li>ADA requires? *(reasonable accommodations / accessibility for people with disabilities)*</li><li>Internal vs external compliance reporting? *(own policies by internal audit vs regulators/customers, often legally mandated)*</li><li>Due diligence = ? *(exhaustive review identifying compliance risks)*</li><li>Due care = ? *(steps taken to mitigate the risks)*</li><li>Attestation = ? *(formal declaration processes/controls are compliant)*</li><li>Acknowledgement = ? *(acceptance of requirements by relevant parties — e.g., signing)*</li><li>GDPR maximum fine? *(€20M or 4% of annual global turnover, whichever is higher)*</li><li>Name the five non-compliance consequences. *(fines, sanctions, reputational damage, loss of license, contractual impacts)*</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="third-party-vendor-risks-study-notes.html">&larr; Prev: Section 9 · Third Party Vendor Risks</a> <a class="btn ghost" href="asset-and-change-management-study-notes.html">Next &rarr;: Section 11 · Asset and Change Management</a></div>
+  <script>
+    var SLUG = "governance-and-compliance";
+    var TOTAL = 9;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 27 · Exam Readiness — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 27 · Exam Readiness &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  <div class="banner">Based on the course's Section 28 lecture (&quot;Access Your Readiness Assessment&quot;) plus the official CompTIA SY0-701 Exam Objectives document included with the course. This is the final checkpoint before booking your exam date.</div>
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><details class="topic" open><summary><span class="t-name">1. What a Readiness Assessment Is For</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>The course provides a <strong>targeted readiness assessment</strong> (linked in the course) designed to <strong>evaluate your exam preparedness</strong> with a focused set of questions.</li><li>Its real value is <strong>diagnostic</strong>: it highlights your <strong>current knowledge</strong> AND <strong>identifies areas for improvement before test day</strong>.</li><li>Treat the score as a <strong>decision input</strong>, not a verdict: it tells you whether to book the exam, or go back and restudy specific domains first.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">2. The Official SY0-701 Domain Weighting</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>These percentages come straight from the official CompTIA SY0-701 Exam Objectives and define where your preparation time should go:</p>
+<div class="tblwrap"><table><thead><tr><th>Domain</th><th>Weight</th></tr></thead><tbody><tr><td>1.0 General Security Concepts</td><td><strong>12%</strong></td></tr><tr><td>2.0 Threats, Vulnerabilities, and Mitigations</td><td><strong>22%</strong></td></tr><tr><td>3.0 Security Architecture</td><td><strong>18%</strong></td></tr><tr><td>4.0 Security Operations</td><td><strong>28%</strong></td></tr><tr><td>5.0 Security Program Management and Oversight</td><td><strong>20%</strong></td></tr></tbody></table></div>
+<ul class="mdlist"><li><strong>Security Operations (28%)</strong> is the single biggest domain — monitoring, incident response, vulnerability management, and alerting deserve the most review time.</li><li><strong>Threats, Vulnerabilities, and Mitigations (22%)</strong> is second — threat actors, malware, attack types, and mitigations.</li><li>Do not over-invest in General Security Concepts (12%) just because it's &quot;easy&quot; — but do not skip it either; the CIA triad, security controls, and zero trust appear constantly as the foundation under other domains.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">3. How to Use a Readiness Assessment Properly</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Take it under exam conditions</strong> — timed, no notes, no pausing. An untimed score overstates readiness.</li><li><strong>Score by domain, not just overall.</strong> A 78% that hides a 50% in Security Operations is a failing profile — that domain is 28% of the real exam.</li><li><strong>Map every miss back to a domain and objective.</strong> The assessment exists to show you *where* to restudy, not just *that* you need to.</li><li><strong>Re-test after targeted review.</strong> One assessment is a snapshot; the trend across 2–3 attempts under conditions is the signal.</li><li><strong>Pair it with full practice exams.</strong> The readiness assessment is a targeted check; full-length timed exams test stamina and pacing, which the real 90-minute SY0-701 exam demands.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">4. Interpreting Your Results</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Consistently scoring at or above ~85%</strong> across multiple full practice exams under timed conditions is the commonly cited comfort threshold for scheduling.</li><li><strong>Below that, or highly uneven across domains:</strong> restudy the weakest domains first (weighted by their exam percentage), then reassess.</li><li><strong>A single strong score after memorizing a question bank is a false positive</strong> — readiness means you can answer *novel* questions on the concepts.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">5. Exam-Day Logistics to Confirm Before You're &quot;Ready&quot;</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Know the <strong>exam format</strong>: multiple-choice and <strong>multiple-response</strong> questions, up to <strong>90 minutes</strong>, scaled score out of <strong>900 with 750 required to pass</strong>, taken at a Pearson VUE test center or online proctored.</li><li><strong>No fill-in-the-blank, no essays</strong> — you recognize answers; you don't regurgitate them (see Section 01 tips).</li><li>Verify your ID requirements, test-center arrival time (usually 15–30 min early), or online-proctoring room/ID/screen-sharing requirements days before.</li><li>If you fail, CompTIA's retake policy applies (waiting period between attempts) — check current terms before scheduling so a bad day doesn't derail your plan.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">6. Study-Plan Reality Check (from Section 01, applies here)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Plan roughly <strong>40 hours of total study</strong> for the exam; concentrated study wins — don't stretch preparation beyond ~90 days or early material fades.</li><li>Backward-plan from your target date: content days + practice-exam days + final review days.</li><li>The readiness assessment fits in the <strong>last week</strong> of your plan: take it, fix the gaps it reveals, then take the full practice exams, then sit the real exam.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Key Takeaways</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>The readiness assessment is a <strong>diagnostic tool</strong> — its job is finding your weak domains, not flattering you.</li><li>Weight your review by the <strong>official domain percentages</strong> — Security Operations (28%) and Threats/Vulnerabilities/Mitigations (22%) dominate.</li><li>Take it <strong>timed and closed-book</strong>; an honest low score saves you an expensive failed exam.</li><li>Judge readiness on <strong>trend across attempts and domain balance</strong>, not one number.</li><li>Confirm logistics (format, timing, ID, retake policy) before scheduling.</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="security-awareness-study-notes.html">&larr; Prev: Section 26 · Security Awareness</a> <a class="btn ghost" href="conclusion-study-notes.html">Next &rarr;: Section 28 · Conclusion</a></div>
+  <script>
+    var SLUG = "exam-readiness";
+    var TOTAL = 7;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

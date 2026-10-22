@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 14 · Security Architecture — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 14 · Security Architecture &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><p class="doc-title">Security Architecture — Study Notes (Section 15 · OBJ 3.1 &amp; 4.1)</p>
+<p>Exam weight feel: architecture &quot;compare and contrast&quot; questions are everywhere on SY0-701. Know the definitions cold, and know which model fits which scenario (the exam loves &quot;which architecture BEST fits…&quot;).</p>
+<details class="topic" open><summary><span class="t-name">1. On-Premise vs Cloud vs Hybrid</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Model</th><th>Who manages</th><th>Best for</th></tr></thead><tbody><tr><td>On-premise</td><td>Organization owns/maintains everything (servers, updates, security, power)</td><td>Maximum control, sensitive data, regulatory needs (law firm, HIPAA patient data)</td></tr><tr><td>Cloud (IaaS/PaaS/SaaS)</td><td>Split per the <strong>responsibility matrix</strong> (always defined in the contract)</td><td>Scalability, low upfront cost, fast deployment</td></tr><tr><td>Hybrid</td><td>Mix of on-prem + private + public cloud; move workloads between environments</td><td>Sensitive data on-prem, high-volume low-sensitivity tasks in cloud</td></tr></tbody></table></div>
+<ul class="mdlist"><li><strong>Responsibility matrix</strong>: division of responsibilities between provider and customer. In <strong>IaaS</strong> the provider manages the *infrastructure only* — the customer handles OS, middleware, runtime, data, and applications. It changes with the model and contract.</li><li><strong>Hybrid considerations</strong>: data security, compliance, interoperability, cost.</li><li><strong>Key cloud considerations</strong> (memorize the list): availability, resilience, cost, responsiveness, <strong>scalability</strong>, ease of deployment, <strong>risk transference</strong> (some risk moves to the provider — but the customer is still responsible for securing their own data), ease of recovery, <strong>patch availability</strong> (provider patches automatically) vs <strong>inability to patch</strong> (legacy app incompatibility), power (provider's problem), compute.</li><li>Availability ≠ resilience: availability = accessible when needed (SLAs, e.g. 99.99% uptime); resilience = ability to recover from failures and keep functioning.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">2. Cloud Security Issues (the 8 classic weaknesses)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Shared physical server vulnerabilities</strong> — multi-tenant; mitigate with hypervisor protection, secure multi-tenancy, isolation</li><li><strong>Inadequate virtual environment security</strong> — secure VM templates, patch VMs, monitor, network segmentation to stop lateral movement</li><li><strong>User access management</strong> — weak passwords, excessive permissions; MFA + least privilege + activity monitoring</li><li><strong>Lack of up-to-date security measures</strong></li><li><strong>Single point of failure</strong> — redundancy + failover across multiple servers/data centers/providers</li><li><strong>Weak authentication and encryption practices</strong></li><li><strong>Unclear policies</strong> — confusion/inconsistency in data handling, access control, incident response</li><li><strong>Data remnants</strong> — residual data left after deletion; recoverable by attackers. Fix: secure deletion that <strong>overwrites</strong> data, secure backup management, verify removal</li></ul>
+<p>Cloud security is a <strong>shared responsibility</strong>: provider secures the infrastructure, customer secures their data and applications.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">3. Virtualization &amp; Containerization (very high exam frequency)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Hypervisor</strong> = platform that distributes physical resources (CPU, memory, disk) among VMs.</li><li><strong>Type 1 (bare-metal/native)</strong>: runs directly on hardware, acts like a specialized OS — Hyper-V, XenServer, ESXi/vSphere. <strong>Faster and more efficient</strong> (no host OS consuming resources).</li><li><strong>Type 2 (hosted)</strong>: runs inside a standard OS — VirtualBox, VMware Workstation. More versatile, less efficient.</li><li><strong>Containers</strong> (Docker, Kubernetes, OpenShift): lightweight alternative; app + dependencies isolated in user space, <strong>shares the host OS kernel</strong> with other containers. Benefits: efficiency/speed, portability, scalability, isolation, consistency.</li><li><strong>Virtualization vulnerabilities</strong> (know all six):</li><ul><li><strong>VM escape</strong> — attacker breaks out of a VM to interact with the hypervisor, then into other VMs. Hard, but real. Mitigation: host VMs with similar classification together on the same physical server/segment.</li><li><strong>Privilege elevation</strong> — especially catastrophic on the hypervisor itself (VMware hypervisor flaw → any guest OS). Keep current on hotfixes/service packs.</li><li><strong>Live VM migration</strong> — VM moves host-to-host; attacker positioned between the two hosts conducts an <strong>adversary-in-the-middle</strong> attack and captures unencrypted data in transit.</li><li><strong>Resource reuse</strong> — memory/storage not cleared before reassignment; previous tenant's sensitive data leaks to the next (big in multi-tenant cloud).</li><li><strong>VM sprawl</strong> — VMs deployed without oversight, unpatched and untracked.</li><li>Container-specific: all containers share <strong>one OS</strong> — exploit the OS kernel and every container is at risk.</li></ul><li><strong>Securing VMs</strong>: patch OS/apps/hypervisor, AV + host firewall per VM, strong passwords, minimize VM-to-VM/shared-resource connections, remove unneeded features (attack surface), distribute VMs across physical servers (DoS resilience), track and patch everything, <strong>encrypt the VM files</strong> themselves.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">4. Serverless</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Not &quot;no servers&quot; — provider manages servers, databases, some app logic; developers write individual <strong>functions</strong> triggered by events, run only when needed = <strong>Function as a Service (FaaS)</strong>. Examples: AWS Lambda, Google Cloud Functions.</li><li>Benefits: pay only for compute time consumed (no charge when idle), automatic/precise scaling, developers focus on code, faster time to market.</li><li>Risks: <strong>vendor lock-in</strong> (proprietary provider interfaces make switching hard), <strong>immaturity of best practices</strong> (new field, practices still evolving), critical dependency on the provider.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">5. Microservices</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Application broken into small, autonomous, independently deployable services, each doing one business function, communicating over lightweight mechanisms. Contrast: <strong>monolithic</strong> = all components interconnected and interdependent.</li><li>Netflix example: moved from monolith (whole system went down under load) to microservices (recommendations, signups, encoding, each separate).</li><li>Benefits: <strong>scalability</strong> (scale each service independently), <strong>flexibility</strong> (different languages/stacks/teams per service), <strong>resilience</strong> (one service failing ≠ whole system down), faster independent deployments/updates.</li><li>Challenges: complexity (inter-service communication, distributed testing), data management (each service may have its own DB → consistency problems), network latency, security (bigger attack surface — many services talking over a network).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">6. Network Infrastructure — Separation</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Physical separation (air gap)</strong>: system isolated from all other networks — remove ALL direct and indirect connections including Wi-Fi and Bluetooth. Used for classified military/gov networks and ICS in critical infrastructure. Most secure method *if* strict physical security is in place — but <strong>not infallible: Stuxnet</strong> compromised air-gapped systems.</li><li><strong>Logical separation</strong>: boundaries via firewalls, <strong>VLANs</strong>, rules/policies. Example: VLAN segregating HR traffic from marketing on the same physical network; firewall screen/DMZ subnet for external-facing services. More flexible and easier to implement than physical — <strong>but not as secure</strong>; misconfigured devices can be exploited.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">7. Software-Defined Networking (SDN)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Architecture that decouples control and forwarding, giving a centralized programmatic view. Three planes:</p>
+<div class="tblwrap"><table><thead><tr><th>Plane</th><th>Role</th></tr></thead><tbody><tr><td><strong>Data (forwarding) plane</strong></td><td>Moves packets place to place; forwarding decisions per IP/Ethernet; switches/routers do the sending/receiving</td></tr><tr><td><strong>Control plane</strong></td><td><strong>The brain</strong> — decides where traffic is sent. In SDN it is <strong>centralized</strong>: one controller dictates traffic flow for the whole network (in traditional networks each router has its own)</td></tr><tr><td><strong>Application plane</strong></td><td>Network applications live here; they instruct the controller, which manipulates the network</td></tr></tbody></table></div>
+<p>Real-world: Google B4 (data-center WAN traffic/bandwidth efficiency), AT&amp;T Domain 2.0.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">8. Infrastructure as Code (IaC)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Managing/provisioning infrastructure through machine-readable definition files (code) instead of manual configuration. Languages: YAML, JSON, HCL (HashiCorp Configuration Language). Key DevOps practice, pairs with cloud.</li><li><strong>Idempotence</strong> — running the operation any number of times produces the <strong>same result</strong>; identical environment every run regardless of initial state.</li><li>Goal: eliminate <strong>snowflake systems</strong> (one-off inconsistent builds that introduce risk).</li><li>Benefits: speed/efficiency, consistency &amp; standardization, scalability, cost savings, auditability &amp; compliance (code is versioned and auditable).</li><li>Challenges: learning curve, growing complexity (mitigate: modularization, documentation), security risks (secrets exposed in code files, insecure configs introduced).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">9. Centralized vs Decentralized</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th></th><th>Centralized</th><th>Decentralized</th></tr></thead><tbody><tr><td>Structure</td><td>One location/authority (central server, mainframe, data center)</td><td>Functions distributed across nodes, no single point of control</td></tr><tr><td>Benefits</td><td>Control, consistency (one data store), cost-effective to maintain</td><td>Resiliency (node failure ≠ system down), scalability (add nodes), flexibility (remote work, distributed teams)</td></tr><tr><td>Risks</td><td><strong>Single point of failure</strong>, scalability limits, juicy target (one compromise = everything)</td><td>More security risk (every remote connection an entry point), management complexity, data inconsistency/synchronization issues</td></tr></tbody></table></div>
+</div></details>
+<details class="topic" open><summary><span class="t-name">10. IoT</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Network of physical devices with sensors, software and connectivity exchanging data near real time.</li><li>Components: <strong>hub/control system</strong> (central point connecting devices, collects/processes data, sends commands — Amazon Echo, Google Home, or an app), <strong>smart devices</strong> (appliances to industrial robots), <strong>wearables</strong> (watches, fitness trackers, smart glasses), <strong>sensors</strong> (eyes and ears — measure temperature, motion, pressure etc.).</li><li>Top risks: <strong>weak default usernames/passwords</strong> left unchanged, <strong>poorly configured network services</strong> (open ports, unencrypted communication, unnecessary services). Best practice: <strong>put IoT devices on a separate network/segment</strong>.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">11. Embedded Systems</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Dedicated computer built for one or two specific functions inside a larger device: smartphones, cameras, microwaves, vehicles (engine control, ABS, airbags), medical (pacemakers, insulin pumps), industrial automation/robotics.</li><li><strong>RTOS (real-time operating system)</strong>: executes processes in a timely, predictable manner, no buffer delays — flight navigation, medical equipment.</li><li>Risks: hardware failure (harsh environments), software bugs (safety risks), security vulnerabilities, outdated systems (long operational lives).</li><li>Securing them: <strong>network segmentation</strong> (breach of one segment ≠ whole network), <strong>wrappers</strong> (e.g. IPsec tunneling — interceptor sees only the wrapper header showing entry/exit points), <strong>firmware code control</strong> (secure coding, code reviews, automated testing, secure boot, cryptographic signatures), and coping with the <strong>inability to patch</strong> (downtime unacceptable / physically unreachable / never designed for updates) via <strong>over-the-air updates</strong> (delivered remotely — needs careful security planning).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Quick-fire exam traps</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Type 1 hypervisor = bare metal = faster. Type 2 = hosted inside an OS.</li><li>VM escape target = the <strong>hypervisor</strong>; container risk = shared <strong>kernel</strong>.</li><li>Data remnants = data left after deletion → overwrite.</li><li>Live migration attack = adversary-in-the-middle between the two physical hosts.</li><li>IaC repeatability = <strong>idempotence</strong>; one-off systems = <strong>snowflakes</strong>.</li><li>SDN control plane = centralized brain; data plane = moves packets.</li><li>Air gap strongest but Stuxnet proved it breakable.</li><li>Serverless = FaaS, pay-per-execution, vendor lock-in risk.</li><li>Microservice dies alone; monolith falls as one.</li><li>IoT defaults + open services → segment them off.</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="cyber-resilience-study-notes.html">&larr; Prev: Section 13 · Cyber Resilience</a> <a class="btn ghost" href="security-infrastructure-study-notes.html">Next &rarr;: Section 15 · Security Infrastructure</a></div>
+  <script>
+    var SLUG = "security-architecture";
+    var TOTAL = 12;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

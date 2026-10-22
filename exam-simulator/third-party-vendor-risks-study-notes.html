@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 9 · Third Party Vendor Risks — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 9 · Third Party Vendor Risks &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><p class="doc-title">Third-Party Vendor Risks — SY0-701 Study Notes (Section 10)</p>
+<p><strong>Exam weight:</strong> Domain 2.0 (Threats, Vulnerabilities &amp; Mitigations) — OBJ 2.2, 2.3 · Domain 5.0 (Program Management &amp; Oversight) — OBJ 5.3 <strong>Lessons covered:</strong> 89–94 (Third-party vendor risks · Supply chain risks · Supply chain attacks · Vendor assessment · Vendor selection &amp; monitoring · Contracts &amp; agreements)</p>
+<details class="topic" open><summary><span class="t-name">1. Why Third-Party Vendor Risk Matters</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Third-party vendor risk</strong> = the security and operational challenges introduced by external entities you work with: <strong>vendors, suppliers, and service providers</strong>.</li><li>Integrating external partners opens your environment to threats and vulnerabilities that can affect integrity, data security, and business continuity.</li><li>Examples: a hardware provider whose components have vulnerabilities, a software supplier whose app has a hidden backdoor, an MSP with access to your sensitive data but weak security protocols.</li><li>Core principle: <strong>you are only as strong as the weakest link in your supply chain.</strong></li></ul>
+<h3>Know the three entity types (classic exam distinction)</h3>
+<div class="tblwrap"><table><thead><tr><th>Entity</th><th>What they do</th><th>Example</th></tr></thead><tbody><tr><td><strong>Vendor</strong></td><td>Provides goods or services to your organization</td><td>Microsoft, Oracle (software)</td></tr><tr><td><strong>Supplier</strong></td><td>Involved in production/delivery of products or parts</td><td>Processor, memory, hard-drive makers for a PC manufacturer</td></tr><tr><td><strong>MSP (Managed Service Provider)</strong></td><td>Hired to manage IT services on your behalf</td><td>AWS, Google Cloud</td></tr></tbody></table></div>
+</div></details>
+<details class="topic" open><summary><span class="t-name">2. Supply Chain Risks (Lesson 90)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<h3>Hardware manufacturers</h3>
+<ul class="mdlist"><li>A device like a router/switch contains hundreds of components from various suppliers — each can be a vulnerability if tampered with or from an untrusted source.</li><li><strong>Trusted Foundry program</strong> — used by low-risk-appetite entities (e.g., the <strong>Department of Defense</strong>) to ensure hardware is authentic and microprocessors are manufactured securely against a known-good baseline.</li><li><strong>Secondary / aftermarket hardware sources</strong> — budget-friendly but high risk of <strong>counterfeit or tampered devices</strong>: modified code with Trojans, remote/unauthorized access, operational failures.</li></ul>
+<h3>Software developers / providers</h3>
+<ul class="mdlist"><li>Check that software is <strong>properly licensed, authentic, free of known vulnerabilities/bugs</strong>, and scanned with <strong>antivirus/anti-malware</strong>.</li><li><strong>Open-source</strong> software is easier to assess because you can review the <strong>entire source code</strong>; proprietary software (e.g., Microsoft Office) still gets scans and vulnerability assessments.</li></ul>
+<h3>Service providers / MSPs</h3>
+<ul class="mdlist"><li>Unique challenges, especially <strong>SaaS</strong>: Can you ensure confidentiality and integrity of data they touch? Are their security protocols robust? Will they support incident response / forensics after a breach?</li><li>The decision hinges on your organization's <strong>risk appetite</strong> and the ramifications of a data breach.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">3. Supply Chain Attacks (Lesson 91) — HIGH-YIELD</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Definition:</strong> an attack that targets a <strong>weaker link in the supply chain</strong> to gain access to a primary target — instead of attacking a well-defended organization directly.</p>
+<h3>Real-world examples</h3>
+<ul class="mdlist"><li><strong>2000s–2010s Cisco counterfeits:</strong> counterfeit routers/switches sold on the secondary market.</li><li><strong>Chip washing:</strong> repackaging the contents of a microchip with a <strong>less expensive chip or one containing embedded malware</strong>. Best case: device malfunctions; worst case: always-on backdoor in your network hardware.</li><li><strong>Rootkits embedded by overseas suppliers:</strong> pre-installed malware providing backdoor access once devices are active.</li><li><strong>SolarWinds (2021):</strong> attackers infiltrated the <strong>SolarWinds Orion software update system</strong> and used it to distribute malware to thousands of clients, including governments. Lesson: attackers compromise the <strong>update mechanism</strong> to bypass even strong defenses (e.g., DoD).</li></ul>
+<h3>Mitigating supply chain attacks (4 things — memorize)</h3>
+<ul class="mdlist"><li><strong>Vendor due diligence</strong> — especially vendors with access to critical systems/data; examine their security posture *and* their own supply chain management.</li><li><strong>Regular monitoring and audits</strong> — early detection of suspicious activity.</li><li><strong>Education and collaboration</strong> — share threats/vulnerabilities/best practices; joint defense with industry groups.</li><li><strong>Contractual safeguards</strong> — contract language requiring security standards, with legal repercussions.</li></ul>
+<h3>CHIPS Act (2022) — know the numbers</h3>
+<ul class="mdlist"><li><strong>~$280 billion</strong> total funding to boost US semiconductor research and manufacturing.</li><li><strong>$39 billion</strong> in subsidies for US chip manufacturing.</li><li><strong>25% investment tax credit</strong> for manufacturing equipment.</li><li><strong>$13 billion</strong> for semiconductor research and workforce training.</li><li>Goal: reduce reliance on <strong>foreign-made semiconductors</strong> and strengthen domestic supply chain resilience.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">4. Vendor Assessment (Lesson 92) — HIGH-YIELD</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Vendor assessment</strong> = evaluating the security, reliability, and performance of external entities you rely on. A weak link in one vendor can reverberate across multiple businesses.</li></ul>
+<h3>Assessment methods (know each cold)</h3>
+<div class="tblwrap"><table><thead><tr><th>Method</th><th>What it is</th></tr></thead><tbody><tr><td><strong>Penetration testing of suppliers</strong></td><td>A <strong>simulated cyberattack</strong> against supplier systems to find exploitable vulnerabilities, the same way a real attacker would</td></tr><tr><td><strong>Right to audit clause</strong></td><td>Contract clause granting your organization the right to <strong>evaluate the vendor's internal processes</strong> and verify compliance with agreed standards (trust but verify)</td></tr><tr><td><strong>Internal audit</strong></td><td>The vendor's <strong>self-assessment</strong> against industry standards or organizational requirements</td></tr><tr><td><strong>Independent assessment</strong></td><td>Evaluation by a <strong>third party with no stake</strong> in the vendor (e.g., <strong>ISO</strong>) — neutral validation</td></tr><tr><td><strong>Supply chain analysis</strong></td><td>Deep dive into the vendor's <strong>entire supply chain</strong>, assessing the security and reliability of <strong>each link</strong> (counterfeit/tampered parts risk)</td></tr></tbody></table></div>
+<p>&gt; Exam tip: &quot;trust but verify&quot; is the mantra. Internal audits are commendable but may lack rigor → independent assessments add credibility.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">5. Vendor Selection &amp; Monitoring (Lesson 93)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<h3>Selection</h3>
+<ul class="mdlist"><li><strong>Due diligence</strong> — rigorous evaluation beyond surface credentials: <strong>financial stability, operational history, client testimonials, on-the-ground practices</strong>.</li><li><strong>Conflict of interest</strong> — personal/financial relationships that could bias vendor-selection judgments. Mitigate by <strong>requiring disclosures</strong> or <strong>excluding conflicted parties</strong> from the decision.</li><li><strong>Vendor questionnaire</strong> — comprehensive document vendors complete so you can <strong>compare vendors on standardized criteria</strong> (e.g., data redundancy, security protocols, uptime guarantees, disaster recovery plans).</li><li><strong>Rules of engagement</strong> — guidelines dictating the <strong>terms of interaction</strong> with potential vendors: communication protocols, data-sharing policies, negotiation boundaries (e.g., deleting unsolicited proposals).</li></ul>
+<h3>Monitoring (after selection)</h3>
+<ul class="mdlist"><li><strong>Performance reviews</strong> — periodic evaluations of vendor deliverables against the <strong>standards and objectives in the contract</strong>.</li><li><strong>Feedback loops</strong> — <strong>two-way communication channels</strong> where both sides share feedback; leads to collaborative growth and refinement.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">6. Contracts &amp; Agreements (Lesson 94) — HIGH-YIELD</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Document</th><th>Purpose</th><th>Exam cue</th></tr></thead><tbody><tr><td><strong>Basic contract</strong></td><td>Formally establishes a relationship; roles, responsibilities, repercussions for failure</td><td>The foundation stone</td></tr><tr><td><strong>SLA</strong> (Service Level Agreement)</td><td>Defines the <strong>standard of service</strong> expected (e.g., downtime ≤ 2 hours/month); deviations → <strong>penalties</strong></td><td>Uptime/downtime + penalties</td></tr><tr><td><strong>MOA</strong> (Memorandum of Agreement)</td><td><strong>Formal</strong>; outlines <strong>specific responsibilities and roles</strong> of each party</td><td>Formal + specific duties</td></tr><tr><td><strong>MOU</strong> (Memorandum of Understanding)</td><td><strong>Less binding</strong>; declaration of <strong>mutual intent</strong>, broad strokes</td><td>Intent, not commitment</td></tr><tr><td><strong>MSA</strong> (Master Service Agreement)</td><td><strong>Blanket agreement</strong> covering general terms across <strong>multiple transactions</strong>; supplemented by work orders/SOWs</td><td>Umbrella for repeat business</td></tr><tr><td><strong>SOW</strong> (Statement/Scope of Work)</td><td>Details for a <strong>particular project</strong>: deliverables, timeline, milestones</td><td>Pairs with the MSA</td></tr><tr><td><strong>NDA</strong> (Non-disclosure Agreement)</td><td>Keeps <strong>sensitive information shared during negotiations confidential</strong></td><td>Discussing secrets before a deal</td></tr><tr><td><strong>BPA</strong> (Business Partnership Agreement)</td><td>For entities pooling resources: profit sharing, decision-making structures, exit strategies; aka <strong>Joint Venture (JV) agreement</strong></td><td>Partnership/revenue sharing</td></tr></tbody></table></div>
+<p>&gt; MOA vs MOU is a favorite exam trap: <strong>MOA = formal and specific; MOU = informal intent.</strong></p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">7. Likely Exam Scenarios</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>&quot;An organization wants the right to inspect a vendor's data-handling practices&quot; → <strong>right to audit clause</strong></li><li>&quot;A neutral body like ISO evaluates a data center&quot; → <strong>independent assessment</strong></li><li>&quot;Counterfeit chip repackaged into a device&quot; → <strong>chip washing</strong></li><li>&quot;Attackers compromised the software update mechanism to reach many clients&quot; → <strong>SolarWinds-style software supply chain attack</strong></li><li>&quot;Two organizations want to express intent to explore a partnership without binding details&quot; → <strong>MOU</strong></li><li>&quot;Document covering profit sharing and exit strategies between two firms&quot; → <strong>BPA / JV agreement</strong></li><li>&quot;Standardized document to compare cloud providers on redundancy and uptime&quot; → <strong>vendor questionnaire</strong></li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">8. Rapid-Fire Self-Test (44 items)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Third-party vendor risk is introduced by which three external entity types? *(vendors, suppliers, service providers/MSPs)*</li><li>Which program ensures authentic, securely manufactured hardware for the DoD? *(Trusted Foundry)*</li><li>Why are secondary/aftermarket hardware sources risky? *(counterfeit/tampered devices, malware, backdoors)*</li><li>What makes open-source software easier to assess? *(full source code review possible)*</li><li>What must purchased software be checked for? *(licensing, authenticity, no known vulnerabilities, malware-scanned)*</li><li>What unique risk do SaaS providers pose? *(your data's confidentiality/integrity in their hands)*</li><li>Define a supply chain attack. *(targeting a weaker link to reach a primary target)*</li><li>What is chip washing? *(repackaging a chip's contents with a cheaper or malware-bearing chip)*</li><li>What's the worst-case outcome of a counterfeit chip? *(always-on backdoor in network hardware)*</li><li>What did the SolarWinds attackers compromise? *(the Orion software update system)*</li><li>Name the four mitigations for supply chain attacks. *(due diligence, monitoring/audits, education/collaboration, contractual safeguards)*</li><li>CHIPS Act total funding? *(~$280B)*</li><li>CHIPS Act manufacturing subsidies? *($39B)*</li><li>CHIPS Act investment tax credit? *(25%)*</li><li>CHIPS Act research/workforce funding? *($13B)*</li><li>CHIPS Act goal? *(reduce reliance on foreign semiconductors)*</li><li>Penetration testing of a vendor simulates what? *(a real cyberattack to find exploitable vulnerabilities)*</li><li>What does a right to audit clause grant? *(right to evaluate vendor's internal processes/compliance)*</li><li>An internal audit is the vendor's what? *(self-assessment)*</li><li>Who conducts an independent assessment? *(a neutral third party, e.g., ISO)*</li><li>What does a supply chain analysis examine? *(every link in the vendor's own supply chain)*</li><li>What is the cybersecurity mantra for vendor relations? *(trust but verify)*</li><li>What four things does vendor-selection due diligence examine? *(financial stability, operational history, testimonials, on-the-ground practices)*</li><li>How do you handle a conflict of interest in selection? *(disclosures; exclude conflicted parties)*</li><li>What's the purpose of a vendor questionnaire? *(standardized comparison of vendors)*</li><li>Rules of engagement cover what three areas? *(communication protocols, data sharing, negotiation boundaries)*</li><li>What are vendor performance reviews measured against? *(contract standards/objectives)*</li><li>Feedback loops are what kind of channels? *(two-way communication)*</li><li>What does a basic contract establish? *(relationship, roles, responsibilities, repercussions)*</li><li>What does an SLA define, and what happens on deviation? *(service standard; penalties)*</li><li>MOA vs MOU: which is formal? *(MOA)*</li><li>Which is a declaration of mutual intent? *(MOU)*</li><li>What does an MSA cover? *(blanket general terms across multiple transactions)*</li><li>What does an SOW specify? *(project deliverables, timeline, milestones)*</li><li>When is an NDA used? *(when sharing sensitive info before/without a formal partnership)*</li><li>What does a BPA outline? *(partnership nature, profit sharing, decision-making, exit strategies)*</li><li>BPA is also known as what? *(Joint Venture agreement)*</li><li>Vendor vs supplier vs MSP — which manages IT for you? *(MSP)*</li><li>Which entity provides parts used in production? *(supplier)*</li><li>Which entity sells finished goods/services (e.g., Microsoft)? *(vendor)*</li><li>Why is chip washing best case still bad? *(device malfunctions, network failures/crashes)*</li><li>What risk do overseas-manufactured devices carry per the lesson? *(pre-installed rootkits/backdoors)*</li><li>What makes internal audits insufficient sometimes? *(lack of rigor — need independent assessment)*</li><li>Supply chain security is whose job? *(everyone's — not just IT/security)*</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="risk-management-study-notes.html">&larr; Prev: Section 8 · Risk Management</a> <a class="btn ghost" href="governance-and-compliance-study-notes.html">Next &rarr;: Section 10 · Governance and Compliance</a></div>
+  <script>
+    var SLUG = "third-party-vendor-risks";
+    var TOTAL = 8;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

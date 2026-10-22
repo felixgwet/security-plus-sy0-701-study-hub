@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 20 · Security Techniques — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 20 · Security Techniques &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><p class="doc-title">Section 21 — Security Techniques (SY0-701 Study Notes)</p>
+<p>Objectives 4.1 &amp; 4.5: applying security techniques to computing resources and modifying enterprise capabilities to enhance security. Heavily tested: WPA3 features, DKIM/SPF/DMARC, EDR/XDR, UBA, and secure protocol/port selection.</p>
+<details class="topic" open><summary><span class="t-name">199 — Wireless Infrastructure Security</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>WAP placement</strong>: center of the facility, away from windows/exterior walls — signals that leak into the parking lot invite attackers. Mount high (shelf/ceiling) for coverage and less interference. If a WAP must sit on an exterior wall, use a <strong>unidirectional antenna</strong> aimed inward (omnidirectional broadcasts 360°).</li><li><strong>ESS (extended service set)</strong>: multiple WAPs cooperating for seamless roaming across a large building. Watch <strong>interference</strong>:</li><ul><li><strong>Co-channel interference</strong>: two WAPs overlapping on the SAME channel → collisions and retransmissions.</li><li><strong>Adjacent channel interference</strong>: channels too close (e.g., 1, 3, 6) → overlapping frequency errors. In 2.4 GHz use only <strong>channels 1, 6, and 11</strong> (each 22 MHz wide, only 100 MHz total — these three don't overlap).</li></ul><li><strong>Site survey</strong>: plan/design the wireless network — site visit to test RF interference and find optimal AP locations (what's already broadcasting in the band).</li><li><strong>Heat map</strong>: graphical map of signal strength/coverage per location, color-coded. Use it to find dead zones, overly strong signals, and <strong>signal leaking outside the building</strong> (then reposition APs or turn power down / aim unidirectional antennas inward).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">200 — Wireless Security Settings</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Encryption evolution (exam loves this):</strong></p>
+<ul class="mdlist"><li><strong>WEP (1999)</strong>: static shared key, 64/128-bit (24-bit IV + 40/104-bit key), weak RC4 → crackable in ~3 minutes. Never use.</li><li><strong>WPA (2003)</strong>: interim fix; <strong>TKIP</strong> dynamically generates a new 128-bit key per packet, but inherits WEP weaknesses; insufficient integrity checks. Insecure.</li><li><strong>WPA2 (2004, 802.11i)</strong>: <strong>AES + CCMP</strong> (Counter Cipher Mode with Block Chaining MAC Protocol), adds <strong>MIC</strong> (message integrity code). Vulnerable to <strong>KRACK (2016)</strong>.</li><li><strong>WPA3</strong> — current standard, four key features:</li><ul><li><strong>SAE (Simultaneous Authentication of Equals)</strong>: replaces the WPA2 pre-shared key four-way handshake with a Diffie-Hellman-based protocol → resistant to <strong>offline dictionary attacks</strong> even with weak passwords; captured handshake data is useless for password guessing.</li><li><strong>Enhanced Open (OWE — Opportunistic Wireless Encryption)</strong>: individualized encryption on open (no-password) networks; protects public Wi-Fi against passive eavesdropping. Not full authentication.</li><li><strong>Updated crypto: AES-GCMP</strong> (Galois/Counter Mode) replacing CCMP; 128-bit for personal, <strong>192-bit option for enterprise</strong>.</li><li><strong>Management frame protection</strong>: protects deauth/disassoc-type frames from forgery/tampering (defeats deauth-based attacks; these frames used to be unprotected).</li></ul></ul>
+<p><strong>AAA protocols:</strong></p>
+<ul class="mdlist"><li><strong>RADIUS</strong>: centralized <strong>authentication, authorization, accounting</strong> over UDP; industry standard for network access.</li><li><strong>TACACS+</strong>: AAA with <strong>separated</strong> authn/authz/accounting (more granular control), uses <strong>TCP</strong> and <strong>encrypts the entire authentication payload</strong> — favored for device administration.</li></ul>
+<p><strong>EAP family (authentication framework for wireless/PPP):</strong></p>
+<ul class="mdlist"><li><strong>EAP</strong>: framework, not a specific protocol — negotiates the auth method.</li><li><strong>PEAP</strong>: EAP inside a TLS tunnel; <strong>requires certificates on BOTH server and client</strong>.</li><li><strong>EAP-TTLS</strong>: server-side certificate only; carries a second auth protocol inside the TLS tunnel (extends TLS across platforms).</li><li><strong>EAP-FAST</strong>: Cisco; uses Protected Access Credentials (PAC) to re-authenticate securely when roaming without full re-auth; replaced vulnerable <strong>LEAP</strong>.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">201 — Application Security (six areas)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Input validation</strong>: the gatekeeper — define validation rules (e.g., phone number = 10 digits); validate <strong>front-end AND back-end</strong> (front-end alone can be bypassed; back-end alone is costly). Not a cure-all — still need defense in depth.</li><li><strong>Secure cookies</strong>: transmit only over HTTPS; <strong>never use persistent cookies for session verification</strong> — issue a fresh cookie at each authentication. Attributes: <strong>Secure</strong> (HTTPS only), <strong>HttpOnly</strong> (unreachable by DOM/client scripts → blocks XSS cookie theft), <strong>SameSite</strong> (restricts cross-origin sending → reduces CSRF).</li><li><strong>Static code analysis (SAST)</strong>: examine <strong>source code before running</strong> for buffer overflows, SQLi, XSS, missing validation. Tool must support the language. Human review = <strong>manual code review</strong> (ideally by a different programmer).</li><li><strong>Dynamic code analysis (DAST)</strong>: test the app <strong>while running</strong>; finds runtime errors, memory leaks static analysis misses. Two common methods: <strong>fuzzing</strong> (inject massive random/malformed data to force crashes) and <strong>stress testing</strong> (extreme load — thousands/millions of simulated users — to find bottlenecks and test load balancing/recovery).</li><li><strong>Code signing</strong>: hash the file, encrypt the hash with the developer's <strong>private key</strong> = digital signature; receiver verifies with the public key in the shipped certificate. Proves <strong>authenticity + integrity</strong> (not that the code is vulnerability-free). App stores require it.</li><li><strong>Sandboxing</strong>: isolate running/untrusted programs, limiting resources and changes they can make; browser sandboxes confine web code; can run multiple OS sandboxes on one host for testing.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">202 — Network Access Control (NAC)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>NAC scans devices for security state <strong>before</strong> granting network access; works for internal, wired, or VPN-connected devices.</li><li>Flow: device enters a <strong>virtual holding area</strong> while scanned (simple checks like EAP auth up through AV definitions, patch status) → pass = full access; <strong>fail = quarantine</strong> in a screened subnet for remediation (AV updates, patches, configs) — logically isolated until healthy.</li><li><strong>Agents</strong>: <strong>persistent</strong> (installed software — good for corporate-owned, managed devices) vs <strong>non-persistent</strong> (downloaded via captive-portal link, scans, then deletes itself — good for BYOD, e.g., college campuses).</li><li><strong>802.1x</strong>: the IEEE port-based NAC standard most NAC solutions build on.</li><li>Access rules beyond health: <strong>time-based</strong> (schedules, e.g., deny 2 AM logins — beware global teams), <strong>location-based</strong> (geo-IP/GPS — Florida user suddenly in Italy → remediate), <strong>role-based (adaptive NAC)</strong> (re-evaluate when a device attempts new functions — a user laptop joining a server-management subnet is rejected), <strong>rule-based</strong> (complex if/then admission policies).</li><li>NAC = defense in depth + supports <strong>zero trust</strong>.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">203 — Web and DNS Filtering</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Web filtering (content filtering)</strong> types:</p>
+<ul class="mdlist"><li><strong>Agent-based</strong>: software agent on each device enforces policy — works anywhere, best for remote/mobile workers.</li><li><strong>Centralized proxy</strong>: all requests go through an intermediary server that evaluates policy and fetches/blocks content.</li><li><strong>URL scanning</strong>: check requested URL against a database of known malicious sites; match = blocked.</li><li><strong>Content categorization</strong>: classify sites (social media, adult, gambling) and allow/block categories.</li><li><strong>Block rules</strong>: explicit admin rules (e.g., block an IP seen in suspected exfiltration during incident response).</li><li><strong>Reputation-based filtering</strong>: third-party reputation score (history of malware/phishing) decides block/allow.</li></ul>
+<p><strong>DNS filtering</strong>: block by refusing to resolve blocked domains — the DNS server simply won't return the IP. Common in schools to enforce acceptable use.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">204 — Email Security</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>DKIM</strong>: sender signs email headers with a digital signature; receiver validates against the <strong>public key in the sender domain's DNS</strong>. Proves origin + content not tampered in transit. Anti-spoofing, better deliverability/reputation.</li><li><strong>SPF</strong>: domain publishes authorized sending <strong>IPs in DNS</strong>; receiving server checks the sender's IP against that list — not listed → spam/reject. Prevents sender-address forging.</li><li><strong>DMARC</strong>: domain owner publishes a <strong>policy telling receivers what to do</strong> with messages that fail SPF/DKIM (works with either or both). Anti-BEC/phishing minimum baseline — every email server should have it.</li><li><strong>Email gateway</strong>: entry/exit point for all mail (SMTP-based); handles <strong>routing, security scanning</strong> (spam/phishing/malware in and out), <strong>policy enforcement</strong> (block sensitive outgoing mail, block known-bad senders), and <strong>encryption/decryption</strong> of messages. Deployment: <strong>on-premise</strong> (max control, you maintain it), <strong>cloud-based</strong> (scalability, less maintenance, provider-defined security), or <strong>hybrid</strong> (balance).</li><li><strong>Spam filtering</strong>: content analysis, <strong>Bayesian filtering</strong>, DNS-based sinkhole/blocklists, and custom rules (flag &quot;lottery/free/prize&quot; language).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">205 — EDR / FIM / XDR</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>EDR (endpoint detection &amp; response)</strong>: monitors endpoint/network events into a central DB for analysis, detection, investigation, reporting, alerting. Six steps: <strong>data collection → consolidation → threat detection → alerts/response → investigation → remediation</strong> (remove malware, reverse changes, restore from secure baseline).</li><ul><li>Detection: signature-based (known patterns) + behavior-based (anomalies).</li><li>Response: alert analysts or automated playbook actions (e.g., <strong>isolate the endpoint</strong> from the network).</li></ul><li><strong>FIM (file integrity monitoring)</strong>: agent hashes critical files; compares current state to a <strong>known-good baseline</strong> of hashes; unauthorized change → alert. Often bundled into EDR/XDR.</li><li><strong>XDR (extended detection &amp; response)</strong>: integrates <strong>multiple protection layers — email, endpoint, server, cloud workloads, network</strong> — into ONE platform; correlates data across all layers for faster detection/response; replaces separate siloed tools.</li><li>EDR = endpoints only; XDR = everything, correlated.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">206 — User Behavior Analytics (UBA/UEBA)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Uses <strong>big data + machine learning</strong> to baseline <strong>normal user behavior</strong>, then flags anomalies: late-night logins, accessing unusual file sets, bulk downloads (exfil), read-only accounts suddenly modifying/deleting.</li><li><strong>UEBA</strong> = UBA + monitoring <strong>entities</strong> (routers, servers, endpoints), not just user accounts.</li><li>Benefits: <strong>early threat detection</strong> (beats manual log review by days/weeks), <strong>insider threat detection</strong> (hardest for traditional tools), <strong>improved incident response</strong> (auto-logout of compromised accounts, rich context).</li><li>Anomalies are alerts for review — may be legitimate (working late).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">207 — Selecting Secure Protocols</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Rule: pick the encrypted version</strong> — HTTP→<strong>HTTPS</strong>, FTP→<strong>SFTP</strong> (over SSH tunnel), Telnet→<strong>SSH</strong>, SMTP→<strong>SMTPS</strong>, POP3→<strong>POP3S</strong>, IMAP→<strong>IMAPS</strong>, SNMP→<strong>SNMPS</strong>. Usually just an &quot;S&quot; suffix.</li><li><strong>Ports</strong>: well-known 0–1023 (system services); registered 1024–49,151 (applications); dynamic/private 49,152–65,535 (client side, randomly assigned).</li><li>Key port numbers: HTTP 80 / HTTPS 443; SMTP 25 / <strong>SMTPS 587</strong>; POP3 110 / <strong>POP3S 995</strong>; IMAP 143 / <strong>IMAPS 993</strong>.</li><li><strong>Least privilege for ports</strong>: open only what's needed; block the rest. To force HTTPS, open 443 and close 80.</li><li><strong>Non-standard ports</strong> (e.g., web on 8888): add obscurity, not security — never a substitute for encryption/auth; document carefully.</li><li><strong>Transport</strong>: <strong>TCP</strong> = connection-oriented, ACKs, retransmission, sequencing → accuracy (web, email). <strong>UDP</strong> = connectionless, no error checking/recovery → speed (streaming video, gaming; a lost frame is skipped).</li></ul>
+<h3>High-yield rapid-fire list</h3>
+<ul class="mdlist"><li>WEP RC4/24-bit IV (3-min crack) → WPA TKIP → WPA2 AES-CCMP + MIC (KRACK) → WPA3: SAE (anti offline dictionary), Enhanced Open/OWE, AES-GCMP (192-bit enterprise), mgmt frame protection.</li><li>RADIUS = UDP AAA combined; TACACS+ = TCP, encrypts whole auth payload, separates AAA functions.</li><li>PEAP = client+server certs; EAP-TTLS = server cert only; EAP-FAST = Cisco PAC, replaced LEAP.</li><li>2.4 GHz channels → 1, 6, 11 only. Heat map = signal/coverage picture.</li><li>SAST = source before run; DAST = running app; fuzzing = random input crashes; stress = extreme load.</li><li>Cookie attributes: Secure, HttpOnly, SameSite. Never persistent cookies for sessions.</li><li>NAC: pass → network; fail → quarantine subnet. 802.1x = port-based NAC. BYOD → non-persistent agent + captive portal.</li><li>DKIM = signature verified via DNS public key; SPF = authorized sender IPs in DNS; DMARC = policy for failed checks.</li><li>EDR = endpoints; XDR = endpoints+network+email+cloud correlated; FIM = hash vs known-good baseline; UEBA adds entities.</li><li>SMTPS 587, POP3S 995, IMAPS 993, HTTPS 443. TCP accurate, UDP fast. Non-standard port = obscurity only.</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="hardening-study-notes.html">&larr; Prev: Section 19 · Hardening</a> <a class="btn ghost" href="vulnerability-management-study-notes.html">Next &rarr;: Section 21 · Vulnerability Management</a></div>
+  <script>
+    var SLUG = "security-techniques";
+    var TOTAL = 9;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

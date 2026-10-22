@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 15 · Security Infrastructure — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 15 · Security Infrastructure &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><p class="doc-title">Security Infrastructure — Study Notes (Section 16 · OBJ 3.2 &amp; 4.5)</p>
+<p>This section is a SY0-701 goldmine: ports/protocols, firewall types, IDS/IPS, VPN/IPSec, 802.1x/EAP, and fail-open/fail-closed are all perennial exam topics. Memorize the port table cold.</p>
+<details class="topic" open><summary><span class="t-name">1. Ports &amp; Protocols (OBJ 4.5)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Port ranges: <strong>well-known 0–1023</strong> (IANA-assigned common services), <strong>registered 1024–49,151</strong> (vendors register with IANA, e.g. MS SQL 1433, RDP 3389), <strong>dynamic/private 49,152–65,535</strong> (clients pick random high ports for outbound connections — also gaming/IM).</p>
+<div class="tblwrap"><table><thead><tr><th>Port</th><th>Protocol</th><th>Transport</th><th>Purpose</th></tr></thead><tbody><tr><td>21</td><td>FTP</td><td>TCP</td><td>File transfer (control)</td></tr><tr><td>22</td><td>SSH / SCP / SFTP</td><td>TCP</td><td>Secure remote terminal + secure file copy</td></tr><tr><td>23</td><td>Telnet</td><td>TCP</td><td>Remote access — <strong>unencrypted/insecure</strong>; replace with SSH</td></tr><tr><td>25</td><td>SMTP</td><td>TCP</td><td>Send email</td></tr><tr><td>53</td><td>DNS</td><td><strong>TCP + UDP</strong></td><td>Domain name → IP</td></tr><tr><td>69</td><td>TFTP</td><td><strong>UDP</strong></td><td>Trivial file transfer</td></tr><tr><td>80</td><td>HTTP</td><td>TCP</td><td>Web, unencrypted</td></tr><tr><td>88</td><td>Kerberos</td><td>UDP</td><td>Network authentication</td></tr><tr><td>110</td><td>POP3</td><td>TCP</td><td>Retrieve email</td></tr><tr><td>119</td><td>NNTP</td><td>TCP</td><td>Newsgroups</td></tr><tr><td>135</td><td>RPC</td><td>TCP+UDP</td><td>Inter-process communication (Windows file sharing)</td></tr><tr><td>137–139</td><td>NetBIOS</td><td>UDP+TCP</td><td>Windows name services, file/printer sharing</td></tr><tr><td>143</td><td>IMAP</td><td>TCP</td><td>Access email on server</td></tr><tr><td>161</td><td>SNMP</td><td>UDP</td><td>Manage network devices</td></tr><tr><td>162</td><td>SNMP Traps</td><td>UDP</td><td>Device → manager alerts</td></tr><tr><td>389</td><td>LDAP</td><td>TCP</td><td>Directory services</td></tr><tr><td>443</td><td>HTTPS</td><td>TCP</td><td>Secure web</td></tr><tr><td>445</td><td>SMB</td><td>TCP</td><td>File/printer sharing</td></tr><tr><td>465/587</td><td>SMTPS</td><td>TCP (SSL/TLS)</td><td>Secure email sending</td></tr><tr><td>514</td><td>Syslog</td><td><strong>UDP</strong></td><td>Log messages</td></tr><tr><td>636</td><td>LDAPS</td><td>TCP</td><td>LDAP over SSL/TLS</td></tr><tr><td>993</td><td>IMAPS</td><td>TCP</td><td>Secure IMAP</td></tr><tr><td>995</td><td>POP3S</td><td>TCP</td><td>Secure POP3</td></tr><tr><td>1433</td><td>MS SQL</td><td>TCP</td><td>Microsoft SQL Server</td></tr><tr><td>1645/1646</td><td>RADIUS</td><td>TCP</td><td>Remote auth (TCP variant)</td></tr><tr><td>1812/1813</td><td>RADIUS</td><td><strong>UDP</strong></td><td>Remote auth (standard UDP variant)</td></tr><tr><td>3389</td><td>RDP</td><td>TCP</td><td>Remote desktop</td></tr><tr><td>6514</td><td>Syslog-TLS</td><td>TCP</td><td>Encrypted syslog</td></tr></tbody></table></div>
+<p>Exam framing: you won't be asked &quot;which port is SSH?&quot; — you'll get a scenario (&quot;secure web connection blocked by firewall&quot;) where you must know it's 443.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">2. Firewalls (OBJ 3.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Screened subnet</strong> (= DMZ, dual-homed host config): buffer between untrusted external and trusted internal networks; hosts public services (web, email, DNS). <strong>For the exam use &quot;screened subnet&quot;</strong> even though devices still say DMZ.</li><li>Types (more inspection = more security but less throughput):</li><ul><li><strong>Packet-filtering</strong> — inspects header only (IP + port); fastest; <strong>Layer 4 firewall</strong>; cannot stop IP spoofing, fragmentation attacks, TCP handshake attacks.</li><li><strong>Stateful</strong> — tracks state of connections; remembers your outbound request and allows the return traffic.</li><li><strong>Proxy</strong> — makes connections on behalf of endpoints. <strong>Circuit-level (SOCKS, Layer 5/session)</strong> vs <strong>application-level (Layer 7 firewall)</strong>: deep inspection per application type (HTTP filtered differently than FTP); slow, so place close to the server it protects.</li><li><strong>Kernel proxy</strong> — &quot;fifth-generation firewall&quot;: full inspection at every layer with minimal performance impact; place close to protected system.</li></ul><li>Evolutions:</li><ul><li><strong>NGFW (next-generation)</strong> — application-aware; single deep inspection; signature-based IPS when inline; fast; full-stack visibility; complex; <strong>vendor-lock-in risk</strong> (integrates with one vendor's product line); single efficient engine.</li><li><strong>UTM</strong> — many security functions in one appliance (firewall + IPS + AV/antispam + VPN concentrator + content filtering + load balancing + DLP). Benefits: lower cost/power, easier management. <strong>Biggest drawback: single point of failure</strong> (lose the device = lose the whole security stack); separate engine per function = less efficient than NGFW. Place inline between LAN and Internet. Choose NGFW if speed/efficiency is the priority.</li><li><strong>WAF (web application firewall)</strong> — inspects HTTP/HTTPS with rule sets against <strong>XSS and SQL injection</strong>. <strong>Inline</strong> = can block live attacks but slows traffic; <strong>out-of-band</strong> (SPAN/mirror port copy) = non-intrusive but can only alert (like an IDS), cannot block.</li></ul><li>ACL rules: <strong>top-down order</strong> (first match wins; specific rules on top, generic at bottom); end with <strong>explicit deny all</strong> (implied deny isn't universal — best practice is to write it); <strong>log all actions including denies</strong>. Rule = traffic type + source + destination + action.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">3. IDS / IPS (OBJ 3.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>IDS = detect, log, alert</strong> (never stops the attack). <strong>IPS = detect AND act</strong> (block traffic, stop application, kick device off).</li><li>Types by placement: <strong>NIDS</strong> (network appliance on a <strong>SPAN/mirror port</strong> off the backbone switch; watches for port scans, suspicious payloads, bad IPs/ports), <strong>HIDS</strong> (software on a host; watches that host's traffic, processes, files), <strong>WIDS</strong> (wireless: deauth attacks, disassociation, auth flooding, wireless DoS).</li><li>Detection methods:</li><ul><li><strong>Signature-based</strong> — matches known-attack signatures in a database; needs frequent updates; <strong>weak against zero-days</strong>. Subtypes: <strong>pattern-matching</strong> (sequence of attack steps; common in NIDS/WIDS) vs <strong>stateful-matching</strong> (known system baseline, report changes; common in HIDS).</li><li><strong>Anomaly-based</strong> (behavioral) — compares to a normal-traffic baseline; catches unknown attacks; <strong>higher false-positive rate</strong>. Five types: statistical, protocol, traffic, rule/heuristic, application-based.</li></ul><li>Placement: <strong>NIPS inline right behind the firewall</strong> (so it can block everything funneled through); <strong>NIDS passive on mirrored port</strong>.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">4. Network Appliances</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Load balancer</strong> — distributes traffic across servers; health checks; redirects when a server fails; prevents bottlenecks. <strong>ADC (application delivery controller)</strong> = advanced LB adding SSL termination, HTTP compression, content caching.</li><li><strong>Proxy server</strong> — intermediary client↔server: <strong>content caching</strong> (speed + bandwidth), request filtering, login management; masks internal endpoints (DDoS protection layer); can route traffic to satisfy data-sovereignty laws.</li><li><strong>Sensor</strong> — monitors/analyzes traffic for anomalies, performance issues, security events; feeds IDS/IPS; first-line detection (e.g. traffic spike from unknown IP = possible DDoS).</li><li><strong>Jump server / jump box</strong> — hardened gateway admins use to reach devices in other security zones; single controlled, logged entry point; reduces attack surface; speeds incident forensics.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">5. Port Security, 802.1x &amp; EAP (OBJ 3.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Switches operate at Layer 2, forward by MAC (CAM table = content addressable memory). Hubs rebroadcast everything; switches send only to the intended port.</li><li><strong>MAC flooding</strong> — attacker floods randomized MACs, overflows the CAM table, switch <strong>fails open and acts like a hub</strong> (rebroadcasts everything). Defense: port security / MAC filtering.</li><li><strong>Port security</strong> — bind a MAC address to a switch interface; unknown devices rejected. <strong>Sticky MAC</strong> (persistent MAC learning) — dynamically learns the first MAC on a port and treats it as authorized.</li><li>Bypass: <strong>MAC spoofing</strong> (attacker sets their NIC's MAC to an approved one) → need deeper defense: <strong>802.1x + EAP</strong>.</li><li><strong>802.1x</strong> — port-based authentication framework (wired and wireless, Layer 2). Three roles: <strong>supplicant</strong> (device requesting access), <strong>authenticator</strong> (switch/WAP/VPN concentrator), <strong>authentication server</strong> (RADIUS or TACACS+).</li><li><strong>EAP</strong> — not one protocol but a framework of authentication methods: <strong>EAP-MD5</strong> (passwords, one-way only), <strong>EAP-TLS</strong> (certs on client AND server, mutual, immune to password attacks), <strong>EAP-TTLS</strong> (server cert + client password), <strong>EAP-FAST</strong> (protected access credential), <strong>PEAP</strong> (server cert + AD-backed password), <strong>LEAP</strong> (Cisco proprietary).</li><li><strong>RADIUS vs TACACS+</strong>: RADIUS = cross-platform, UDP (1812/1813 or TCP 1645/1646); TACACS+ = Cisco-only, TCP (slower but more secure), separates authn/authz/accounting. All-Cisco → TACACS+; mixed network → RADIUS.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">6. Securing Network Communications (OBJ 3.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>VPN types</strong>: site-to-site (network-to-network over Internet, cheap leased-line alternative; all branch traffic funnels through HQ), client-to-site (single device to HQ), <strong>clientless</strong> (browser + HTTPS/TLS, no client software).</li><li><strong>Full tunnel</strong> — ALL traffic routed/encrypted via HQ: more secure, but can't reach local resources and slower. <strong>Split tunnel</strong> — only HQ-bound traffic goes via VPN, rest direct to Internet: better performance, less secure (attacker on the open path can pivot through the laptop into the VPN). On untrusted networks (hotel/café Wi-Fi) → always full tunnel.</li><li><strong>TLS</strong> — encrypts at Layers 5–7, over TCP. <strong>DTLS</strong> = UDP version of TLS: same security, faster (less overhead) — great for video streaming.</li><li><strong>IPSec</strong> — most popular VPN protocol suite: <strong>confidentiality (encryption), integrity (hash digest check), authentication, anti-replay (sequence numbers)</strong>.</li><li>Five IPSec steps: (1) key-exchange request, (2) <strong>IKE Phase 1</strong> — authenticate parties, establish secure negotiation channel (ISAKMP tunnel), (3) <strong>IKE Phase 2</strong> — negotiate security associations, establish the tunnel (tunnel-in-tunnel), (4) data transfer, (5) tunnel termination (mutual deletion or timeout).</li><li><strong>Transport mode</strong> — uses original IP header; <strong>for client-to-site</strong>; no added size (MTU-friendly). <strong>Tunneling mode</strong> — encapsulates entire packet with a NEW header; <strong>for site-to-site</strong>; adds size — watch the 1,500-byte MTU (use jumbo frames up to 9,000 on your own LAN or lower inner MTU to ~1,400).</li><li><strong>AH (Authentication Header)</strong> — integrity + origin authentication + anti-replay, <strong>NO confidentiality</strong>. <strong>ESP (Encapsulating Security Payload)</strong> — authentication, integrity, anti-replay <strong>AND confidentiality</strong> (encrypts payload, not headers in transport mode; tunnel mode encrypts everything incl. original header behind the new outer header).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">7. SD-WAN &amp; SASE</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>SD-WAN</strong> — virtualized WAN: control extracted from hardware, layered over any transport (MPLS, broadband, cellular, microwave); centralized control intelligently routes per-application traffic across links; fixes the traditional star-topology bottleneck where all branch traffic hairpins through HQ.</li><li><strong>SASE (Secure Access Service Edge)</strong> — cloud-native framework combining network + security in one service: firewall, secure web gateway, VPN, <strong>ZTNA</strong>, <strong>CASB</strong>, plus SD-WAN; identity/policy-based access regardless of user location. Cloud flavors: AWS VPC, Azure Virtual WAN/ExpressRoute, Google Cloud Interconnect/Cloud VPN.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">8. Infrastructure Considerations (OBJ 3.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Device placement</strong> — routers at the edge filter traffic; APs positioned for coverage and to keep RF inside the building; switches as central connection points.</li><li><strong>Security zones</strong> — segments of like-trust devices with their own policies. <strong>Screened subnet</strong> (modern term for DMZ) hosts public-facing services; breach there ≠ access to the core internal network.</li><li><strong>Attack surface</strong> — every point where data can enter/leave or be extracted; grows with every device/app/open port; minimize by eliminating or controlling vulnerabilities.</li><li><strong>Connectivity</strong> — wired = stable/fast but immobile; wireless = flexible but interference + security risk; fiber = high speed/long distance; hybrid combos for redundancy.</li><li><strong>Device attributes</strong>: <strong>active</strong> (IPS — influences traffic) vs <strong>passive</strong> (IDS — observes only); <strong>inline</strong> (in the traffic path; can block; disruption risk) vs <strong>tap/monitor</strong> (out of path, copies traffic, zero disruption but can't block).</li><li><strong>Failure modes</strong>: <strong>fail-open</strong> = keep passing traffic uninspected on failure (continuity, no security — good for guest Wi-Fi); <strong>fail-closed</strong> = block all traffic on failure (security, outage — right for sensitive financial data). Choose per security policy and data criticality.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">9. Selecting Infrastructure Controls (OBJ 4.5)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Principles: <strong>least privilege</strong>, <strong>defense in depth</strong> (layers), <strong>risk-based prioritization</strong> (limited budget — rank by risk), <strong>lifecycle management</strong> (controls age — review/update/retire), <strong>open design</strong> (transparency, rigorous scrutiny of controls).</li><li>Methodology: assess current state → <strong>gap analysis</strong> → clear objectives → <strong>benchmarking</strong> vs industry → <strong>cost-benefit analysis</strong> → stakeholder involvement → monitoring &amp; feedback loops.</li><li>Best practices: risk assessment is <strong>recurring</strong> (not one-time; rerun on significant change), align to frameworks (<strong>NIST CSF, NIST RMF, ISO</strong>), customize the framework to your org, stakeholder engagement + training.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Quick-fire traps</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>IDS alerts; IPS acts. NIDS on mirror port; NIPS inline behind firewall.</li><li>Packet filter = Layer 4, header-only. App proxy = Layer 7, deep inspection.</li><li>UTM = one box, one point of failure. NGFW = single engine, faster.</li><li>Out-of-band WAF can only alert, not block.</li><li>Telnet 23 → replace with SSH 22. Syslog 514 UDP; secure syslog 6514 TCP.</li><li>RADIUS UDP 1812/1813 (or TCP 1645/1646); TACACS+ TCP, Cisco-only.</li><li>EAP-TLS = certs both sides = mutual. EAP-MD5 = one-way passwords. LEAP = Cisco proprietary.</li><li>MAC flood → CAM overflow → switch fails open into hub mode.</li><li>AH ≠ encryption. ESP = encryption. Transport = host-to-site; tunnel = site-to-site.</li><li>Full tunnel = security; split tunnel = performance. Untrusted network → full.</li><li>Screened subnet is the exam term; DMZ is the legacy term.</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="security-architecture-study-notes.html">&larr; Prev: Section 14 · Security Architecture</a> <a class="btn ghost" href="identity-and-access-management-study-notes.html">Next &rarr;: Section 16 · Identity and Access Management</a></div>
+  <script>
+    var SLUG = "security-infrastructure";
+    var TOTAL = 10;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

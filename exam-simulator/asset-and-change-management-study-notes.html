@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 11 · Asset and Change Management — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 11 · Asset and Change Management &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><p class="doc-title">Asset and Change Management — SY0-701 Study Notes (Section 12)</p>
+<p><strong>Exam weight:</strong> Domain 1.0 (General Security Concepts) — OBJ 1.3 (change management processes &amp; security impact) · Domain 4.0 (Security Operations) — OBJ 4.1 (security techniques for computing resources) &amp; 4.2 (hardware/software/data asset management) <strong>Lessons covered:</strong> 104–112 (Intro · Acquisition &amp; procurement · Mobile asset deployments · Asset management · Asset disposal &amp; decommissioning · Change management · Change management processes · Technical implications · Documenting changes)</p>
+<details class="topic" open><summary><span class="t-name">1. Foundations (Lesson 104)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Asset management</strong> = systematic process of developing, operating, maintaining, and selling assets in a cost-effective manner — every digital asset (hardware to software) is identified, cataloged, and monitored.</li><li><strong>Change management</strong> = structured approach to transitioning individuals, teams, and organizations from a current state to a desired future state — modifications done in a controlled, secure manner.</li><li>Together they prevent, detect, and respond to cyber threats.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">2. Acquisition and Procurement (Lesson 105) — know the difference!</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Acquisition</strong> = the process of <strong>obtaining</strong> goods and services.</li><li><strong>Procurement</strong> = the <strong>entire process</strong> of sourcing and obtaining — including everything that leads up to the actual acquisition.</li></ul>
+<h3>Purchase options</h3>
+<div class="tblwrap"><table><thead><tr><th>Option</th><th>Used for</th></tr></thead><tbody><tr><td><strong>Company credit card</strong></td><td>Minor, low-cost, fast purchases (ink, toner, paper); per-role transaction limits set by the company</td></tr><tr><td><strong>Individual purchase</strong></td><td>Employee pays personally, then seeks <strong>reimbursement</strong> — travel without a company travel card, emergencies, or companies with no company card yet</td></tr><tr><td><strong>Purchase order (PO)</strong></td><td>Larger/expensive purchases — a <strong>formal document issued by the purchasing department</strong> that <strong>authorizes</strong> a purchase</td></tr></tbody></table></div>
+<p>&gt; PO trap: a purchase order is <strong>NOT a payment</strong> — it's a financial promise to pay, typically net 15 / net 30 / net 60 per the MSA.</p>
+<h3>Internal approval process (example: US Navy ITPR)</h3>
+<ul class="mdlist"><li>Detailed assessment of the need and benefits</li><li>Check product against IT standards — security and interoperability with current systems</li><li>Verify budget allocation and funding source</li><li>Formal request rises through <strong>multiple levels of approval</strong> by senior decision-makers</li></ul>
+<p>After approval: assess compatibility, perform security checks/configurations, train end users, integrate into workflows.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">3. Mobile Asset Deployment Models (Lesson 106) — HIGH-YIELD</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Model</th><th>Who owns</th><th>Personal use?</th><th>Pros</th><th>Cons</th></tr></thead><tbody><tr><td><strong>BYOD</strong> (bring your own device)</td><td>Employee</td><td>Yes (one device)</td><td>Cheap for org; employee freedom; satisfaction</td><td>Employee controls security; hard to add to MDM, patch, enforce configs</td></tr><tr><td><strong>COPE</strong> (corporate-owned, personally enabled)</td><td>Company</td><td>Yes (company-car analogy)</td><td>Standard models; simpler management; MDM-managed</td><td>High upfront cost; org can monitor → employee privacy concerns</td></tr><tr><td><strong>CYOD</strong> (choose your own device)</td><td>Company</td><td>Usually <strong>work-only</strong> (two phones)</td><td>Middle ground — employee choice from approved list + org control/standardization; best for MDM</td><td>High upfront cost; privacy concerns; carrying two devices</td></tr></tbody></table></div>
+<p><strong>Decision factors: cost, security, employee satisfaction.</strong> Security paramount → <strong>CYOD</strong> (best control, all devices in MDM).</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">4. Asset Management (Lesson 107)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Two main areas: <strong>assignment/accounting</strong> and <strong>monitoring/tracking</strong>.</p>
+<ul class="mdlist"><li><strong>Assignment/ownership allocation</strong> — every asset assigned to an owner (person/team/department) — no ambiguity; eases troubleshooting, upgrades, replacement.</li><li><strong>Classification</strong> — categorize by function, <strong>value</strong>, and other criteria: high-value assets (servers with critical data) get stringent maintenance; low-value assets (old laptop in storage) get recycled/disposed.</li><li><strong>Monitoring</strong> — maintain an inventory/record of every asset: specifications, location, assigned users, service history.</li><li><strong>Asset tracking</strong> — goes further: specialized software/technologies to monitor location, status, condition of physical assets (e.g., GPS location of a device).</li><li><strong>Enumeration</strong> — identifying and counting assets with software tools/scanners: what's connected to the network, what software/OS runs, each asset's health. Detects unauthorized devices; informs patching and vulnerability decisions. (First step when acquiring another company: enumerate their network.)</li><li><strong>MDM (Mobile Device Management)</strong> — securely manage/monitor smartphones, tablets, laptops: enforce corporate policies, software uniformity, safeguard data. Enables <strong>remote lock and wipe</strong> of lost devices and pushing patches/updates/apps to <strong>thousands of devices simultaneously</strong>.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">5. Asset Disposal &amp; Decommissioning (Lesson 108) — HIGH-YIELD</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Governing document: <strong>NIST Special Publication 800-88 — Guidelines for Media Sanitization.</strong></p>
+<h3>Sanitization methods (data unrecoverable; device may survive)</h3>
+<div class="tblwrap"><table><thead><tr><th>Method</th><th>How it works</th><th>Key fact</th></tr></thead><tbody><tr><td><strong>Overwrite</strong></td><td>Replace data with random data, repeated — <strong>1, 7, or 35 passes</strong> depending on classification level</td><td>More passes for higher classification</td></tr><tr><td><strong>Degaussing</strong></td><td>Strong magnetic field disrupts magnetic domains (HDD, tape)</td><td><strong>Permanently destroys the drive's ability to store data</strong> — device cannot be reused</td></tr><tr><td><strong>Secure Erase</strong></td><td>Firmware-level built-in erasure routine purges all blocks</td><td>Older method; <strong>flaws found</strong> → replaced by cryptographic erase</td></tr><tr><td><strong>Cryptographic Erase (CE)</strong></td><td><strong>Destroy the encryption keys</strong> — data remains but is unreadable</td><td>Extremely fast (30–60 seconds); device can be <strong>repurposed or resold</strong> safely</td></tr></tbody></table></div>
+<h3>Destruction (device beyond recovery/reuse)</h3>
+<ul class="mdlist"><li><strong>Shredding, pulverizing, melting, incinerating</strong> — NIST-recommended.</li><li>NSA shredded hard drives from top-secret workstations.</li><li>For <strong>secret/top-secret data, sanitization is NOT enough → destruction</strong> is required.</li></ul>
+<h3>Certification &amp; data retention</h3>
+<ul class="mdlist"><li><strong>Certification</strong> = act of <strong>proof</strong> that data/hardware was securely disposed — an audit log of the sanitization/destruction process; vital for regulatory controls and sensitive data (government, financial, health).</li><li><strong>Data lifecycle</strong>: creation → processing → archiving → destruction.</li><li><strong>Data retention</strong> = strategically deciding what to keep and for how long — regulations may mandate keeping financial transactions or medical records; retained data supports historical analysis, trend prediction, dispute resolution.</li><li>Why not keep everything? Storage costs, retrieval clutter, and <strong>the more you store, the more you must secure</strong> — a bigger target for threat actors.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">6. Change Management (Lesson 109)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Change must be <strong>approved</strong> — no installing software or changing configurations without an approval process; changes are assessed for value and implementability with minimal disruption.</li><li><strong>CAB (Change Advisory Board)</strong> — body of representatives from across the organization that conducts <strong>due diligence</strong> on proposed changes: viability, potential impacts, alignment with organizational objectives.</li><li><strong>Change owner</strong> — individual/team who initiates the change request; the <strong>advocate</strong> who details reasons, benefits, and implementation challenges.</li><li><strong>Stakeholders</strong> — anyone with a <strong>vested interest</strong>: directly impacted OR has a role in assessment/implementation. Types: technical (developers, server admins), business (support teams), end users. Must be <strong>consulted or informed</strong> before the change (example: server reboot = 5 minutes of global downtime; train users; brief support team; warn students ahead).</li><li><strong>Impact analysis</strong> — what could go wrong? Immediate effects on business processes, reputation, users; long-term operational impact; unforeseen challenges.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">7. Change Management Process (Lesson 110) — HIGH-YIELD</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Five steps:</strong> prepare → create vision → implement → verify → document.</p>
+<ul class="mdlist"><li><strong>Prepare</strong> — understand current state; assess existing processes; identify inefficiencies; gather resources; engage stakeholders.</li><li><strong>Create vision</strong> — the North Star: desired future state, reasons, picture of success; generates buy-in.</li><li><strong>Implement</strong> — training, restructuring, new tools; <strong>continuous communication</strong> to reduce resistance.</li><li><strong>Verify</strong> — compare the new state to envisioned objectives (surveys, metrics analysis, stakeholder interviews); fix discrepancies.</li><li><strong>Document</strong> — historical record + lessons learned for continuous improvement.</li></ul>
+<h3>Ongoing requirements</h3>
+<ul class="mdlist"><li><strong>Scheduled maintenance windows</strong> — never change on the fly or in peak hours (example: Saturday midnight–4 a.m.); <strong>emergency changes</strong> (e.g., critical Microsoft patch) can be approved and implemented in minutes/hours/days.</li><li><strong>Backout plan</strong> — predetermined strategy to revert to the original state; the safety net.</li><li><strong>Test results</strong> after implementation — validate success; confirm no new issues.</li><li><strong>SOPs (Standard Operating Procedures)</strong> — detailed step-by-step instructions ensuring consistency and reduced errors.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">8. Technical Implications of Changes (Lesson 111) — HIGH-YIELD</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Element</th><th>What to watch</th></tr></thead><tbody><tr><td><strong>Allow list / deny list (block list)</strong></td><td>Adding/removing one IP can inadvertently grant or restrict access to critical services; a firewall upgrade requires a <strong>firewall rules review</strong> so rules migrate properly</td></tr><tr><td><strong>Restricted activities</strong></td><td>Tasks restricted due to impact (accessing a protected database; rebooting a too-sensitive server) — verify none are hidden in the proposed change</td></tr><tr><td><strong>Downtime</strong></td><td>Estimate it; weigh against benefits; consider peak hours; schedule in the maintenance window</td></tr><tr><td><strong>Service/application restarts</strong></td><td>Restarting a domain controller disrupts all users — lost data in transit, backlogs; it's more than the restart time</td></tr><tr><td><strong>Legacy applications</strong></td><td>Old but still-functional software; less supported; even minor updates can cause malfunctions/crashes — identify them before changing</td></tr><tr><td><strong>Dependencies</strong></td><td>Apps rely on specific databases/services; a change in one area cascades across systems, networks, even partners' architecture — <strong>map dependencies first</strong></td></tr></tbody></table></div>
+</div></details>
+<details class="topic" open><summary><span class="t-name">9. Documenting Changes (Lesson 112)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Version control</strong> — tracks and manages changes to documents/software/files; enables collaboration and <strong>reverting to a previous stable version</strong> when rollback is needed; preserves continuity and stability.</li><li><strong>Update diagrams</strong> after every change — the visual snapshot must reflect reality; at team/enterprise scale, undocumented changes cause misunderstandings and misconfigurations.</li><li><strong>Revise policies and procedures</strong> when a change doesn't yield the desired result — don't just fix the immediate issue; prevent recurrence through iterative process improvement.</li><li><strong>Update change requests / trouble tickets</strong> post-implementation — creates a timeline, informs stakeholders, and preserves change history.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">10. Rapid-Fire Self-Test (44 items)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Acquisition vs procurement? *(obtaining goods/services vs the entire sourcing process leading up to it)*</li><li>Which purchase option suits low-cost urgent items? *(company credit card)*</li><li>What is an individual purchase? *(employee pays, then gets reimbursed)*</li><li>What is a PO? *(formal purchasing-department document authorizing a purchase)*</li><li>Is a PO a payment? *(no — a promise to pay, net 15/30/60 per MSA)*</li><li>Navy ITPR sequence? *(need/benefits assessment → standards check → budget verification → multi-level approval)*</li><li>BYOD ownership and key drawback? *(employee-owned; employee controls security, MDM/patching hard)*</li><li>COPE meaning? *(corporate-owned, personally enabled — company car analogy)*</li><li>CYOD meaning? *(choose from a company-approved shortlist)*</li><li>Which model gives the best security control? *(CYOD — all devices MDM-managed)*</li><li>Three deployment decision factors? *(cost, security, employee satisfaction)*</li><li>Asset management's two main areas? *(assignment/accounting; monitoring/tracking)*</li><li>Why classify assets? *(value-based decisions on maintenance, replacement, retirement)*</li><li>Monitoring vs tracking? *(inventory records vs location/status/condition via specialized tech like GPS)*</li><li>What is enumeration? *(identifying/counting assets with tools — connected devices, software/OS, health)*</li><li>Why enumerate before acquiring a company? *(see what assets exist to reuse, upgrade, or retire)*</li><li>What does MDM enable for a lost phone? *(remote lock or wipe)*</li><li>MDM push capability? *(patches/updates/apps to thousands of devices simultaneously)*</li><li>Which NIST publication covers media sanitization? *(SP 800-88)*</li><li>Overwrite pass counts? *(1, 7, or 35 by classification level)*</li><li>Degaussing effect on the drive? *(destroys its ability to store data — unusable after)*</li><li>What replaced Secure Erase? *(cryptographic erase — flaws found in Secure Erase)*</li><li>How does cryptographic erase work? *(destroy the encryption keys; data stays but unreadable; 30–60 seconds)*</li><li>Why is CE good for resale? *(device can be repurposed/resold — data indecipherable)*</li><li>Four NIST destruction methods? *(shredding, pulverizing, melting, incinerating)*</li><li>For top-secret data, is sanitization enough? *(no — destruction required)*</li><li>What is certification in disposal? *(act of proof + audit log of sanitization/destruction)*</li><li>Data lifecycle stages? *(creation, processing, archiving, destruction)*</li><li>Why retain data? *(regulatory mandates, historical analysis, disputes)*</li><li>The storage mantra? *(the more you store, the more you must secure)*</li><li>Who approves changes? *(CAB — Change Advisory Board)*</li><li>CAB's role? *(due diligence: viability, impact, alignment with objectives)*</li><li>Change owner role? *(initiates request; advocate for reasons/benefits/challenges)*</li><li>Who is a stakeholder? *(anyone with vested interest — impacted or involved)*</li><li>Stakeholder categories in the Dion example? *(technical, business, end users)*</li><li>What does impact analysis ask? *(what could go wrong; effects on business/reputation/users; long-term impact)*</li><li>Five change process steps? *(prepare, create vision, implement, verify, document)*</li><li>Why are maintenance windows used? *(minimize disruption; avoid peak hours)*</li><li>What is an emergency change? *(critical patch etc. — approved and deployed in minutes/hours/days)*</li><li>What is a backout plan? *(predetermined strategy to revert to the original state)*</li><li>What is an SOP? *(detailed step-by-step instructions for a task)*</li><li>What does a firewall upgrade require? *(a firewall rules review so rules migrate correctly)*</li><li>Why map dependencies before changing? *(a minor tweak can cascade into a major outage elsewhere)*</li><li>After a change, which records get updated? *(diagrams, policies/procedures if needed, change requests/trouble tickets)*</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="governance-and-compliance-study-notes.html">&larr; Prev: Section 10 · Governance and Compliance</a> <a class="btn ghost" href="audits-and-assessments-study-notes.html">Next &rarr;: Section 12 · Audits and Assessments</a></div>
+  <script>
+    var SLUG = "asset-and-change-management";
+    var TOTAL = 10;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

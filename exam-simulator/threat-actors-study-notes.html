@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 2 · Threat Actors — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 2 · Threat Actors &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  <div class="banner"><strong>Maps to exam objectives:</strong> 2.1 (Motivations, attributes &amp; types of threat actors, insider threats, shadow IT), 2.2 (Threat vectors &amp; attack surfaces), 1.2 (Deception &amp; disruption technologies).<br>The Threats/Vulnerabilities domain is one of the heaviest-weighted on SY0-701 — expect several questions straight from this section, usually as <strong>compare/contrast</strong> (&quot;Which actor is MOST likely…&quot;) or scenario-based (&quot;An employee did X — what is this called?&quot;).</div>
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><details class="topic" open><summary><span class="t-name">1. Threat Actor Motivations (Obj 2.1)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>The 10 motivations — learn this list cold; matching questions love it:</strong></p>
+<div class="tblwrap"><table><thead><tr><th>Motivation</th><th>Who / How it shows up</th></tr></thead><tbody><tr><td><strong>Data exfiltration</strong></td><td>Unauthorized transfer of data out of the org. Targets: intellectual property, PII, trade secrets.</td></tr><tr><td><strong>Blackmail</strong></td><td>Threatening to expose data unless paid. Forms: ransomware, doxxing, sextortion. Payment usually demanded in <strong>cryptocurrency (Bitcoin)</strong>.</td></tr><tr><td><strong>Espionage</strong></td><td>Spying to steal secrets — mostly <strong>nation-state</strong> actors.</td></tr><tr><td><strong>Service disruption</strong></td><td>Taking systems offline — typically <strong>DDoS</strong>. (Example cited: GitHub hit by a massive DDoS in 2018.)</td></tr><tr><td><strong>Financial gain</strong></td><td>The #1 driver for cybercrime — ransomware, banking trojans, fraud.</td></tr><tr><td><strong>Philosophical/political beliefs</strong></td><td><strong>Hacktivism</strong> — hacking to advance a cause.</td></tr><tr><td><strong>Ethical reasons</strong></td><td>The &quot;good guys&quot;: penetration testers, bug bounty hunters — authorized.</td></tr><tr><td><strong>Revenge</strong></td><td>Disgruntled or fired employees striking back at the org.</td></tr><tr><td><strong>Disruption/chaos</strong></td><td>&quot;Watch the world burn&quot; — unauthorized hackers who just want to cause mayhem.</td></tr><tr><td><strong>War</strong></td><td>Cyber warfare conducted by nation-states against other nations.</td></tr></tbody></table></div>
+<p><strong>⚠️ Exam trap — Intent vs. Motivation:</strong></p>
+<ul class="mdlist"><li><strong>Motivation</strong> = the *underlying reason* (why: money, ideology, revenge).</li><li><strong>Intent</strong> = the *desired outcome* of the specific action (what: steal data, disrupt service).</li><li>CompTIA loves a stem that describes both and asks for one. Read carefully.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">2. Threat Actor Attributes (Obj 2.1)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Three attributes classify any threat actor:</p>
+<ul class="mdlist"><li><strong>Internal vs. External</strong> — based on the actor's <strong>relationship to the targeted organization</strong>, not their physical location.</li><ul><li><strong>Internal:</strong> employees, contractors, business associates — they have *legitimate access* and use it in an unauthorized way. Dangerous because of intimate knowledge of infrastructure and vulnerabilities.</li><li><strong>External:</strong> outsiders (cyber criminals, hacktivists, competitors, state-sponsored) with <strong>no authorized access</strong> — must use malware or social engineering to get in.</li></ul><li><strong>Resources &amp; Funding</strong> — tools, skills, and personnel available. Drives the scale, frequency, and sophistication of attacks. A lone hacker has a PC and personal skills; a nation-state has budgets, teams, and advanced tooling.</li><li><strong>Sophistication &amp; Capability</strong> — technical skill, tool complexity, and ability to evade detection. Rated <strong>low → high</strong>:</li><ul><li><strong>Low:</strong> widely available tools, common malware, phishing. Bottom of the scale = <strong>script kiddies</strong>.</li><li><strong>High:</strong> custom malware, <strong>zero-day exploits</strong>, advanced evasion. Nation-states and <strong>APT groups</strong> live here — can dwell undetected in well-defended networks for extended periods.</li></ul></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">3. Types of Threat Actors (Obj 2.1)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<h3>Comparison table — memorize this, it is THE exam pattern</h3>
+<div class="tblwrap"><table><thead><tr><th>Actor</th><th>Motivation</th><th>Funding/Resources</th><th>Sophistication</th><th>Signature traits</th></tr></thead><tbody><tr><td><strong>Unskilled attacker (script kiddie)</strong></td><td>Recognition, thrill, curiosity</td><td>Very low</td><td>Low</td><td>Uses <strong>other people's tools</strong> (e.g., <strong>LOIC</strong> to DDoS); opportunistic, not targeted; attacks easy/weak targets; sheer numbers make them a real threat</td></tr><tr><td><strong>Hacktivist</strong></td><td>Ideology — political/social cause</td><td>Varies (often self-funded)</td><td>Fairly <strong>high</strong></td><td>Defacement (&quot;electronic graffiti&quot; = vandalism), DDoS, <strong>doxxing</strong>, data leaks. Groups: <strong>Anonymous</strong> (Operation Payback, 2010, vs MPAA/RIAA), <strong>LulzSec</strong> (50 Days of Lulz, 2011 — Sony, CIA, FBI)</td></tr><tr><td><strong>Organized crime</strong></td><td><strong>Financial gain — almost always</strong></td><td>High, well-structured</td><td>Very high</td><td>Roles/chain of command like the mafia; custom malware, ransomware, sophisticated phishing; exploits cryptocurrency &amp; dark web; <strong>transnational</strong> = hard to prosecute; may act as <strong>&quot;hired guns&quot;/mercenaries</strong> for governments. Examples: <strong>FIN7</strong> (retail &amp; hospitality phishing), <strong>Carbanak</strong> (&gt;$1B from banks; forced ATMs to dispense cash)</td></tr><tr><td><strong>Nation-state</strong></td><td>Long-term <strong>strategic goals</strong> — intelligence, infrastructure disruption, influencing political processes, IP theft</td><td>State-backed, essentially unlimited</td><td>Highest</td><td>Part of intelligence/military or <strong>proxies</strong> for <strong>plausible deniability</strong>; custom malware + zero-days + APTs; <strong>false flag attacks</strong>; mostly NOT financial — <strong>except North Korea</strong> (banks, crypto exchanges). Examples: <strong>Stuxnet</strong> (US/Israel attributed; destroyed Iranian nuclear centrifuges via USB across an air gap, using Windows zero-days), 2016 US election interference</td></tr><tr><td><strong>Insider</strong></td><td>Financial gain, revenge — or unintentional</td><td>N/A (already inside)</td><td>Varies with role + skill</td><td>Has legitimate access; knows layout/processes; forms: data theft, sabotage, privilege misuse, planting backdoors; also <strong>careless/untrained users</strong> (phishing clickers). Examples: <strong>Edward Snowden</strong> (NSA contractor, 2013), <strong>Twitter 2020</strong> Bitcoin scam aided by insiders</td></tr></tbody></table></div>
+<p><strong>⚠️ Traps:</strong></p>
+<ul class="mdlist"><li><strong>Script kiddie ≠ hacktivist</strong>: both may deface sites, but script kiddies want *notoriety*, hacktivists want *change*. The course explicitly says script kiddies are &quot;less likely to be motivated by financial gain or political ideologies.&quot;</li><li><strong>Hacktivist vs nation-state</strong>: both attack governments, but hacktivists = ideology/attention, nation-states = strategy/espionage and they have state resources.</li><li><strong>Organized crime may act politically — but only for money</strong> (&quot;hired guns&quot;).</li><li><strong>APT ≠ nation-state, strictly</strong>: APT used to be synonymous with nation-state, but sophisticated organized crime groups are now also called APTs. <strong>APT = a prolonged, targeted attack where the intruder stays undetected for an extended period</strong> to steal data or monitor activity — *not* to cause immediate damage.</li></ul>
+<h3>Insider threats — extra detail</h3>
+<ul class="mdlist"><li>Capability = f(role/access, individual skill). A skilled user with low privileges can out-damage an unskilled admin.</li><li>Can <strong>facilitate external attacks</strong>: install malware, create backdoors.</li><li>Mitigation: <strong>Zero Trust architecture, robust access controls, regular audits, security awareness training.</strong></li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">4. Shadow IT (Obj 2.1)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Definition:</strong> use of IT systems, devices, software, applications, or services <strong>without explicit organizational approval</strong>. Also called <strong>stealth IT</strong> or <strong>client IT</strong>.</li><li>Managed outside/without the knowledge of the IT department.</li><li><strong>Why it exists:</strong> (1) security posture set too high or too complex for business to function (course example: 45 days to get a second monitor → employee buys their own); (2) desire for efficiency/convenience (browser plugins, unsanctioned apps); (3) cloud services + <strong>BYOD</strong> trend.</li><li><strong>Forms:</strong> personal devices for work, unapproved software, personal cloud storage (Dropbox/Google Drive) for work files, personal peripherals (USB drives, external disks, network adapters).</li><li><strong>Risks:</strong> the IT dept <strong>cannot secure what it doesn't know exists</strong> — unknown security posture, no lifecycle management → data breaches, regulatory non-compliance, system disruption, lack of standardization, harder incident troubleshooting.</li><li>Exam angle: an employee using Dropbox for work docs, or a self-bought monitor/USB stick = shadow IT. A *helpdesk-approved* tool is not.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">5. Threat Vectors &amp; Attack Surfaces (Obj 2.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Threat vector = the HOW</strong> — the means or pathway an attacker uses to gain unauthorized access or deliver a payload.</li><li><strong>Attack surface = the WHERE</strong> — all points where an unauthorized user could enter or extract data; the sum of all vulnerabilities and entry points.</li><li><strong>Shrink the attack surface:</strong> restrict access, remove unnecessary software, disable unused protocols. Email/IM, removable devices, and unsecured networks all *expand* it.</li></ul>
+<h3>The six threat vectors</h3>
+<div class="tblwrap"><table><thead><tr><th>Vector</th><th>What it is</th><th>Example from course</th></tr></thead><tbody><tr><td><strong>Message-based</strong></td><td>Email, SMS, instant messaging — phishing: impersonating a trusted entity to steal info or deliver malware links/attachments</td><td>&quot;Free iPhone, click this link&quot; email</td></tr><tr><td><strong>Image-based</strong></td><td>Malicious code embedded inside image files, executed when the image loads</td><td><strong>Stegano (2017)</strong>: code hidden in banner-ad pixels, exploited old Internet Explorer, redirected to exploit kit</td></tr><tr><td><strong>File-based</strong></td><td>Malicious files disguised as legit documents/software — email attachments, file shares, malicious sites</td><td>Cracked/pirated game laced with malware</td></tr><tr><td><strong>Voice calls (vishing)</strong></td><td>Phone calls impersonating trusted entities to extract info</td><td>Fake &quot;IRS&quot; calls demanding SSN/payment (real IRS sends letters)</td></tr><tr><td><strong>Removable devices</strong></td><td>USB thumb drives, external HDDs/SSDs — technique = <strong>baiting</strong>: leaving infected USBs in parking lots/lobbies; or sneaking in to plug devices in directly</td><td>Stuxnet crossing an air gap on USB</td></tr><tr><td><strong>Unsecured networks</strong></td><td>Wireless, wired, Bluetooth without proper security</td><td>Wireless: <strong>evil twin</strong> rogue AP mimics legit Wi-Fi → intercept/modify traffic. Wired: cable tapping, MAC address cloning, VLAN hopping. Bluetooth: <strong>BlueBorne</strong> (take over devices/spread malware/on-path attack — no user interaction) and <strong>BlueSmack</strong> (DoS via oversized L2CAP packets → crash)</td></tr></tbody></table></div>
+<p><strong>⚠️ Traps:</strong> vishing = voice phishing (not video); baiting is the *name of the USB technique*, not just a generic word; BlueBorne = takeover/RCE, BlueSmack = denial of service.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">6. Deception &amp; Disruption Technologies (Obj 1.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Purpose:</strong> mislead, confuse, and divert attackers from critical assets while detecting them — and learn their <strong>TTPs (tactics, techniques, and procedures)</strong> = the methods and behavior patterns of a specific threat actor/group.</p>
+<h3>The four &quot;honey&quot; technologies — know the differences exactly</h3>
+<div class="tblwrap"><table><thead><tr><th>Technology</th><th>What it is</th><th>Key facts</th></tr></thead><tbody><tr><td><strong>Honeypot</strong></td><td>A <strong>decoy system</strong> mimicking a real system with attractive vulnerabilities</td><td>Purpose is <strong>not to block attacks</strong> but to gather info on methods, motives, TTPs. Works against <strong>insider threats</strong> too (detect fraud/snooping). Logs all interactions. Place in a <strong>screened subnet / isolated segment</strong> reachable from the internet</td></tr><tr><td><strong>Honeynet</strong></td><td>A <strong>network of honeypots</strong> mimicking an entire network (servers, routers, switches)</td><td>Used by large orgs/researchers. Logs successful AND unsuccessful attacks. <strong>Double-edged sword</strong>: an attacker can study it and learn how your *production* systems are configured</td></tr><tr><td><strong>Honeyfile</strong></td><td>A <strong>decoy file</strong> that looks valuable but contains fake data</td><td>Hidden metadata/watermarks/unique identifiers to track if stolen; accessing it triggers an alert; some can enumerate the attacker's network; placed under *looser* defenses than real sensitive files; can be any file type</td></tr><tr><td><strong>Honeytoken</strong></td><td>A <strong>piece of data with no legitimate value</strong> that is monitored</td><td>Fake user account (&quot;Admin&quot;/&quot;Root&quot;), bogus URL, dummy database record, fabricated credentials. <strong>Any access = likely breach</strong> — great for detecting <strong>insider threats</strong> and data-leak pathways; early-warning of breaches</td></tr></tbody></table></div>
+<p><strong>⚠️ Trap — honeyfile vs honeytoken:</strong> a *file* (looks like a real document) vs a *token* (fake credential/record/URL — any use is inherently suspicious). If the stem says &quot;fake database entry that should never be accessed&quot; → honeytoken.</p>
+<h3>Disruption strategies (less famous, still testable)</h3>
+<ul class="mdlist"><li><strong>Bogus DNS entries</strong> — fake DNS records sending attackers to non-existent domains; wastes their time and alerts defenders.</li><li><strong>Decoy directories</strong> — fake folders/files; unauthorized access raises an alert while attacker thinks they succeeded.</li><li><strong>Dynamic page generation</strong> — ever-changing content to confuse/slow web crawlers, scrapers, bots.</li><li><strong>Port triggering</strong> — ports stay closed until a specific <strong>outbound traffic pattern</strong> is detected, then open temporarily; services invisible to port scans but available to legit users.</li><li><strong>Spoofed fake telemetry</strong> — when a scan is detected, respond with false data (e.g., report Windows 11 while actually running macOS) so exploits are mis-targeted.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Rapid-fire self-test (the facts exams repeat)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Motivation vs intent? → Motivation = *why*; intent = *desired outcome of the action*.</li><li>Internal vs external is decided by…? → Relationship to the organization, not location.</li><li>Three actor attributes? → Internal/external; resources &amp; funding; sophistication &amp; capability.</li><li>Script kiddie's defining trait? → Uses others' pre-made tools without understanding them.</li><li>Hacktivist's defining trait? → Hacking for a political/social cause, not money.</li><li>APT meaning? → Prolonged, targeted intrusion that remains undetected for an extended period (steal/monitor, not immediate damage).</li><li>False flag attack? → Attack made to look like it came from someone else to mislead attribution (e.g., 2018 Olympics malware mimicking North Korea, actually Russia).</li><li>Which nation-state hacks for revenue? → North Korea (banks, crypto exchanges).</li><li>Shadow IT = ? → IT used without explicit organizational approval (aka stealth/client IT).</li><li>Threat vector vs attack surface? → How (pathway) vs where (sum of entry points).</li><li>Baiting? → Leaving malware-infected USB drives where targets will find them.</li><li>Vishing? → Voice-call phishing.</li><li>BlueBorne vs BlueSmack? → Bluetooth takeover/RCE vs Bluetooth DoS.</li><li>Honeypot placement? → Screened subnet / isolated segment.</li><li>Honeytoken example? → Fake admin account / dummy DB record — any access signals a breach.</li><li>Insider threat mitigation? → Zero Trust, access controls, audits, awareness training.</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="exam-tips-study-notes.html">&larr; Prev: Section 0 · Exam Tips</a> <a class="btn ghost" href="physical-security-study-notes.html">Next &rarr;: Section 3 · Physical Security</a></div>
+  <script>
+    var SLUG = "threat-actors";
+    var TOTAL = 7;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 16 · Identity and Access Management — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 16 · Identity and Access Management &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><p class="doc-title">Identity and Access Management Solutions — Study Notes (Section 17 · OBJ 2.4 &amp; 4.6)</p>
+<p>Identity is Domain 4's heart and SY0-701 loves scenario questions here: &quot;which factor is this?&quot;, &quot;which access control model fits?&quot;, &quot;what stops password spraying?&quot;. Know the definitions and the attacks.</p>
+<details class="topic" open><summary><span class="t-name">1. IAM Fundamentals</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Goal: the <strong>right individuals</strong> access the <strong>right resources</strong> at the <strong>right times</strong> for the <strong>right reasons</strong>.</p>
+<p>Four processes:</p>
+<ul class="mdlist"><li><strong>Identification</strong> — user CLAIMS an identity (username/email). Claiming, not proving.</li><li><strong>Authentication</strong> — VERIFYING that claimed identity (password, biometrics, factors).</li><li><strong>Authorization</strong> — determining what permissions/access the authenticated user has (HR sees personnel files; finance sees financial data).</li><li><strong>Accounting (auditing)</strong> — tracking and recording user activities (logins, actions, changes) for monitoring, forensics, evidence.</li></ul>
+<p>Supporting concepts:</p>
+<ul class="mdlist"><li><strong>Provisioning</strong> — creating accounts and granting appropriate access (new hire setup).</li><li><strong>Deprovisioning</strong> — removing access when no longer needed (termination) — critical against insider-threat revenge.</li><li><strong>Identity proofing</strong> — verifying identity BEFORE account creation (driver's license, passport, trusted data source).</li><li><strong>Interoperability</strong> — systems working together via standards like <strong>SAML / OpenID Connect</strong>.</li><li><strong>Attestation</strong> — periodic reviews/audits confirming accounts and rights are correct and minimal.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">2. Multifactor Authentication</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Five factor categories:</p>
+<div class="tblwrap"><table><thead><tr><th>Factor</th><th>Type</th><th>Examples</th></tr></thead><tbody><tr><td>Something you <strong>know</strong></td><td>Knowledge</td><td>Password, PIN, security question</td></tr><tr><td>Something you <strong>have</strong></td><td>Possession</td><td>Smart card, hardware token/key fob, soft token (app), phone receiving SMS code</td></tr><tr><td>Something you <strong>are</strong></td><td>Inherence</td><td>Fingerprint, face, iris, voice</td></tr><tr><td>Something you <strong>do</strong></td><td>Behavior</td><td>Keystroke patterns, mouse movement, gait, swipe style</td></tr><tr><td>Somewhere you <strong>are</strong></td><td>Location</td><td>IP address, GPS, network connection</td></tr></tbody></table></div>
+<ul class="mdlist"><li><strong>Single-factor</strong> = one category. Username + password + security questions = STILL single-factor (all knowledge).</li><li><strong>2FA</strong> = two different categories (password + phone code). <strong>MFA</strong> = two or more; 2FA is a subset of MFA.</li><li>Smart card + PIN = 2FA (possession + knowledge) — classic government badge model.</li><li>Hardware tokens: key fobs rotating codes every <strong>30–60 seconds</strong>; USB tokens holding a private-key certificate. Soft tokens: authenticator apps (Google/Microsoft Authenticator) or <strong>SMS one-time codes valid 3–10 minutes</strong>.</li><li>Biometrics data points: fingerprint ~1 in 50,000 false match (Apple); Face ID ~1 in 1,000,000 — roughly 20× stronger.</li><li><strong>Passkeys</strong> (passwordless): public-key cryptography — private key stays on the device protected by the lock screen; <strong>public key on the server</strong> (server breach leaks no secret). Each passkey unique per service → phishing-resistant. Benefits: better login success, lower drop-off, reduced MFA cost.</li><li>Security vs convenience: more factors = safer but harder to use; most orgs use 2–3.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">3. Password Security</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Five policy characteristics:</p>
+<ul class="mdlist"><li><strong>Length</strong> — the #1 strength driver; every added character multiplies the crack time (4-digit PIN = 10,000 combos; 8 digits = 100M). Recommend <strong>12–16+ characters</strong> (via the &quot;relaxed minimum password length&quot; setting beyond 14).</li><li><strong>Complexity</strong> — mix of upper, lower, numbers, special characters (72-char alphabet → 4-char password has ~26.8M combos vs 10k numeric).</li><li><strong>Reuse</strong> — never across accounts; enforce <strong>password history</strong> (demo set to 24) so old passwords can't cycle back. Note: recycled &gt;90-day-old passwords may already be cracked (cracking takes 3–6 months).</li><li><strong>Expiration</strong> — forced periodic change (e.g., 90 days). <strong>NIST no longer recommends forced expiration</strong> in most orgs (it breeds keyboard-walking: diontraining1→2→3) unless password managers are mandatory.</li><li><strong>Password age</strong> — <strong>minimum age</strong> (e.g., 3 days) stops users rapidly cycling changes to defeat password history and return to their favorite password.</li></ul>
+<p><strong>Password managers</strong> (Bitwarden, 1Password, Dashlane, browser built-ins): one encrypted vault behind a single strong master password. Features: generation, autofill, secure sharing (login without revealing the password), cross-platform.</p>
+<p><strong>Passwordless options</strong>: biometrics, hardware tokens, one-time passwords (OTP, 3–10 min validity, single use), magic links (single-use emailed link), passkeys.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">4. Password Attacks (OBJ 2.4)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Attack</th><th>How it works</th><th>Key mitigation</th></tr></thead><tbody><tr><td><strong>Brute force</strong></td><td>Every possible combination until found; slow vs long/complex</td><td>Length, complexity, attempt limits, MFA, CAPTCHA</td></tr><tr><td><strong>Dictionary</strong></td><td>Tries a list of common passwords; modern lists include <strong>Leet Speak</strong> (P@$$w0rd) substitutions</td><td>Same as brute force</td></tr><tr><td><strong>Password spraying</strong></td><td>A FEW common passwords tried across MANY accounts — avoids per-account lockout</td><td>Unique passwords, MFA</td></tr><tr><td><strong>Hybrid</strong></td><td>Dictionary word + brute-forced variation (e.g. word + 6-digit number appended, generated dynamically)</td><td>Length + complexity</td></tr></tbody></table></div>
+<ul class="mdlist"><li><strong>John the Ripper</strong> demo: <code>john --format=Raw-md5 mypassword.txt</code> cracked instantly via wordlist lookup. Cracked hashes cached in <code>~/.john/john.pot</code> (delete to re-crack).</li><li><strong>Salting</strong> = random string added before hashing; defeats rainbow/lookup tables. Use <strong>SHA-256 + salt</strong> (never plain MD5).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">5. Single Sign-On (SSO)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>One set of credentials → many applications, via a <strong>trusted relationship</strong> with an <strong>Identity Provider (IdP)</strong>. User authenticates to the IdP (e.g., domain controller); apps query the IdP and get an authentication assertion.</p>
+<p>Benefits: better UX, productivity, fewer helpdesk resets, stronger passwords (only one to remember → less reuse).</p>
+<p>Three protocols:</p>
+<ul class="mdlist"><li><strong>LDAP</strong> — directory access/maintenance over IP; central user repository; lookups for authN and group/role data for authZ; plain text capable → use <strong>LDAPS (SSL/StartTLS)</strong> for credentials.</li><li><strong>OAuth (Open Authorization)</strong> — token-based authN/Z for third-party services WITHOUT exposing the password; JSON Web Tokens (JWT, Base64, digitally signed); authorization server issues access token presented to resource/API server. (&quot;Log in with Google&quot; = OAuth.)</li><li><strong>SAML (Security Assertion Markup Language)</strong> — XML-based standard for logging users into apps based on sessions in another context; app redirects to IdP, IdP verifies and returns a SAML response/assertion; decouples services from identity providers.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">6. Federation</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Sharing identities ACROSS organizations: users log in with their HOME organization's credentials to access a PARTNER's systems, based on pre-established trust. Covers employees, partners, suppliers, customers.</p>
+<p>Six steps: (1) login initiation (domain recognized as federated), (2) redirect to the IdP (home network), (3) authenticate at IdP, (4) IdP generates an <strong>assertion</strong> (token with identity/auth status/attributes, e.g. SAML or OpenID Connect), (5) user returned to the <strong>service provider</strong> with the assertion, (6) SP verifies the assertion and grants access.</p>
+<p>Benefits: simplified UX, reduced admin overhead (no partner account management), better security (no password reuse/insecure storage). Technologies: <strong>SAML, OAuth, OpenID Connect</strong>.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">7. Privileged Access Management (PAM)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Policies + procedures + technical controls preventing abuse of privileged accounts. Three components:</p>
+<ul class="mdlist"><li><strong>Just-in-time (JIT) permissions</strong> — admin rights granted only when needed for a specific task/period, revoked on completion (no standing privilege).</li><li><strong>Password vaulting</strong> — privileged credentials (Windows admin, Linux root) stored in a secure vault requiring MFA; checkout is logged (who/when).</li><li><strong>Temporal (temporary) accounts</strong> — time-limited accounts auto-disabled/deleted (e.g., contractor account for a project, killed at completion).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">8. Access Control Models (OBJ 4.6)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Model</th><th>Decided by</th><th>Example / notes</th></tr></thead><tbody><tr><td><strong>MAC</strong> (Mandatory)</td><td>Central authority via <strong>security labels/clearances</strong></td><td>Military: Secret clearance reads Secret/Confidential/Unclassified, NOT Top Secret. Everything not expressly allowed is forbidden. Complex, costly — high-security systems only.</td></tr><tr><td><strong>DAC</strong> (Discretionary)</td><td>The resource <strong>owner</strong> decides who gets access</td><td>Sharing a file and adding a specific user; need-to-know based on identity.</td></tr><tr><td><strong>RBAC</strong> (Role-based)</td><td>User's <strong>role/group</strong></td><td>Windows groups mirroring org chart (Accounting, HR, nested Employees group). Great for high turnover — permissions follow the role.</td></tr><tr><td><strong>Rule-based</strong></td><td><strong>Rules/ACLs</strong> applied to all users</td><td>Router/firewall ACLs affecting everyone on a segment; quickly changeable.</td></tr><tr><td><strong>ABAC</strong> (Attribute-based)</td><td>Attributes of user, environment AND resource</td><td>User role + time of access + location + data sensitivity combine into the decision.</td></tr></tbody></table></div>
+<p>(Note the course's collision: RBAC also abbreviates rule-based in one slide — context tells them apart.)</p>
+<ul class="mdlist"><li><strong>Time-of-day restrictions</strong> — access only during set hours (e.g., block 2 AM logins); pairs with other models; blunts insider threats acting in irregular hours.</li><li><strong>Least privilege</strong> — minimum access needed for the job, nothing more (read-only users can't write). Also limits damage from compromised accounts.</li><li><strong>Permission/authorization creep</strong> — users accumulate rights across moves/promotions (Samantha's three departments). Fix: revoke old permissions at role change + attestation reviews.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">9. Assigning Permissions</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Local administrator</strong> = master key (system settings, installs); <strong>standard user</strong> = limited key (no config changes, own storage area only). Everyday work on standard accounts.</li><li><strong>Microsoft account</strong> — online account spanning Windows/Office 365/Xbox/Skype; can replace a local account.</li><li><strong>UAC (User Account Control)</strong> — Windows checkpoint: actions needing admin rights require explicit authorization (password or Yes); the shield icon marks such actions. Purpose: stop malware from silently gaining admin privilege.</li><li>Groups: users inherit group permissions (Administrators, Standard Users; nested groups).</li><li>File/folder permissions (Windows: right-click → Properties → Security): read / write / execute / full control, set per file or folder (folder applies to contents). When in doubt, grant LESS.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Quick-fire traps</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Username + password + security question = single-factor (all knowledge).</li><li>Spraying = few passwords × many accounts (avoids lockout).</li><li>NIST says drop forced password expiration (unless managers are mandated).</li><li>Passkeys: private key on device, public key on server — server breach ≠ credential leak.</li><li>MAC = labels; DAC = owner; RBAC = role/group; rule-based = ACLs; ABAC = attributes.</li><li>Federation crosses orgs; SSO can be within one org.</li><li>PAM trio: JIT, vaulting, temporal accounts.</li><li>Deprovisioning at termination — insider threat defense.</li><li>UAC prompts = least-privilege enforcement on Windows.</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="security-infrastructure-study-notes.html">&larr; Prev: Section 15 · Security Infrastructure</a> <a class="btn ghost" href="vulnerabilities-and-attacks-study-notes.html">Next &rarr;: Section 17 · Vulnerabilities and Attacks</a></div>
+  <script>
+    var SLUG = "identity-and-access-management";
+    var TOTAL = 10;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

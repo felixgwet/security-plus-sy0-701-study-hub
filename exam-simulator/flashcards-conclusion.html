@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 28 · Conclusion — Flashcards</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .stats { display: flex; gap: 10px; flex-wrap: wrap; margin: 6px 0 14px; }
+  .stat { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px 18px; text-align: center; flex: 1; min-width: 74px; }
+  .stat b { display: block; font-size: 20px; }
+  .stat span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .controls { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; font-size: 14px; color: var(--muted); }
+  .chk { display: flex; align-items: center; gap: 6px; cursor: pointer; min-height: 32px; }
+  .chk input { width: 18px; height: 18px; accent-color: var(--accent); }
+  .deck { perspective: 1200px; }
+  .card { position: relative; width: 100%; min-height: 300px; cursor: pointer; transform-style: preserve-3d; transition: transform .45s; outline: none; }
+  .card.flipped { transform: rotateY(180deg); }
+  .card-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 22px; display: flex; flex-direction: column; }
+  .card-front { border-top: 3px solid var(--accent); }
+  .card-back { transform: rotateY(180deg); border-top: 3px solid var(--green); }
+  .face-tag { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 10px; }
+  .card-text { font-size: 16.5px; line-height: 1.6; flex: 1; overflow-y: auto; }
+  .card-back .card-text { color: var(--green); font-weight: 600; }
+  .why { font-size: 13.5px; color: var(--muted); line-height: 1.55; border-top: 1px solid var(--border); margin-top: 12px; padding-top: 10px; max-height: 130px; overflow-y: auto; }
+  .why:empty { display: none; }
+  .flip-hint { font-size: 11px; color: #6e7681; text-align: center; margin-top: 10px; }
+  .grade { display: flex; gap: 12px; margin-top: 16px; }
+  .grade .btn { flex: 1; margin: 0; padding: 14px; font-size: 15px; }
+  .g-learn { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+  .g-know { background: transparent; border: 1px solid var(--green); color: var(--green); }
+  .g-learn:hover { background: rgba(210,153,34,.12); filter: none; }
+  .g-know:hover { background: rgba(63,185,80,.12); filter: none; }
+  .deckdone { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 36px 22px; text-align: center; }
+  .score-big { font-size: 56px; font-weight: 700; color: var(--green); margin: 6px 0; }
+  @media (max-width: 600px) { .card { min-height: 340px; } .card-text { font-size: 15.5px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../flashcards.html">&larr; All decks</a>
+    <span class="grow"></span>
+    <select id="deckSel" style="display:none;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;">
+      <option value="0">Section 28 · Conclusion (63 cards)</option>
+    </select>
+  </div>
+  <h1>Section 28 · Conclusion — Flashcards</h1>
+  <p class="sub">Tap the card to flip it, then grade yourself honestly &mdash; the deck remembers what you know and will prioritize your weak cards.</p>
+  <div class="stats">
+    <div class="stat"><b id="stTotal">0</b><span>cards</span></div>
+    <div class="stat"><b id="stKnown" style="color:var(--green)">0</b><span>known</span></div>
+    <div class="stat"><b id="stLearn" style="color:var(--gold)">0</b><span>learning</span></div>
+    <div class="stat"><b id="stPos">0/0</b><span>position</span></div>
+  </div>
+  <div class="controls">
+    <label class="chk"><input type="checkbox" id="shuffle"> Shuffle</label>
+    <label class="chk"><input type="checkbox" id="weakOnly"> Weak cards only</label>
+    <button class="btn ghost" id="restart" style="margin:0;padding:8px 16px;font-size:13px;">Restart deck</button>
+  </div>
+  <div class="deck" id="deck" style="display:none;">
+    <div class="card" id="card" tabindex="0" role="button" aria-label="flashcard — tap to flip">
+      <div class="card-face card-front"><span class="face-tag">Question</span><div class="card-text" id="front"></div><span class="flip-hint">tap to flip</span></div>
+      <div class="card-face card-back"><span class="face-tag">Answer</span><div class="card-text" id="back"></div><div class="why" id="why"></div><span class="flip-hint">tap to flip back</span></div>
+    </div>
+    <div class="grade">
+      <button class="btn g-learn" id="btnLearn">Still learning</button>
+      <button class="btn g-know" id="btnKnow">Know it</button>
+    </div>
+  </div>
+  <div class="deckdone" id="deckDone" style="display:none;">
+    <div class="score-big" id="donePct"></div>
+    <p class="sub" id="doneMsg" style="text-align:center;"></p>
+    <div style="text-align:center;"><button class="btn" id="again">Go again</button></div>
+  </div>
+  <script>
+    var DECKS = [{"label":"Section 28 · Conclusion","cards":[{"id":"19l6x50","q":"Which certification is the most direct defense-side continuation of Security+, focused on detection, analysis, and response?","a":"CySA+","why":"CySA+ (Cybersecurity Analyst) extends Security+ into blue-team work: threat detection, SIEM analysis, and incident response.","multi":false},{"id":"1ldabdf","q":"Which certifications sit on the OFFENSE side of the security career spectrum? (Select TWO.)","a":"PenTest+;  CASP+/SecurityX as an offensive-practice pinnacle for experienced testers","why":"PenTest+ is explicitly offensive testing; CASP+/SecurityX covers advanced practitioner skills. CySA+ is defense; ITIL is process management.","multi":true},{"id":"1psvdrg","q":"CompTIA Security+ certification remains valid for how long, and how is it renewed?","a":"3 years, renewed by earning CEUs or passing a higher-level CompTIA cert","why":"CompTIA certs expire after 3 years. Renewal is via CEUs (training, conferences, publishing) or earning a higher certification, which renews lower ones automatically.","multi":false},{"id":"dq988i","q":"Why does the course recommend Linux knowledge (e.g., LPI) alongside security certifications?","a":"Most security tooling runs on Linux and employers expect daily shell comfort","why":"Scanners, SIEMs, and exploitation frameworks predominantly run on Linux. It is a daily job skill, not an optional extra.","multi":false},{"id":"az4yty","q":"A new Security+ holder wants the fastest route to a hands-on defense job. Which combination is BEST?","a":"Build a home lab and practice with a SIEM;  Join CTFs to build practical skills","why":"Certs get interviews; demonstrated hands-on skill (labs, SIEM practice, CTFs) gets offers. Waiting or overreaching wastes the cert's momentum.","multi":true},{"id":"cel5di","q":"Which roles are realistic FIRST jobs for a new Security+ holder? (Select TWO.)","a":"SOC analyst;  Junior penetration tester","why":"Entry-level roles — SOC analyst, security analyst, junior pentester, GRC analyst — are the realistic start. Executive and architect titles require years of experience.","multi":true},{"id":"l81wox","q":"Which statement about CEU renewal strategy is TRUE?","a":"Earning a higher-level CompTIA cert is usually the highest-value renewal because it also advances your career","why":"A higher cert (e.g., CySA+) simultaneously renews Security+ and moves you up the ladder — double value for the same study time.","multi":false},{"id":"mqgsmm","q":"A professional aims at a GOVERNANCE and compliance career track. Which addition to Security+ fits best?","a":"ITIL 4 (plus familiarity with frameworks like PRINCE2 for project leadership)","why":"GRC and security-governance roles weight process knowledge heavily. ITIL/PRINCE2 signal that you can operate in process-driven environments.","multi":false},{"id":"13978z2","q":"Why is Security+ specifically named in so many U.S. government and defense job postings?","a":"It satisfies the DoD 8570/8140 baseline certification requirement","why":"DoD 8570/8140 mandates approved baselines for information-assurance positions, and Security+ is the standard entry-level baseline — hence its ubiquity in those postings.","multi":false},{"id":"19r73zd","q":"Which of these are POOR renewal strategies for Security+? (Select TWO.)","a":"Ignoring CEUs until the final month, then cramming low-value activities;  Assuming the cert renews itself with no action","why":"Panic-CEU-ing at the deadline risks lapse and yields low-value activities, and assuming auto-renewal guarantees expiry. Spreading CE activity across the cycle — or better, earning the next cert — is the sound strategy.","multi":true},{"id":"1l5b9lz","q":"What is the key message of the course conclusion?","a":"Certification is a ladder: keep studying, keep building hands-on skill, and climb toward the next role","why":"The conclusion frames Security+ as a milestone on a longer path — upward momentum in both credentials and practical skill.","multi":false},{"id":"con7w8","q":"What is the most direct next certification after Security+ for someone who wants to focus on defense, detection, and SIEM work?","a":"CySA+","why":"CySA+ (Cybersecurity Analyst) is the defense-side continuation: detection, analysis, and response. PenTest+ is the offense-side option.","multi":false},{"id":"1luv9ou","q":"Which certification targets authorized penetration testing and exploitation?","a":"PenTest+","why":"PenTest+ is the offensive counterpart to CySA+: hands-on pentesting methodology and reporting.","multi":false},{"id":"1lyc161","q":"CASP+ (now SecurityX) is best described as:","a":"The advanced, vendor-neutral, hands-on pinnacle of the CompTIA security ladder for experienced practitioners","why":"CASP+/SecurityX is the advanced practitioner cert — practical, performance-based, and aimed at experienced security professionals, not beginners.","multi":false},{"id":"1w6ep63","q":"Which foundational cert would most fill networking gaps that make Security+ material easier?","a":"Network+","why":"Network+ covers the TCP/IP, subnetting, and protocol knowledge that underpins Security Architecture and Security Operations domains.","multi":false},{"id":"capyo5","q":"Why is Linux knowledge (e.g., LPI Linux Essentials) recommended alongside security certifications?","a":"Most security tooling runs on Linux, and employers expect comfort with it","why":"Security tools — scanners, SIEMs, exploitation frameworks — predominantly run on Linux. Comfort with the shell is a daily-job skill.","multi":false},{"id":"j4f5q6","q":"ITIL 4 and PRINCE2 are most useful for someone aiming at which kind of security role?","a":"GRC and security governance/process-heavy roles, or leading security projects","why":"ITIL (service management) and PRINCE2 (project management) are process frameworks — they serve governance, compliance, and project-leadership career paths.","multi":false},{"id":"18ak4rl","q":"How long is a CompTIA Security+ certification valid before renewal is required?","a":"3 years","why":"CompTIA certs are valid for 3 years, renewable by earning CEUs or passing a higher-level certification.","multi":false},{"id":"eaixax","q":"Which activity RENEWS a Security+ certification automatically?","a":"Passing a higher-level CompTIA certification such as CySA+","why":"Earning a higher-level CompTIA cert automatically renews lower certs — the highest-value CE path available.","multi":false},{"id":"2b6e0g","q":"CEU stands for:","a":"Continuing Education Unit","why":"CEUs are Continuing Education Units — the currency of CompTIA's renewal program, earned through approved training, conferences, publishing, and certifications.","multi":false},{"id":"fqjt8y","q":"Which is a typical FIRST job role for a new Security+ holder?","a":"SOC analyst / security analyst","why":"Entry-level security roles — SOC analyst, security analyst, junior pen tester, GRC analyst — are the realistic first step; leadership roles come with experience.","multi":false},{"id":"1piqlj2","q":"Why is Security+ specifically valued for U.S. government and defense contractor jobs?","a":"It satisfies the DoD 8570/8140 baseline requirement that appears in most entry-level cyber job postings","why":"Security+ is the DoD 8570/8140-approved baseline certification, which is why it dominates entry-level cybersecurity job requirements.","multi":false},{"id":"liapi5","q":"Which activity best converts a fresh certification into job offers?","a":"Hands-on practice: home labs, CTFs, and current security-events knowledge","why":"Certifications get interviews; demonstrated skill gets offers. Labs and CTFs prove you can do the work, not just recognize it.","multi":false},{"id":"xc0f7d","q":"A CTF is:","a":"Capture The Flag — hands-on security competitions that build practical offensive and defensive skills","why":"CTFs are practical security competitions — one of the best ways to build the hands-on skills employers test in interviews.","multi":false},{"id":"1johlgd","q":"Which pairing of cert → focus area is correct?","a":"PenTest+ → offensive security testing","why":"PenTest+ = offensive testing; CySA+ = defense/analysis; ITIL = service management; A+ = hardware/helpdesk fundamentals.","multi":false},{"id":"1wlx39r","q":"For CEU earning, which of these typically counts toward renewal?","a":"Approved training, webinars, and conferences","why":"CompTIA accepts approved training, conferences, webinars, publishing, teaching, and higher certifications as CEU-earning activities.","multi":false},{"id":"8v62dr","q":"What is the strategic reason to plan your CE path early rather than at the deadline?","a":"The next certification (e.g., CySA+) is usually the highest-value renewal move and takes months to earn","why":"Earning a higher cert both advances your career AND renews Security+ — but it takes real study time. Starting at the deadline means panic or lapse.","multi":false},{"id":"1lg5fri","q":"Which statement about the certification journey is BEST advice?","a":"Security+ is the baseline; stack follow-on skills (CySA+/PenTest+, Linux, process frameworks) in the direction of your target role","why":"Security+ opens the door; deliberate follow-on study aimed at a target role (defense, offense, or governance) turns it into a career.","multi":false},{"id":"9n5ipx","q":"Which role sits on the OFFENSE side of security work?","a":"Penetration tester","why":"Penetration testers attack systems with authorization to find weaknesses; SOC analysts, auditors, and GRC roles sit on defense/oversight.","multi":false},{"id":"1namb9h","q":"The instructor's final message is best summarized as:","a":"Keep studying, keep certifying upward, and keep building toward the next step in your career","why":"The conclusion's theme: certification is a ladder. Security+ is a milestone, not a finish line.","multi":false},{"id":"1pj5p96","q":"Which combination would best prepare someone for a junior SOC analyst role?","a":"Security+ plus Linux familiarity plus hands-on SIEM/lab practice","why":"Security+ provides the baseline; Linux and hands-on SIEM/lab work provide the practical skills a SOC screens for.","multi":false},{"id":"1petpcg","q":"Which certification is the most direct defense-side continuation of Security+ (detection, analysis, response)?","a":"CySA+","why":"CySA+ extends Security+ into blue-team work: threat detection, SIEM analysis, and incident response. PenTest+ is the offense-side alternative.","multi":false},{"id":"1fa3gfr","q":"PenTest+ best prepares you for which kind of work?","a":"Authorized offensive security testing and reporting","why":"PenTest+ covers authorized penetration testing methodology, exploitation, and reporting — the red-team track.","multi":false},{"id":"1ct28vp","q":"CompTIA Security+ remains valid for ____ and is renewed by ____.","a":"3 years; earning CEUs or passing a higher-level CompTIA certification","why":"CompTIA certifications expire after 3 years. Renewal is via CEUs (approved training, conferences, publishing) or a higher certification.","multi":false},{"id":"qf3oo3","q":"CASP+ (SecurityX) is aimed at:","a":"Experienced practitioners seeking an advanced, hands-on, vendor-neutral credential","why":"CASP+/SecurityX is the advanced pinnacle of the CompTIA security ladder — performance-based and intended for experienced professionals.","multi":false},{"id":"h4k9lv","q":"Which cert best fills NETWORKING gaps that make Security+ material easier to apply?","a":"Network+","why":"Network+ covers TCP/IP, subnetting, and protocols — the foundation under Security Architecture and Security Operations questions.","multi":false},{"id":"116qb7x","q":"Why is Linux familiarity recommended for security professionals?","a":"Most security tools (scanners, SIEMs, exploitation frameworks) run on Linux, and employers expect daily shell comfort","why":"Security tooling is predominantly Linux-based. Shell fluency is a daily job skill, not an optional nicety.","multi":false},{"id":"1xlzksk","q":"ITIL 4 and PRINCE2 are most valuable for which career direction?","a":"Security governance, GRC, and project/process-heavy roles","why":"ITIL (service management) and PRINCE2 (project management) are process frameworks — they serve governance and project-leadership tracks.","multi":false},{"id":"1hdkv2n","q":"Earning CySA+ while holding Security+ has what renewal effect?","a":"It automatically renews Security+ (higher-level CompTIA certs renew lower ones)","why":"Higher-level CompTIA certifications automatically renew lower-level ones — the highest-value CE move available.","multi":false},{"id":"1xvdxix","q":"Which is a realistic FIRST security role for a new Security+ holder?","a":"SOC analyst / security analyst","why":"Entry-level roles — SOC analyst, security analyst, junior pentester, GRC analyst — are the realistic start. Leadership titles need years of experience.","multi":false},{"id":"7h6prb","q":"Security+ appears constantly in U.S. government job postings because:","a":"It satisfies the DoD 8570/8140 baseline requirement","why":"DoD 8570/8140 mandates approved baseline certifications for IA positions; Security+ is the standard entry-level baseline.","multi":false},{"id":"y7xbtc","q":"What best converts a fresh Security+ into job offers?","a":"Hands-on evidence: home lab, SIEM practice, CTF participation","why":"Certifications earn interviews; demonstrated hands-on capability earns offers. Labs and CTFs are the proof.","multi":false},{"id":"19q52v6","q":"A Capture The Flag (CTF) competition builds which skill?","a":"Practical offensive and defensive security technique under realistic pressure","why":"CTFs are hands-on security competitions — among the best evidence of practical skill for interviews.","multi":false},{"id":"1t6rcd3","q":"Which pairing of certification → job family is CORRECT?","a":"PenTest+ → offensive security consultant","why":"PenTest+ feeds offensive/red-team roles; CySA+ feeds SOC/analysis; ITIL feeds process/governance; A+ feeds hardware/helpdesk.","multi":false},{"id":"1v89ybh","q":"Which activities typically earn CEUs toward Security+ renewal? (Select the best answer.)","a":"Approved training, webinars, conferences, publishing, and higher certifications","why":"CompTIA approves specific CE activities: training, conferences, webinars, teaching, publishing, and certifications. Plan them across the 3-year cycle.","multi":false},{"id":"1i5aot9","q":"What is the BEST reason to start your next certification well before the Security+ renewal deadline?","a":"A higher cert is the highest-value renewal move but takes months to earn; deadline panic risks a lapse","why":"CySA+ (or similar) renews Security+ AND advances your career, but requires real study time. Starting early turns renewal into progress.","multi":false},{"id":"18l5v6","q":"The course conclusion's core message is:","a":"Security+ is a milestone — keep certifying upward and building hands-on skill toward your target role","why":"The wrap-up frames certification as a ladder: Security+ opens the door; deliberate next steps (CySA+/PenTest+, Linux, process skills) turn it into a career.","multi":false},{"id":"1rcp1j6","q":"For a junior SOC analyst target, which combination is strongest?","a":"Security+ plus Linux familiarity plus hands-on SIEM/lab practice","why":"Security+ provides the baseline; Linux and SIEM lab work provide the practical screening skills a SOC interview tests.","multi":false},{"id":"5taofv","q":"Which role is on the OFFENSE side of security?","a":"Penetration tester","why":"Penetration testers attack systems with authorization. SOC, GRC, and audit roles are defense or oversight.","multi":false},{"id":"fdz7tk","q":"Why plan a certification roadmap toward a specific target role rather than collecting random certs?","a":"Deliberate stacking (e.g., defense: CySA+; offense: PenTest+; governance: ITIL) builds a coherent story employers recognize","why":"A coherent cert-to-role story shows direction. Scattered credentials signal collecting, not building.","multi":false},{"id":"1gln5f8","q":"A new Security+ holder wants a defense-focused career in detection and response. Which roadmap is MOST coherent?","a":"CySA+ with Linux practice and hands-on SIEM lab work","why":"CySA+ is the direct defense continuation; Linux and SIEM practice supply the daily tooling skills a detection role screens for. The other paths point at different job families.","multi":false},{"id":"dytd2","q":"Which statements about CompTIA renewal are TRUE? (Select TWO.)","a":"Security+ expires after 3 years without CE activity;  Earning a higher-level CompTIA cert (e.g., CySA+) automatically renews Security+","why":"CompTIA certs lapse after 3 years without CEUs. Higher certs renew lower ones automatically — the double-value move. Retaking is not the only path, and lapsed certs simply expire.","multi":true},{"id":"4i0p1o","q":"A candidate has 18 months before their Security+ renewal deadline. Which plan is BEST?","a":"Study for and earn CySA+ within 12 months — renewing Security+ automatically and advancing toward a target role","why":"A higher cert is the highest-value CE move: it renews Security+ and advances the career simultaneously. Starting early removes deadline risk.","multi":false},{"id":"uo2356","q":"Which activities build the practical skills that convert a certification into job offers? (Select THREE.)","a":"Home lab with SIEM and detection tooling;  CTF competitions;  Daily security news and threat-landscape reading","why":"Certs earn interviews; demonstrated capability earns offers. Labs, CTFs, and current-events knowledge are the evidence. Waiting and rote memorization produce nothing.","multi":true},{"id":"sz2h6j","q":"Why is Security+ the standard baseline in U.S. government and defense-contractor job postings?","a":"It satisfies the DoD 8570/8140 baseline certification requirement for information-assurance positions","why":"DoD 8570/8140 mandates approved baseline certifications for IA roles, and Security+ is the ubiquitous entry-level baseline — hence its dominance in those postings.","multi":false},{"id":"1g4nwpd","q":"Which is a realistic FIRST role for a new Security+ holder aiming at offense?","a":"Junior penetration tester (with CTF/lab evidence)","why":"Junior pentester is the entry offensive role — but it demands hands-on evidence (CTFs, labs) beyond the certificate itself.","multi":false},{"id":"145ahu","q":"Which pairing of follow-on cert → reason is CORRECT? (Select TWO.)","a":"ITIL 4 -> strengthens governance and process-heavy security roles;  Linux Essentials -> daily tooling fluency since most security tools run on Linux","why":"ITIL serves governance; Linux serves tooling. A+ is foundational (not advanced), and PRINCE2 is project management (not offense).","multi":true},{"id":"e1tezj","q":"A professional targets a GRC (governance, risk, compliance) career. Which addition to Security+ fits BEST?","a":"ITIL 4 plus familiarity with PRINCE2 for process and project environments","why":"GRC roles weight process knowledge heavily; ITIL and PRINCE2 signal you can operate in process-driven, audit-facing environments.","multi":false},{"id":"1au084z","q":"Which statement about the 3-year validity window is TRUE?","a":"CE activity can be spread across the whole window;  Deadline panic risks lapse because meaningful CE (like a higher cert) takes months","why":"The window exists to be used gradually. Higher-cert CE takes real study time, so last-minute attempts commonly fail. Lapsed certs require re-earning, not permanent loss.","multi":true},{"id":"1haco2f","q":"Why is deliberate cert stacking (toward one target role) better than collecting many unrelated certs?","a":"A coherent cert-to-role story demonstrates direction; scattered credentials suggest collecting rather than building","why":"Employers read cert sequences as intent. Defense, offense, or governance — pick a lane, stack toward it, and let the story compound.","multi":false},{"id":"1cu5zyh","q":"A candidate asks: \"Security+ done — should I stop studying?\" The best guidance is:","a":"No — certification is a ladder: keep current with threats, build hands-on skill, and climb toward the next credential","why":"Security is a field of continuous change; the conclusion's message is momentum — upward in both credentials and practical skill.","multi":false},{"id":"1iooqt2","q":"Which combination would a hiring manager MOST want to see for an entry-level SOC position?","a":"Security+ certification;  Evidence of hands-on practice: home SIEM lab or CTF writeups","why":"Baseline cert plus demonstrated hands-on practice is the entry-level SOC formula. Unrelated certs and complacency are negatives.","multi":true},{"id":"h7onwu","q":"What is the relationship between Security+ and DoD 8570/8140?","a":"Security+ satisfies the baseline certification requirement for many information-assurance positions under DoD 8570/8140","why":"Security+ is on the DoD 8570/8140 approved baseline list, which is exactly why it appears in the majority of entry-level government/defense security postings.","multi":false}]}];
+    var KEY = 'secplus_cards_v1';
+    var deckIdx = 0, order = [], pos = 0, flipped = false;
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function saveState(s){ localStorage.setItem(KEY, JSON.stringify(s)); }
+    function deck(){ return DECKS[deckIdx]; }
+    function state(){ var s = loadState(); return s[deck().label] || {}; }
+    function setState(st){ var s = loadState(); s[deck().label] = st; saveState(s); }
+    function isWeak(c){ return state()[c.id] !== 'known'; }
+    function buildOrder(){
+      var cards = deck().cards.slice();
+      if (document.getElementById('weakOnly').checked) {
+        cards = cards.filter(isWeak);
+        if (!cards.length) cards = deck().cards.slice();
+      }
+      if (document.getElementById('shuffle').checked) {
+        for (var i = cards.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = cards[i]; cards[i] = cards[j]; cards[j] = t; }
+      } else {
+        cards.sort(function(a, b){ return (state()[a.id] === 'known') - (state()[b.id] === 'known'); });
+      }
+      order = cards; pos = 0;
+    }
+    function paintStats(){
+      var st = state(), k = 0;
+      deck().cards.forEach(function(c){ if (st[c.id] === 'known') k++; });
+      document.getElementById('stTotal').textContent = deck().cards.length;
+      document.getElementById('stKnown').textContent = k;
+      document.getElementById('stLearn').textContent = deck().cards.length - k;
+      document.getElementById('stPos').textContent = order.length ? (pos + 1) + '/' + order.length : '0/0';
+    }
+    function show(){
+      flipped = false;
+      var card = document.getElementById('card');
+      card.classList.remove('flipped');
+      if (pos >= order.length) { finish(); return; }
+      document.getElementById('deck').style.display = '';
+      document.getElementById('deckDone').style.display = 'none';
+      var c = order[pos];
+      document.getElementById('front').textContent = c.q;
+      document.getElementById('back').textContent = c.a;
+      document.getElementById('why').textContent = c.why || '';
+      paintStats();
+    }
+    function finish(){
+      document.getElementById('deck').style.display = 'none';
+      document.getElementById('deckDone').style.display = '';
+      var st = state(), k = 0;
+      deck().cards.forEach(function(c){ if (st[c.id] === 'known') k++; });
+      var pct = deck().cards.length ? Math.round(100 * k / deck().cards.length) : 0;
+      document.getElementById('donePct').textContent = pct + '%';
+      document.getElementById('donePct').style.color = pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--gold)' : 'var(--red)';
+      document.getElementById('doneMsg').textContent = pct >= 80 ? 'Deck mastered — well done. Come back before exam day to keep it fresh.' : pct >= 50 ? 'Good progress. Run "Weak cards only" until this hits 80%.' : 'Keep drilling — mark honestly and the deck will carry you.';
+      paintStats();
+    }
+    function flip(){ flipped = !flipped; document.getElementById('card').classList.toggle('flipped', flipped); }
+    function grade(known){
+      var st = state();
+      st[order[pos].id] = known ? 'known' : 'learning';
+      setState(st);
+      pos++;
+      show();
+    }
+    document.getElementById('card').addEventListener('click', flip);
+    document.getElementById('card').addEventListener('keydown', function(e){ if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flip(); } });
+    document.getElementById('btnKnow').addEventListener('click', function(){ grade(true); });
+    document.getElementById('btnLearn').addEventListener('click', function(){ grade(false); });
+    document.getElementById('shuffle').addEventListener('change', function(){ buildOrder(); show(); });
+    document.getElementById('weakOnly').addEventListener('change', function(){ buildOrder(); show(); });
+    document.getElementById('restart').addEventListener('click', function(){ pos = 0; show(); });
+    document.getElementById('again').addEventListener('click', function(){ buildOrder(); show(); });
+    document.getElementById('deckSel').addEventListener('change', function(){ deckIdx = parseInt(this.value, 10); buildOrder(); show(); });
+    document.addEventListener('keydown', function(e){ if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return; if (e.key === ' ') { e.preventDefault(); flip(); } if (e.key === 'ArrowRight') grade(true); if (e.key === 'ArrowLeft') grade(false); });
+    buildOrder(); show();
+  </script>
+</div>
+</body>
+</html>

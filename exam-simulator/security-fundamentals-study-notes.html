@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Fundamentals — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Security Fundamentals &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  <div class="banner">Based on the course's Section 02 lecture (&quot;Fundamentals of Security&quot;) — SY0-701 Domain 1, objectives 1.1 and 1.2. This is the foundation every other section builds on.</div>
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><details class="topic" open><summary><span class="t-name">1. Security vs. Usability (The Core Tension)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Security and convenience are <strong>always at odds</strong>. Make something more secure → less usable; make it more convenient → less secure.</li><li>Classic example: ISP-provided Wi-Fi routers ship with a long random password (secure, hard to memorize) — so users change it to <code>magic2912</code> (convenient, easy to crack). Some routers even <strong>print the password on the device itself</strong>.</li><li>Users will actively <strong>bypass controls</strong> that make their jobs harder — plan for this human factor in every security decision.</li><li>The business cost is real: in 2022 the average major-company data breach cost <strong>$4.35 million</strong>.</li><li>The goal (&quot;sweet spot&quot;): easy enough for legitimate users, hard enough that threat actors can't get in.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">2. Two Definitions the Exam Loves to Contrast</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Term</th><th>Protects</th><th>Example</th></tr></thead><tbody><tr><td><strong>Information security</strong></td><td>The <strong>data/information itself</strong> — protecting it from unauthorized access, unlawful modification, disruption, disclosure, corruption, destruction</td><td>Encrypting sensitive files</td></tr><tr><td><strong>Information system security</strong></td><td>The <strong>systems that hold and process</strong> the data</td><td>Hardening the server, network device, or smartphone that stores the data</td></tr></tbody></table></div>
+<p>Exam cue: data itself → information security; the devices holding it → information system security.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">3. The CIA Triad — and Its Modern Extension</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Pillar</th><th>Means</th><th>Example</th></tr></thead><tbody><tr><td><strong>Confidentiality</strong></td><td>Information accessible only to authorized parties</td><td>Encrypting files so only authorized people can decrypt and read them</td></tr><tr><td><strong>Integrity</strong></td><td>Data stays accurate and unaltered unless modification is required</td><td>Checksums verify a file was not changed/corrupted in transit</td></tr><tr><td><strong>Availability</strong></td><td>Resources accessible and functional when needed</td><td>Website redundancy keeps it online under high traffic</td></tr></tbody></table></div>
+<p><strong>Expanded model — C.I.A.N.A:</strong> the triad has grown to include:</p>
+<ul class="mdlist"><li><strong>Non-repudiation</strong> — guaranteeing an action/event took place and <strong>cannot be denied</strong> by the parties involved. Example: a <strong>digitally signed email</strong> — the sender cannot deny sending it.</li><li><strong>Authentication</strong> — verifying identity. (Leads directly into the AAAs below.)</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">4. The AAAs of Security</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Authentication</strong> — verifying the <strong>identity</strong> of a user or system. Example: username + password checked against a stored version at login.</li><li><strong>Authorization</strong> — determining <strong>what actions/resources</strong> an authenticated user may perform. Example: you may have read permission on database records but not write/edit.</li><li><strong>Accounting</strong> — <strong>tracking</strong> user activities and resource utilization, typically for <strong>auditing or billing</strong>. Example: logging all user activity on the network to detect unusual or unauthorized behavior.</li></ul>
+<p>Order matters: authenticate (who are you?) → authorize (what may you do?) → account (what did you do?).</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">5. Security Controls</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Definition:</strong> measures or mechanisms put in place to <strong>mitigate risks</strong> and protect the CIA of information systems and their data.</p>
+<p><strong>Categories (by nature):</strong></p>
+<ul class="mdlist"><li><strong>Technical</strong> — technology-based (firewalls, encryption, access control lists)</li><li><strong>Managerial</strong> — administrative/management processes (policies, risk assessments, standards)</li><li><strong>Operational</strong> — day-to-day procedures (awareness training, physical security procedures)</li><li><strong>Physical</strong> — tangible protections (locks, guards, fences)</li></ul>
+<p><strong>Types (by function):</strong></p>
+<ul class="mdlist"><li><strong>Preventative</strong> — stops an incident before it happens (firewall, encryption)</li><li><strong>Deterrent</strong> — discourages attackers (warning banners, visible cameras)</li><li><strong>Detective</strong> — identifies/discovers incidents (IDS, log monitoring, CCTV review)</li><li><strong>Corrective</strong> — restores after an incident (backups, patching, failover)</li><li><strong>Compensating</strong> — alternative control when the primary is not feasible</li><li><strong>Directive</strong> — directs/guid behavior (policies, signage, procedures)</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">6. Zero Trust</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Principle: trust no one by default</strong> — no user, inside or outside the organization, is trusted automatically. <strong>Everyone must be verified</strong> before accessing resources.</li><li>Achieved through two planes:</li><ul><li><strong>Control plane</strong>: adaptive identity, threat scope reduction, policy-driven access controls, secured zones.</li><li><strong>Data plane</strong>: subject and system, <strong>policy engine</strong>, <strong>policy administrator</strong>, and <strong>policy enforcement points</strong> (PEPs).</li></ul></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Key Takeaways</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Security vs. usability is a permanent trade-off — users bypass controls that are too painful, so design for the sweet spot.</li><li><strong>Information security = protect the data; information system security = protect the systems holding it.</strong></li><li>CIA triad + <strong>N</strong>on-repudiation + <strong>A</strong>uthentication = the modern pentagon; the AAAs (authentication → authorization → accounting) flow from it.</li><li>Know the four control <strong>categories</strong> (technical, managerial, operational, physical) and six <strong>types</strong> (preventative, deterrent, detective, corrective, compensating, directive).</li><li><strong>Zero trust = verify everyone</strong>, every time — control plane (policy decisions) + data plane (policy enforcement).</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="cyber-resilience-and-redundancy-study-notes.html">&larr; Prev: Cyber Resilience and Redundancy</a> </div>
+  <script>
+    var SLUG = "security-fundamentals";
+    var TOTAL = 7;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

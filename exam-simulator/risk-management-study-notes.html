@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 8 · Risk Management — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 8 · Risk Management &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><p class="doc-title">Risk Management — Exam-Tailored Study Notes</p>
+<p><strong>Course section:</strong> 09 – Risk Management (Lessons 81–88) <strong>Exam objective covered:</strong> 5.2 — Explain elements of the risk management process</p>
+<p>This is a <strong>small but very testable section</strong>. SY0-701 loves the risk lifecycle ordering, the RTO/RPO/MTTR/MTBF definitions, the SLE/ALE math, and the four risk treatment strategies. Expect definition-matching questions and at least one calculation.</p>
+<details class="topic" open><summary><span class="t-name">1. The Risk Management Lifecycle (Lesson 81)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Five steps, in order (memorize the sequence — ordering questions are common):</p>
+<div class="tblwrap"><table><thead><tr><th>#</th><th>Step</th><th>What it means</th></tr></thead><tbody><tr><td>1</td><td><strong>Risk Identification</strong></td><td>Recognizing potential risks that could negatively impact the organization's ability to operate or meet objectives. Proactive; produces a comprehensive list of risks</td></tr><tr><td>2</td><td><strong>Risk Analysis</strong></td><td>Evaluating the <strong>likelihood</strong> and <strong>potential impact</strong> of identified risks. <strong>Qualitative</strong> (categories/scales) or <strong>quantitative</strong> (numerical values). Output: prioritized list by severity</td></tr><tr><td>3</td><td><strong>Risk Treatment</strong></td><td>Developing strategies to manage risks: <strong>avoidance, reduction, sharing, acceptance</strong>. Goal: reduce potential impact to an acceptable level, given the organization's risk tolerance</td></tr><tr><td>4</td><td><strong>Risk Monitoring</strong></td><td>Ongoing tracking of identified risks, <strong>residual risk</strong>, new risks, and the effectiveness of the risk management process. Keeps the process dynamic and responsive</td></tr><tr><td>5</td><td><strong>Risk Reporting</strong></td><td>Communicating risk information and process effectiveness to stakeholders — dashboards, heat maps, detailed reports — tailored to the audience. Ensures accountability and informed decisions</td></tr></tbody></table></div>
+<p>⚠️ <strong>TRAP:</strong> Analysis (step 2) comes <strong>before</strong> treatment (step 3) — you can't treat what you haven't assessed. Monitoring is <strong>ongoing</strong>, not a one-time final act; reporting is the communication of everything done.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">2. Risk Assessment Frequency (Lesson 82)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Four types — the exam favorite distinction is ad-hoc vs one-time:</p>
+<div class="tblwrap"><table><thead><tr><th>Type</th><th>Definition</th><th>Trigger</th><th>Example</th></tr></thead><tbody><tr><td><strong>Ad-hoc</strong></td><td>Conducted <strong>as and when needed</strong>, in response to a specific event/situation</td><td>A significant event, new market, new product, disaster, regulatory change</td><td>Assessing risk after a major vendor breach</td></tr><tr><td><strong>Recurring</strong></td><td>At <strong>regular intervals</strong> (annual, quarterly, monthly), part of standard operating procedures</td><td>The calendar</td><td>Quarterly credit-risk review; scheduled penetration tests</td></tr><tr><td><strong>One-time</strong></td><td>For a <strong>specific project or initiative</strong>, <strong>not repeated</strong></td><td>A project's lifecycle</td><td>Risk assessment for implementing a new IT system</td></tr><tr><td><strong>Continuous</strong></td><td><strong>Ongoing</strong> real-time monitoring and evaluation, usually technology-enabled</td><td>Always on</td><td>SOC continuously monitoring threats and vulnerabilities</td></tr></tbody></table></div>
+<p>⚠️ <strong>TRAP: Ad-hoc vs one-time.</strong> Both are &quot;not on a fixed schedule,&quot; but: <strong>one-time = tied to a specific project, never repeated</strong>. <strong>Ad-hoc = triggered by an event, and MAY be repeated</strong> if similar circumstances arise again.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">3. Risk Identification &amp; Business Impact Analysis (Lesson 83)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Risk identification is <strong>proactive</strong>; covers operational, financial, strategic, and reputational risks — even unlikely ones with big impact belong on the list.</li><li>Techniques: <strong>brainstorming, checklists, interviews, scenario analysis</strong>.</li><li>Then conduct the <strong>Business Impact Analysis (BIA)</strong>: evaluates the potential effects of disruption on business functions; identifies and prioritizes critical functions; determines <strong>how quickly they must be recovered</strong>.</li></ul>
+<h3>The Four Key Metrics (extremely examable — know them cold)</h3>
+<div class="tblwrap"><table><thead><tr><th>Metric</th><th>Stands for</th><th>Meaning</th><th>Higher or lower is better?</th><th>Course example</th></tr></thead><tbody><tr><td><strong>RTO</strong></td><td>Recovery Time Objective</td><td>Maximum acceptable <strong>length of downtime</strong> before the lack of a business function severely impacts the organization. Target time to <strong>restore</strong> the function</td><td>Shorter = tighter requirement</td><td>E-commerce site down: max tolerable downtime = 2 hours → RTO = 2h</td></tr><tr><td><strong>RPO</strong></td><td>Recovery Point Objective</td><td>Maximum acceptable <strong>data loss measured in time</strong>. How far back the restore point can be — drives backup frequency</td><td>Shorter = less data loss tolerated</td><td>Can afford to lose max 15 min of transactions → backups every 15 min</td></tr><tr><td><strong>MTTR</strong></td><td>Mean Time To Repair</td><td>Average time required to <strong>repair</strong> a failed component (maintainability)</td><td><strong>LOWER = better</strong> (repairs fast)</td><td>Machine breaks 5×/year, avg 4h to fix → MTTR = 4h</td></tr><tr><td><strong>MTBF</strong></td><td>Mean Time Between Failures</td><td>Average time <strong>between</strong> failures (reliability)</td><td><strong>HIGHER = better</strong> (fails less often)</td><td>5 failures/year → MTBF ≈ 2.4 months (~72 days)</td></tr></tbody></table></div>
+<p>⚠️ <strong>TRAPS:</strong></p>
+<ul class="mdlist"><li><strong>RTO = time to recover (restoration). RPO = time of data loss.</strong> RPO is about *backups*: an RPO of 4 hours means backups at least every 4 hours.</li><li><strong>MTTR lower is good; MTBF higher is good.</strong> Don't mix them up — MTTR is about speed of repair, MTBF is about frequency of failure.</li><li>All four guide <strong>disaster recovery (DR) and business continuity (BC) planning</strong>.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">4. The Risk Register (Lesson 84)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>The <strong>risk register</strong> (a.k.a. <strong>risk log</strong>) = the central document recording details about identified risks — description, impact, likelihood, mitigation actions. Tool for communication; resembles the heat map risk matrix; shared with shareholders; lives through the whole project lifecycle.</p>
+<p><strong>Contents, in the order you build them:</strong></p>
+<ul class="mdlist"><li><strong>Risk description</strong> — clear, concise, standalone</li><li><strong>Risk impact</strong> — potential consequences (cost, time, quality…), rated low/medium/high</li><li><strong>Risk likelihood</strong> — chance of occurrence; rated numerically (1–5, 1–10) or descriptively (rare, unlikely, possible, likely, almost certain)</li><li><strong>Risk outcome</strong> — result if the risk occurs; tied to impact × likelihood</li><li><strong>Risk level / threshold</strong> — impact × likelihood combined → high/medium/low; drives prioritization</li><li><strong>Cost</strong> — financial impact if the risk occurs, or cost of mitigating it</li></ul>
+<p>Then add:</p>
+<ul class="mdlist"><li><strong>Key Risk Indicators (KRIs)</strong> — predictive, <strong>forward-looking</strong> metrics giving an <strong>early signal of increasing risk exposure</strong>; a &quot;barometer of risk&quot;; tied to risk appetite. Example: number of loan defaults rising → early warning of credit-default risk</li><li><strong>Risk owner</strong> — the person/group <strong>responsible for managing the risk</strong>: monitoring it, implementing mitigation, updating the register. (E.g., the project manager owns construction risks like weather delays and material costs.)</li></ul>
+<h3>Risk Tolerance vs Risk Appetite (classic confusion pair)</h3>
+<div class="tblwrap"><table><thead><tr><th>Term</th><th>Definition</th></tr></thead><tbody><tr><td><strong>Risk tolerance / risk acceptance</strong></td><td>The degree of uncertainty an organization is willing to <strong>handle while achieving objectives</strong> — the MAXIMUM amount of risk it is prepared to accept. Accepting = no countermeasures because the risk doesn't justify the cost (or countermeasures can't be deployed in time)</td></tr><tr><td><strong>Risk appetite</strong></td><td>The amount and type of risk an organization is <strong>willing to pursue or retain to achieve strategic objectives</strong> — its overall attitude toward risk-taking</td></tr></tbody></table></div>
+<p><strong>Three types of risk appetite:</strong></p>
+<ul class="mdlist"><li><strong>Expansionary</strong> — takes on MORE risk for potentially higher returns (aggressive growth businesses)</li><li><strong>Conservative</strong> — prefers LESS risk even at lower returns (stability-focused businesses)</li><li><strong>Neutral</strong> — balanced between risk and return; calculated risk with steady growth</li></ul>
+<p>⚠️ <strong>TRAP:</strong> Tolerance = the max you'd *endure* (a ceiling). Appetite = how much risk you actively *want/pursue* (a strategy). Define both UP FRONT, before categorizing risk levels.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">5. Qualitative Risk Analysis (Lesson 85)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Assesses risk using <strong>descriptive/categorical scales</strong> (high/medium/low) based on <strong>likelihood</strong> and <strong>impact</strong>.</li><li><strong>Subjective</strong> — relies on the expertise, experience, and judgment of the team and stakeholders.</li><li>Avoids the complexity of quantitative analysis; faster, good for prioritization.</li></ul>
+<div class="tblwrap"><table><thead><tr><th>Factor</th><th>Meaning</th><th>Scale</th></tr></thead><tbody><tr><td><strong>Likelihood / probability</strong></td><td>Chance the risk occurs (past experience, statistical analysis, expert judgment)</td><td>Low / medium / high (or rare→almost certain)</td></tr><tr><td><strong>Impact</strong></td><td>Consequences if it materializes (cost, time, quality…)</td><td>Low = minor damage, functions still work; <strong>Medium = significant damage/loss to assets</strong>; <strong>High = major damage, essential functions can't be performed</strong></td></tr></tbody></table></div>
+<p>Worked course example: key developer leaving mid-project → likelihood <strong>medium</strong> (industry turnover), impact <strong>high</strong> (delays, cost, quality) → prioritize and mitigate (cross-training, documentation, retention strategy).</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">6. Quantitative Risk Analysis (Lesson 86)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Uses <strong>numerical measurements</strong> — probabilistic analysis of potential future events; for financial, safety, and scheduling decisions. More objective and precise than qualitative.</li><li>Memorize the four formulas — <strong>the exam WILL ask you to calculate</strong>:</li></ul>
+<div class="tblwrap"><table><thead><tr><th>Term</th><th>Abbrev.</th><th>Formula</th><th>Meaning</th></tr></thead><tbody><tr><td><strong>Exposure Factor</strong></td><td>EF</td><td>% (0–100%)</td><td>Proportion of the asset LOST in an event (flood destroys 70% of HQ assets → EF = 70%)</td></tr><tr><td><strong>Single Loss Expectancy</strong></td><td>SLE</td><td><strong>Asset Value × EF</strong></td><td>Monetary loss from ONE event ($100,000 asset × 70% EF = $70,000)</td></tr><tr><td><strong>Annualized Rate of Occurrence</strong></td><td>ARO</td><td>events per year</td><td>Expected frequency of the threat in a year (once every 2 years → ARO = 0.5)</td></tr><tr><td><strong>Annualized Loss Expectancy</strong></td><td>ALE</td><td><strong>SLE × ARO</strong></td><td>Expected loss PER YEAR ($70,000 × 0.5 = $35,000… course example: $10,000 server, EF 50% → SLE $5,000; ARO 0.5 → <strong>ALE $2,500</strong>)</td></tr></tbody></table></div>
+<p><strong>Why it matters — the cost-benefit decision:</strong> If a mitigation changes the ARO (new redundant server fails once every 10 years instead of every 2), ALE drops from $2,500 to $500 → saves $2,000/year. If that server costs $40,000 extra with a 3-year life, it saves only $6,000 over its life → <strong>not worth it</strong>. Always compare mitigation cost against ALE savings.</p>
+<p>⚠️ <strong>TRAP:</strong> ARO for &quot;once every two years&quot; is <strong>0.5</strong>, not 2. And SLE uses EF as a percentage of asset value — it is NOT the whole asset value.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">7. Risk Management Strategies (Lesson 87)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Four strategies — scenario questions (&quot;the company bought cyber insurance — which strategy?&quot;) are guaranteed:</p>
+<div class="tblwrap"><table><thead><tr><th>Strategy</th><th>What it is</th><th>Mechanisms</th><th>Key nuance</th></tr></thead><tbody><tr><td><strong>Transfer / Sharing</strong></td><td>Shift the risk to another party</td><td><strong>Insurance</strong> (most common — pay a premium; insurer covers loss up to policy limits), <strong>contract indemnity clauses</strong> (one party compensates the other for harm/loss from the contract)</td><td>Does NOT eliminate the risk — shifts the <strong>financial burden</strong> only; <strong>reputation risk stays with you</strong></td></tr><tr><td><strong>Acceptance</strong></td><td>Acknowledge the risk; deal with it if/when it occurs</td><td>Used when mitigation cost &gt; potential loss or impact is minor. Two flavors: <strong>exemption</strong> (excluded from a rule entirely — no compliance burden, no protection) and <strong>exception</strong> (normally subject to the rule, but can avoid it under specific circumstances)</td><td>Choosing to do nothing is a *deliberate* strategy, not negligence</td></tr><tr><td><strong>Avoidance</strong></td><td>Change plans to <strong>eliminate the risk entirely</strong></td><td>Don't launch the patent-infringing product; don't operate in the politically unstable country</td><td>Chosen when the risk is <strong>too great to accept or transfer</strong></td></tr><tr><td><strong>Mitigation / Reduction</strong></td><td>Steps to <strong>reduce likelihood or impact</strong></td><td>Controls, training, safety measures, cybersecurity investment</td><td><strong>The most common strategy</strong></td></tr></tbody></table></div>
+<p>⚠️ <strong>TRAPS:</strong></p>
+<ul class="mdlist"><li>Transfer ≠ elimination. If the breach still happens, you still suffer — you just get compensated (and your reputation still takes the hit).</li><li><strong>Exemption vs exception:</strong> exemption = never subject to the rule; exception = subject UNLESS specific conditions apply.</li><li>Mitigation is the most common; insurance is the most common transfer mechanism.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">8. Risk Monitoring &amp; Reporting (Lesson 88)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Risk monitoring</strong> = ongoing tracking of identified risks, <strong>residual risk</strong>, new risks, executing risk response plans, evaluating their effectiveness — throughout the lifecycle.</p>
+<ul class="mdlist"><li><strong>Residual risk</strong> — the likelihood/impact <strong>remaining AFTER</strong> mitigation, transference, or acceptance has been applied to the <strong>inherent</strong> risk.</li><li><strong>Control risk</strong> — how much <strong>less effective a security control has become over time</strong>. Course example: antivirus that was excellent against known signatures gets worse as hackers obfuscate their code.</li></ul>
+<p><strong>Risk reporting</strong> = communicating risk-management activities (identification, assessment, response, monitoring results) to stakeholders, usually in a <strong>risk report</strong>.</p>
+<p><strong>Four reasons monitoring &amp; reporting matter:</strong></p>
+<ul class="mdlist"><li><strong>Informed decision making</strong> — resource allocation, timelines, strategic direction</li><li><strong>Risk mitigation</strong> — catch a risk growing more likely/impactful and act BEFORE it becomes a problem</li><li><strong>Stakeholder communication</strong> — manage expectations, demonstrate effective management</li><li><strong>Regulatory compliance</strong> — risk reporting is a legal requirement in many industries</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Rapid-Fire Self-Test (say the answer before looking)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>The five risk management lifecycle steps in order? → <strong>Identification, analysis, treatment, monitoring, reporting</strong></li><li>Qualitative vs quantitative analysis in one line each? → <strong>Categories/scales (subjective, expert judgment) vs numerical values (objective, math)</strong></li><li>Which comes first, treatment or analysis? → <strong>Analysis</strong></li><li>Ad-hoc vs one-time assessment? → <strong>Ad-hoc = event-driven, may repeat; one-time = project-specific, never repeated</strong></li><li>Recurring assessments happen…? → <strong>At regular intervals (annual/quarterly/monthly) as standard procedure</strong></li><li>Continuous assessment is enabled by? → <strong>Technology — real-time data collection and analysis</strong></li><li>RTO measures? → <strong>Max acceptable downtime before impact becomes severe</strong></li><li>RPO measures? → <strong>Max acceptable data loss in time — drives backup frequency</strong></li><li>RPO of 15 minutes means what for backups? → <strong>At least every 15 minutes</strong></li><li>MTTR — higher or lower is better? → <strong>Lower (faster repair)</strong></li><li>MTBF — higher or lower is better? → <strong>Higher (fails less often)</strong></li><li>MTTR vs MTBF in one line? → <strong>Repair speed vs failure frequency</strong></li><li>What is a BIA? → <strong>Business impact analysis — evaluates disruption effects, prioritizes critical functions, sets recovery speed</strong></li><li>Name four risk identification techniques. → <strong>Brainstorming, checklists, interviews, scenario analysis</strong></li><li>What is the risk register also called? → <strong>Risk log</strong></li><li>Six building blocks of a risk register entry? → <strong>Description, impact, likelihood, outcome, level/threshold, cost</strong></li><li>What are KRIs? → <strong>Key risk indicators — predictive, forward-looking early-warning metrics</strong></li><li>Who is the risk owner? → <strong>Person/group responsible for monitoring the risk, implementing mitigation, updating the register</strong></li><li>Risk tolerance vs risk appetite? → <strong>Max risk willing to ENDURE (ceiling) vs risk willing to PURSUE for objectives (strategy)</strong></li><li>Three risk appetites? → <strong>Expansionary, conservative, neutral</strong></li><li>Formula for SLE? → <strong>Asset value × EF</strong></li><li>Formula for ALE? → <strong>SLE × ARO</strong></li><li>EF of a flood destroying 70% of assets? → <strong>70%</strong></li><li>Server worth $10k, EF 50%, fails once every 2 years — SLE and ALE? → <strong>SLE $5,000; ALE $2,500</strong></li><li>Mitigation costing $40k to save $2,000/yr for 3 years — worth it? → <strong>No — saves $6k, costs $40k</strong></li><li>Four risk treatment strategies? → <strong>Transfer, accept, avoid, mitigate</strong></li><li>Most common transfer method? → <strong>Insurance (premium)</strong>; also indemnity clauses</li><li>Does transfer eliminate risk? → <strong>No — shifts financial burden; reputation risk remains</strong></li><li>When is avoidance chosen? → <strong>When risk is too great to accept or transfer</strong></li><li>Most common strategy overall? → <strong>Mitigation</strong></li><li>Exemption vs exception? → <strong>Never subject to the rule vs subject unless specific conditions apply</strong></li><li>When is acceptance appropriate? → <strong>Mitigation cost outweighs potential loss, or impact is minor</strong></li><li>Residual risk? → <strong>Risk remaining after treatment of inherent risk</strong></li><li>Control risk (course meaning)? → <strong>How much less effective a control becomes over time (AV vs obfuscated malware)</strong></li><li>Four reasons monitoring/reporting matter? → <strong>Informed decisions, mitigation, stakeholder communication, regulatory compliance</strong></li><li>Risk reporting formats? → <strong>Dashboards, heat maps, detailed reports — tailored to the audience</strong></li><li>Impact scale meaning of &quot;high&quot;? → <strong>Major damage; essential functions can't be performed</strong></li><li>Likelihood descriptive scale order? → <strong>Rare, unlikely, possible, likely, almost certain</strong></li><li>Qualitative analysis depends on? → <strong>Expertise/experience/judgment of team and stakeholders — subjective</strong></li><li>What quantitative analysis enables for a $50k control? → <strong>Compare its cost against ALE savings to decide if it's worth buying</strong></li><li>Risk register shared with whom? → <strong>Shareholders/stakeholders</strong></li><li>KRI example from banking? → <strong>Number of loan defaults rising → early warning of credit risk</strong></li><li>RTO example: site can tolerate 2h downtime means? → <strong>RTO = 2 hours</strong></li><li>What does monitoring ensure about the risk process? → <strong>That it stays dynamic and responsive to internal/external change</strong></li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="cryptographic-solutions-study-notes.html">&larr; Prev: Section 7 · Cryptographic Solutions</a> <a class="btn ghost" href="third-party-vendor-risks-study-notes.html">Next &rarr;: Section 9 · Third Party Vendor Risks</a></div>
+  <script>
+    var SLUG = "risk-management";
+    var TOTAL = 9;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

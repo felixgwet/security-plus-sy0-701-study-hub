@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 23 · Incident Response — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 23 · Incident Response &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><p class="doc-title">Incident Response — SY0-701 Study Notes (Section 24, OBJ 4.8)</p>
+<details class="topic" open><summary><span class="t-name">Incident Response Overview</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>An <strong>incident</strong> = an act of violating an explicit or implied security policy (stolen password login, malware install, etc.).</li><li>Primary goal: <strong>minimize impact, reduce time to identify and contain, recover swiftly</strong>.</li><li><strong>NIST SP 800-61</strong> defines FOUR phases: Preparation · Detection &amp; Analysis · Containment/Eradication/Recovery · Post-Incident Activity.</li><li><strong>CompTIA exam uses a SEVEN-phase model</strong> — know this one:</li><ul><li><strong>Preparation</strong> — harden systems, write policies/procedures, build the communication plan (encrypted, <strong>out-of-band</strong> comm paths), train/test staff, create <strong>incident response kits</strong>.</li><li><strong>Detection</strong> — determine whether an incident occurred; triage analysts categorize and assess severity.</li><li><strong>Analysis</strong> — examine scope and impact; notify stakeholders; begin initial response actions.</li><li><strong>Containment</strong> — limit scope/magnitude; stop spread (disconnect infected client, lock out user).</li><li><strong>Eradication</strong> — remove the malicious activity (delete malware, reinstall known-good image).</li><li><strong>Recovery</strong> — restore systems to normal secured state (known-good backups, patches, config updates); monitor for lingering threats.</li><li><strong>Post-Incident Activity (Lessons Learned)</strong> — RCA, lessons learned, after-action report.</li></ul><li>The process <strong>loops</strong> — new suspicious findings send you back to detection/analysis.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Post-Incident Activity (3 actions)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Root Cause Analysis (RCA)</strong> — systematic identification of the incident's initial source to prevent recurrence. 4 steps: ① define/scope the incident → ② determine causal relationships → ③ identify an effective solution → ④ implement and track the solution. <strong>No-blame approach</strong> (NTSB model) — encourages honest reporting, finds systemic weaknesses.</li><li><strong>Lessons learned</strong> — document what went right/wrong; improve processes (e.g. faster emergency change approvals).</li><li><strong>After-action report</strong> — formal report containing the RCA + lessons-learned recommendations; technical detail or executive summary.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Incident Response Team</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Core = experienced cybersecurity pros + temporary subject experts (e.g. DBA for a database incident). Large orgs: dedicated teams; small orgs: ad-hoc additional duty.</li><li>Team composition: <strong>leader (skilled responder), SMEs, IT support, legal counsel, HR, PR</strong>.</li><li>Management provides funding/resources and makes critical business decisions + communications.</li><li><strong>Outsourced IR</strong> is effective but expensive and the outsiders must learn your network first.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Threat Hunting</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Proactive</strong> search for threats that bypassed normal monitoring — assumes your existing rules/signatures <strong>failed to alert</strong>.</li><li>Starts with a <strong>hypothesis</strong> from threat modeling: who would attack us, how, with what impact? Combine with <strong>threat intelligence</strong>.</li><li>Profile threat actors/TTPs (insider, hacktivist, criminal org, nation-state APT).</li><li>Hunt in the <strong>SIEM</strong>: logs, processes, file systems, registry changes. Look for things <strong>without signatures</strong> — new TTPs → create new IoCs.</li><li>Fuel: <strong>advisories and bulletins</strong> (vendor/researcher publications on new TTPs/vulns) + <strong>intelligence fusion and threat data</strong> (IoC/TTP feeds correlated with SIEM logs).</li><li>Example flow: advisory on new malware → hunt for outbound C2 traffic → check suspect hosts' process lists → compare infected hosts → identify execution method → block vector (allowlisting or blocklist) → build new IPS signatures.</li><li>Benefits: improves detection capability; converts findings into new rules/IoCs. Costly in time/resources.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Training vs Testing vs Simulation</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Training</strong> = education on processes/procedures/priorities. Role-based: first responders (technical), managers/executives (risk decisions, comms with law enforcement/media), end users (how to report phishing; remedial training if clicked).</li><ul><li>Incorporate <strong>lessons learned</strong> into training; include soft skills/team building.</li></ul><li><strong>Testing</strong> = practical exercises proving people can execute procedures. Three forms:</li><ul><li><strong>Tabletop exercise (TTX)</strong> — discussion-based scenario walk-through around a table; cheap but theoretical, no hands-on. Can be <strong>red team vs blue team</strong> back-and-forth.</li><li><strong>Penetration test</strong> — red team conducts a scenario-based intrusion tied to threat modeling with a <strong>specific goal</strong>; requires agreed <strong>methodology and rules of engagement</strong> (e.g. DDoS usually excluded). Tools: <strong>Metasploit, Cobalt Strike, Kali Linux, ParrotOS, Commando OS</strong> — if defenders see these on the network, think pentest or attacker.</li><li><strong>Simulation / full-scale exercise</strong> — realistic hands-on multi-stage scenarios (simulated phishing/ransomware up to multi-site breaches with law enforcement/PR); tests decisions under pressure, communication, and plan gaps. Expensive (full-scale can cost hundreds of thousands).</li></ul></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Digital Forensic Procedures (4 phases)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Identification</strong> — secure the scene (safety first, e.g. with police), prevent contamination, photograph/document, determine scope of evidence (tablet? server? smart TV?).</li><li><strong>Collection</strong> — with proper <strong>authorization</strong> (law enforcement = warrant; enterprise = CIO/CSO/CEO approval). Follow <strong>order of volatility</strong> and preserve <strong>chain of custody</strong>.</li><li><strong>Analysis</strong> — repeatable methods/tools on the forensic copy; strict documented protocols; find hidden files, timestamps, user actions.</li><li><strong>Reporting</strong> — document methods, tools, actions, findings, conclusions; analyst must be prepared to <strong>testify in court</strong>.</li></ul>
+<h3>Order of Volatility (NIST SP 800-86) — collect most-volatile FIRST</h3>
+<ul class="mdlist"><li><strong>System memory</strong> (CPU registers/cache, RAM)</li><li><strong>System state</strong> (configs, active sessions — data obtainable without altering state)</li><li><strong>Storage devices</strong> (HDD/SSD — non-volatile but changing)</li><li><strong>Network traffic and logs</strong></li><li><strong>Remotely stored archives</strong> (backups, cloud, printouts — least volatile)</li></ul>
+<p>Extended practitioner view: CPU registers/cache → memory (routing tables, ARP caches, process tables, swap) → mass storage → remotely logged data (SIEM) → physical config/topology → archival media (backup tapes, CDR).</p>
+<ul class="mdlist"><li><strong>Windows registry warning</strong>: much of it is on disk, but <strong>HKLM\Hardware lives only in memory</strong> — capture via memory dump first. The HARDWARE hive records every disk ever connected (find that thumb drive!).</li></ul>
+<h3>Key Evidence Concepts</h3>
+<ul class="mdlist"><li><strong>Chain of custody</strong> — documented, verifiable record of evidence handling from collection to court; every handler documents actions/transfers. Breaks = evidence may be inadmissible.</li><li><strong>Disk imaging</strong> — bit-by-bit copy of a device (including deleted files and unallocated space); original stays untouched; analyze the image. Lab: <code>dd</code> with a <strong>write blocker</strong>, then <code>md5sum</code>/SHA-1/SHA-256 hash (MD5 is weak — prefer SHA). <strong>FTK Imager</strong> creates raw DD images (usable by any tool; E01=EnCase, AFF=FTK), chunks at ~1.5 GB, auto-verifies hashes; deleted files (marked X) recoverable; unallocated/slack space inspected.</li><li><strong>File carving</strong> — extracting files/fragments without relying on the file system (when metadata is missing/corrupt).</li><li><strong>Data acquisition</strong> — methods/tools to create a forensically sound copy. Legal right to seize first — <strong>BYOD devices complicate consent</strong>; some data only exists while powered on.</li><li>Collection checklist: capture/hash images (FTK Imager), analyze with <strong>FTK/EnCase</strong>, screenshot the machine, review network captures, pull CCTV if trespass suspected, consider volatility order, witness statements, licensing/docs review, track man-hours and costs.</li><li><strong>Legal hold</strong> — formal notification when litigation is reasonably expected; freeze/preserve all potentially relevant data; destruction = severe legal consequences.</li><li><strong>Preservation</strong> — proactive protection of evidence (backups, isolation, access controls; don't overwrite/delete/modify).</li><li><strong>E-discovery</strong> — identify, collect, and produce electronically stored information for litigation.</li><li>Appoint a <strong>legal liaison</strong> (in-house counsel) for law enforcement interaction.</li><li><strong>Forensic code of ethics — 3 principles: avoid bias, repeatable actions, preserve evidence.</strong> Use an analyst removed from the case (collectors vs examiners separation) to minimize bias; document every action (time, command, result, screenshot) so others can reproduce; always analyze the image, never the original.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">High-yield exam triggers</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>&quot;Seven phases of incident response&quot; → Preparation, Detection, Analysis, Containment, Eradication, Recovery, Post-Incident Activity.</li><li>&quot;Collect first&quot; → <strong>CPU registers/cache and memory</strong> (order of volatility).</li><li>&quot;Documented evidence-handling record&quot; → <strong>chain of custody</strong>.</li><li>&quot;Bit-by-bit copy including deleted files&quot; → <strong>disk imaging</strong>; analyze the image, not the original.</li><li>&quot;Extract files with no file system metadata&quot; → <strong>file carving</strong>.</li><li>&quot;Proactive, assumes alerts failed&quot; → <strong>threat hunting</strong>.</li><li>&quot;Scenario-based intrusion with rules of engagement&quot; → <strong>penetration test</strong>.</li><li>&quot;Discussion-only exercise&quot; → <strong>tabletop (TTX)</strong>.</li><li>&quot;Litigation expected — freeze data&quot; → <strong>legal hold</strong>.</li><li>&quot;No-blame investigation&quot; → <strong>root cause analysis</strong> culture.</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="alerting-and-monitoring-study-notes.html">&larr; Prev: Section 22 · Alerting and Monitoring</a> <a class="btn ghost" href="investigating-an-incident-study-notes.html">Next &rarr;: Section 24 · Investigating an Incident</a></div>
+  <script>
+    var SLUG = "incident-response";
+    var TOTAL = 7;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

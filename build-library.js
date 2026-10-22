@@ -34,10 +34,11 @@ function pick(re) {
 const rows = sections.map(s => {
   const nn = s.num === 0 ? '00' : String(s.num);
   const quiz = pick(new RegExp(`^${s.slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-quiz\\.html$`));
-  let notes = pick(new RegExp(`^${s.slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(-and-redundancy)?-study-notes\\.md$`));
+  let notes = pick(new RegExp(`^${s.slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(-and-redundancy)?-study-notes\\.html$`));
+  const cards = pick(new RegExp(`^flashcards-${s.slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\.html$`));
   const finalExam = pick(new RegExp(`^SY0-701-final-exam-${s.slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\.html$`));
   const feedback = pick(new RegExp(`^SY0-701-practice-exam-feedback-${nn}\\.html$`));
-  return { ...s, quiz, notes, finalExam, feedback };
+  return { ...s, quiz, notes, cards, finalExam, feedback };
 });
 
 // Mega exams
@@ -49,7 +50,9 @@ const comptias = files.filter(f => /comptia-full-exam/.test(f)).sort();
 comptias.forEach(f => used.add(f));
 
 // Anything left over that looks like a quiz/notes/exam (e.g. security-fundamentals)
-const extras = files.filter(f => !used.has(f) && !/^(SY0-701-exam-simulator|index)/.test(f));
+// Study-tools pages (interactive notes html, flashcards) are linked from their own
+// index/columns, and raw .md sources stay in the repo for regeneration only.
+const extras = files.filter(f => !used.has(f) && !/^(SY0-701-exam-simulator|index)/.test(f) && !/-study-notes\.md$/.test(f) && !/^flashcards/.test(f));
 
 const megaCards = megas.map(f => {
   const m = f.match(/mega-exam-(.+)\.html$/);
@@ -98,6 +101,7 @@ const sectionRows = rows.map(r => {
         <td>${link(`SY0-701-exam-simulator-${nn}-${r.slug}.html`, 'Simulator')}</td>
         <td>${link(r.quiz, 'Quiz')}</td>
         <td>${link(r.notes, 'Notes')}</td>
+        <td>${link(r.cards, 'Flashcards')}</td>
         <td>${link(r.feedback, 'Feedback')}</td>
         <td>${link(r.finalExam, 'Final Exam')}</td>
       </tr>`;
@@ -137,7 +141,7 @@ const html = `<!DOCTYPE html>
 <body>
   <div class="wrap">
     <h1>Security+ SY0-701 &mdash; Full Exam Library</h1>
-    <div class="sub">Every section, individually ordered. ${rows.length} sections + ${comptias.length} CompTIA-style 90-question full exams + ${megas.length} mega exams. <span class="top"><a href="index.html">&larr; Overview</a> &middot; <a href="analytics.html">Analytics</a></span></div>
+    <div class="sub">Every section, individually ordered. ${rows.length} sections + ${comptias.length} CompTIA-style 90-question full exams + ${megas.length} mega exams. <span class="top"><a href="index.html">&larr; Overview</a> &middot; <a href="analytics.html">Analytics</a> &middot; <a href="exam-simulator/flashcards.html">Flashcard decks</a></span></div>
 
     <h2>CompTIA-Style Full Exams &mdash; 90 questions, all sections, escalating difficulty</h2>
     <div class="megas">
@@ -149,9 +153,9 @@ const html = `<!DOCTYPE html>
       ${megaCards}
     </div>
 
-    <h2>Sections ${rows[0] ? rows[0].num : ''} &ndash; ${rows.length ? rows[rows.length - 1].num : ''} &mdash; each with simulator, quiz, notes, feedback &amp; final exam</h2>
+    <h2>Sections ${rows[0] ? rows[0].num : ''} &ndash; ${rows.length ? rows[rows.length - 1].num : ''} &mdash; each with simulator, quiz, notes, flashcards, feedback &amp; final exam</h2>
     <table>
-      <thead><tr><th>#</th><th>Section</th><th>Simulator</th><th>Quiz</th><th>Notes</th><th>Feedback</th><th>Final Exam</th></tr></thead>
+      <thead><tr><th>#</th><th>Section</th><th>Simulator</th><th>Quiz</th><th>Notes</th><th>Flashcards</th><th>Feedback</th><th>Final Exam</th></tr></thead>
       <tbody>
       ${sectionRows}
       </tbody>

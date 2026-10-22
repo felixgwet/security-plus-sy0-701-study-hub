@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcard Decks — SY0-701</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+  .tile { display: block; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; color: var(--text); }
+  .tile:hover { border-color: var(--accent); text-decoration: none; }
+  .tile b { display: block; margin-bottom: 6px; font-size: 15px; }
+  .tile .cnt { font-size: 12px; color: var(--muted); display: block; }
+  .tile .prog { font-size: 12px; display: block; margin-top: 6px; color: var(--gold); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar"><a href="../library.html">&larr; Full library</a><span class="grow"></span><a class="btn" href="flashcards-all.html" style="margin:0;padding:10px 18px;font-size:14px;">Study all sections (2564 cards)</a></div>
+  <h1>Flashcard Decks</h1>
+  <p class="sub">Every card is built from that section's question bank (simulator + quiz + feedback + final exam). Your Know-it / Still-learning progress is saved on this device and feeds the weak-cards-first ordering.</p>
+  <div class="grid">
+    
+    <a class="tile" href="flashcards-exam-tips.html">
+      <b>Section 0 · Exam Tips</b>
+      <span class="cnt">72 cards</span>
+      <span class="prog" data-label="Section 0 · Exam Tips" data-total="72"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-threat-actors.html">
+      <b>Section 2 · Threat Actors</b>
+      <span class="cnt">84 cards</span>
+      <span class="prog" data-label="Section 2 · Threat Actors" data-total="84"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-physical-security.html">
+      <b>Section 3 · Physical Security</b>
+      <span class="cnt">88 cards</span>
+      <span class="prog" data-label="Section 3 · Physical Security" data-total="88"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-social-engineering.html">
+      <b>Section 4 · Social Engineering</b>
+      <span class="cnt">92 cards</span>
+      <span class="prog" data-label="Section 4 · Social Engineering" data-total="92"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-malware.html">
+      <b>Section 5 · Malware</b>
+      <span class="cnt">92 cards</span>
+      <span class="prog" data-label="Section 5 · Malware" data-total="92"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-data-protection.html">
+      <b>Section 6 · Data Protection</b>
+      <span class="cnt">92 cards</span>
+      <span class="prog" data-label="Section 6 · Data Protection" data-total="92"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-cryptographic-solutions.html">
+      <b>Section 7 · Cryptographic Solutions</b>
+      <span class="cnt">92 cards</span>
+      <span class="prog" data-label="Section 7 · Cryptographic Solutions" data-total="92"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-risk-management.html">
+      <b>Section 8 · Risk Management</b>
+      <span class="cnt">92 cards</span>
+      <span class="prog" data-label="Section 8 · Risk Management" data-total="92"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-third-party-vendor-risks.html">
+      <b>Section 9 · Third Party Vendor Risks</b>
+      <span class="cnt">95 cards</span>
+      <span class="prog" data-label="Section 9 · Third Party Vendor Risks" data-total="95"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-governance-and-compliance.html">
+      <b>Section 10 · Governance and Compliance</b>
+      <span class="cnt">106 cards</span>
+      <span class="prog" data-label="Section 10 · Governance and Compliance" data-total="106"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-asset-and-change-management.html">
+      <b>Section 11 · Asset and Change Management</b>
+      <span class="cnt">106 cards</span>
+      <span class="prog" data-label="Section 11 · Asset and Change Management" data-total="106"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-audits-and-assessments.html">
+      <b>Section 12 · Audits and Assessments</b>
+      <span class="cnt">103 cards</span>
+      <span class="prog" data-label="Section 12 · Audits and Assessments" data-total="103"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-cyber-resilience.html">
+      <b>Section 13 · Cyber Resilience</b>
+      <span class="cnt">106 cards</span>
+      <span class="prog" data-label="Section 13 · Cyber Resilience" data-total="106"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-security-architecture.html">
+      <b>Section 14 · Security Architecture</b>
+      <span class="cnt">97 cards</span>
+      <span class="prog" data-label="Section 14 · Security Architecture" data-total="97"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-security-infrastructure.html">
+      <b>Section 15 · Security Infrastructure</b>
+      <span class="cnt">90 cards</span>
+      <span class="prog" data-label="Section 15 · Security Infrastructure" data-total="90"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-identity-and-access-management.html">
+      <b>Section 16 · Identity and Access Management</b>
+      <span class="cnt">85 cards</span>
+      <span class="prog" data-label="Section 16 · Identity and Access Management" data-total="85"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-vulnerabilities-and-attacks.html">
+      <b>Section 17 · Vulnerabilities and Attacks</b>
+      <span class="cnt">94 cards</span>
+      <span class="prog" data-label="Section 17 · Vulnerabilities and Attacks" data-total="94"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-malicious-activity.html">
+      <b>Section 18 · Malicious Activity</b>
+      <span class="cnt">91 cards</span>
+      <span class="prog" data-label="Section 18 · Malicious Activity" data-total="91"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-hardening.html">
+      <b>Section 19 · Hardening</b>
+      <span class="cnt">89 cards</span>
+      <span class="prog" data-label="Section 19 · Hardening" data-total="89"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-security-techniques.html">
+      <b>Section 20 · Security Techniques</b>
+      <span class="cnt">92 cards</span>
+      <span class="prog" data-label="Section 20 · Security Techniques" data-total="92"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-vulnerability-management.html">
+      <b>Section 21 · Vulnerability Management</b>
+      <span class="cnt">91 cards</span>
+      <span class="prog" data-label="Section 21 · Vulnerability Management" data-total="91"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-alerting-and-monitoring.html">
+      <b>Section 22 · Alerting and Monitoring</b>
+      <span class="cnt">98 cards</span>
+      <span class="prog" data-label="Section 22 · Alerting and Monitoring" data-total="98"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-incident-response.html">
+      <b>Section 23 · Incident Response</b>
+      <span class="cnt">90 cards</span>
+      <span class="prog" data-label="Section 23 · Incident Response" data-total="90"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-investigating-an-incident.html">
+      <b>Section 24 · Investigating an Incident</b>
+      <span class="cnt">91 cards</span>
+      <span class="prog" data-label="Section 24 · Investigating an Incident" data-total="91"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-automation-and-orchestration.html">
+      <b>Section 25 · Automation and Orchestration</b>
+      <span class="cnt">85 cards</span>
+      <span class="prog" data-label="Section 25 · Automation and Orchestration" data-total="85"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-security-awareness.html">
+      <b>Section 26 · Security Awareness</b>
+      <span class="cnt">86 cards</span>
+      <span class="prog" data-label="Section 26 · Security Awareness" data-total="86"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-exam-readiness.html">
+      <b>Section 27 · Exam Readiness</b>
+      <span class="cnt">75 cards</span>
+      <span class="prog" data-label="Section 27 · Exam Readiness" data-total="75"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-conclusion.html">
+      <b>Section 28 · Conclusion</b>
+      <span class="cnt">63 cards</span>
+      <span class="prog" data-label="Section 28 · Conclusion" data-total="63"></span>
+    </a>
+    
+    <a class="tile" href="flashcards-security-fundamentals.html">
+      <b>Security Fundamentals</b>
+      <span class="cnt">27 cards</span>
+      <span class="prog" data-label="Security Fundamentals" data-total="27"></span>
+    </a>
+  </div>
+  <script>
+    var KEY = 'secplus_cards_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    document.querySelectorAll('.prog').forEach(function(el){
+      var st = loadState()[el.getAttribute('data-label')] || {};
+      var k = 0, t = 0;
+      // counts are patched below with per-deck totals
+      t = parseInt(el.getAttribute('data-total') || '0', 10);
+      Object.keys(st).forEach(function(id){ if (st[id] === 'known') k++; });
+      el.textContent = k + ' / ' + t + ' known';
+      el.style.color = k === t ? 'var(--green)' : 'var(--muted)';
+    });
+  </script>
+</div>
+</body>
+</html>

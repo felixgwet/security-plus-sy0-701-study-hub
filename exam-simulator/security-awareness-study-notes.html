@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 26 · Security Awareness — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 26 · Security Awareness &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><p class="doc-title">Security Awareness — SY0-701 Study Notes (Section 27, OBJ 5.6)</p>
+<details class="topic" open><summary><span class="t-name">Security Awareness Overview</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Security awareness</strong> = knowledge/understanding of threats and mitigations. Goal: equip people to recognize and respond to threats. <strong>Human error remains one of the most significant vulnerabilities</strong> — technical defenses alone aren't enough.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Recognizing Insider Threats</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Insider threat</strong> = security risk from people INSIDE the organization: employees, former employees, contractors, business partners — with knowledge of security practices/data/systems. Intentional OR unintentional.</li><li>Contributing factors: personnel issues, financial struggles, job dissatisfaction.</li><li><strong>Warning signs (exam vocabulary):</strong></li><ul><li><strong>Altered states</strong> (drunk/hungover regularly) — impaired judgment, coercion risk (clearance holders are flagged).</li><li><strong>Emotional distress</strong> (giving away possessions, depression) — less vigilant, exploitable by competitors/nation-states. Handle with empathy via management/HR.</li><li><strong>Lifestyle incongruences</strong> — lifestyle beyond income ($80K salary + $150K car + $2M house). May be innocent (spouse's income, reported windfall) — requires <strong>discreet investigation</strong> without violating privacy. Clearance holders file financial disclosures and report windfalls.</li><li><strong>Financial struggles/debt</strong> — susceptible to bribery or selling secrets to competitors.</li></ul><li><strong>Insider threat program</strong>: security culture encouraging reporting, training on warning signs, policies supporting mental health/financial well-being, fair and confidential investigations.</li><li><strong>User activity monitoring</strong>: detect anomalous access, mass copying/downloading of sensitive data, odd hours — <strong>balanced with employee privacy rights</strong>.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Password Management</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Password reuse is the biggest trap</strong> — one breached site (Yahoo, Target...) exposes every account sharing that password; usernames are usually the same email everywhere. Use a <strong>long, strong, UNIQUE password per site</strong>.</li><li><strong>Password managers</strong> remember/generate them. Browsers have built-in managers (Chrome Autofill), but <strong>standalone third-party managers (1Password, Dashlane, LastPass, Bitwarden) are more secure</strong>.</li><li>Bitwarden demo: install browser extension → create account with a strong <strong>master password (the encryption key — lose it, lose everything; you only memorize this ONE)</strong> → vault stores credentials encrypted → generator makes 14+ char passwords (upper/lower/numbers/symbols) → auto-fill on sites.</li><li>Corporate accounts allow secure password SHARING within an org.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Avoiding Social Engineering</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Situational awareness</strong> = mindfulness of surroundings, requested actions, and consequences. First line of defense.</li><li><strong>Shoulder surfing</strong> — peeking at your screen. Counter: awareness in public, <strong>privacy screen protectors</strong>, don't read confidential info in public.</li><li><strong>Eavesdropping</strong> — listening to conversations. Counter: sensitive talks only in soundproofed/secure areas; beware smart devices (phones, watches) that could record remotely.</li><li><strong>Piggybacking/tailgating</strong> — unauthorized people following authorized staff in. Counter: <strong>access control vestibules (mantraps)</strong> — one person at a time — plus awareness at doors.</li><li><strong>Dumpster diving</strong> — sifting trash for reconstructable info. Counter: awareness + shredding policies.</li><li><strong>OPSEC (operational security)</strong> — military origin; protecting critical info that reveals activities to adversaries. Every small detail is a puzzle piece social engineers assemble from social media, calls, casual talk. A mindset, not just a protocol.</li><li><strong>Baiting</strong> — planted <strong>USB thumb drives</strong> (never pick up / never plug in) and <strong>malicious charging cables</strong> in public (airports, coffee shops — malware in cable firmware). <strong>Carry your own cable/charger.</strong></li><li><strong>Phone scams/impersonation (vishing)</strong> — fake IT support creating <strong>urgency/fear of legal or financial consequences</strong> to rush you past normal procedures. People make mistakes when rushed — be proactive, not reactive.</li><li><strong>Proactive culture</strong>: regular training for ALL positions, simulated phishing with remediation for clickers.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Policies and Handbooks</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Policy</strong> = deliberate system of principles/rules guiding decisions; upholds internal controls, legal/ethical compliance. <strong>Handbook</strong> = comprehensive reference guide (procedures, guidelines, best practices) — e.g. employee handbook.</li><li>Examples: data protection, remote work, acceptable use, conflict-of-interest policies; employee/training/compliance handbooks.</li><li><strong>Data destruction policy examples</strong>: color-coded paper (pink = sensitive → cross-cut shred; government: white recycle / pink shred / yellow incinerate) to defeat dumpster diving.</li><li>Remote-work policies define what may leave the office (gov example: no smartphones inside; notebooks can't go home; bag checks at exit).</li><li>Handbooks also say what TO do: how to report suspicious email (who to contact, what info, how to isolate).</li><li><strong>Review policies at least annually</strong>; update and highlight significant changes (one-page summary); train on the WHY so staff can make judgment calls when the policy doesn't cover something. Policies are <strong>guides, not guardrails</strong> — escalate gaps to leadership.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Remote and Hybrid Work Security</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Remote work</strong> = working outside a traditional office (home, coffee shop, abroad). <strong>Hybrid</strong> = blend of office + remote.</li><li>Risks: physical controls don't extend; data transits public/untrusted networks (eavesdropping on unencrypted connections, weak Wi-Fi passwords); higher loss/theft of devices.</li><li><strong>Controls:</strong></li><ul><li><strong>VPN</strong> for encrypted end-to-end connections back to the company network.</li><li><strong>MFA</strong> as an added layer if credentials are compromised.</li><li><strong>Company-issued devices</strong> preferred (updated security software, firewalls, monitoring). If <strong>BYOD</strong> (vs CYOD/COPE) — org must define required security measures (patching, updates) but <strong>ownership complicates enforcement</strong> (can't install software without consent).</li><li><strong>Full-disk encryption + remote wipe</strong> for lost/stolen devices.</li><li><strong>Automated backups</strong> (server or cloud) — recovery from ransomware/loss.</li><li><strong>Secure collaboration tools</strong>: end-to-end encryption, robust admin controls, compliance with international standards.</li><li>Continuous training (phishing recognition, data handling, incident reporting); clear security-team communication; regular audits and feedback sessions.</li></ul></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Creating a Culture of Security</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Culture of security = every member prioritizes security in daily tasks/decisions; collective responsibility.</li><li>Uses <strong>organizational change management (OCM)</strong>, strategic development, comprehensive execution, constant monitoring/reporting.</li><li><strong>Starts at the TOP</strong> — executives set the tone; security as shared corporate responsibility, not a mandated directive (down to seasonal/part-time staff).</li><li>Phases: ① <strong>Development</strong> — strategic planning, policies, threat education, empowerment (confidence to recognize/respond). ② <strong>Execution</strong> — continual (not one-time): roll out policies, training, simulated attacks, daily communication; embed into workflows. ③ <strong>Monitoring &amp; reporting</strong> — initial monitoring then recurring check-ins; track compliance, assess effectiveness, find improvements; teach everyone HOW/WHERE to report.</li><li><strong>No-blame reporting culture</strong> — fear of blame suppresses incident reporting (counterproductive). Encourage reporting; value employee input.</li><li><strong>Feedback loops</strong> — insights from monitoring/reporting shape future actions; continuous learning/adaptation.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">High-yield exam triggers</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>&quot;$80K salary, $150K sports car&quot; → <strong>lifestyle incongruence</strong>.</li><li>&quot;Gave away possessions, depression&quot; → <strong>emotional distress</strong> (engage with empathy).</li><li>&quot;Found USB in parking lot&quot; → <strong>baiting</strong> — never plug in.</li><li>&quot;Free charging cable at the airport&quot; → <strong>baiting (juice jacking-style)</strong> — carry your own.</li><li>&quot;Following an employee through the door&quot; → <strong>tailgating/piggybacking</strong> → <strong>access control vestibule</strong>.</li><li>&quot;One master password encrypts the vault&quot; → <strong>password manager</strong> (Bitwarden/LastPass/Dashwarden class).</li><li>&quot;Review at least once per year&quot; → <strong>policy review cycle</strong>.</li><li>&quot;Fear of being blamed for reporting&quot; → <strong>no-blame culture / feedback loops</strong>.</li><li>&quot;Executives set the tone&quot; → <strong>OCM starts at the top</strong>.</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="automation-and-orchestration-study-notes.html">&larr; Prev: Section 25 · Automation and Orchestration</a> <a class="btn ghost" href="exam-readiness-study-notes.html">Next &rarr;: Section 27 · Exam Readiness</a></div>
+  <script>
+    var SLUG = "security-awareness";
+    var TOTAL = 8;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

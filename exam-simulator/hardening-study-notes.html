@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 19 · Hardening — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 19 · Hardening &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><p class="doc-title">Section 20 — Hardening (SY0-701 Study Notes)</p>
+<p>Objectives 2.5, 4.1, 4.5: mitigation techniques to secure the enterprise, security techniques for computing resources, modifying enterprise capabilities to enhance security. Classic &quot;given a scenario, pick the right hardening control&quot; domain.</p>
+<details class="topic" open><summary><span class="t-name">187/188 — Changing Default Configurations</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Defaults exist for easy setup, NOT security. Change them first:</p>
+<ul class="mdlist"><li><strong>Default passwords</strong>: e.g., admin/admin, administrator/password, admin/blank — published in manuals/knowledge bases. Change immediately; add MFA if supported; otherwise long/strong/unique (rotate ~90 days, use a password manager).</li><li><strong>Unneeded ports/protocols</strong>: audit what's in use; disable the rest — every open port is an attack surface. Move to encrypted versions where available: <strong>HTTP (80) → HTTPS (443); SMTP (25) → SMTPS (587 or 465)</strong>.</li><li><strong>Extra open ports</strong>: devices ship with ports open for max compatibility (e.g., 22 SSH and 23 Telnet). <strong>Close Telnet (23) — plaintext, never use it.</strong> Close 80 if only 443 is needed.</li><li>Simple changes (passwords, closed ports) are the first, most formidable line of defense. Be proactive, not reactive.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">189 — Restricting Applications &amp; Least Functionality</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Least functionality</strong>: configure a workstation/server to provide ONLY the essential apps/services the user needs. Restrict unneeded applications, services, ports, protocols; uninstall unneeded apps (each adds code = vulnerabilities, and each must be patched).</li><li>Legacy versions linger after upgrades (e.g., old Adobe installs) — uninstall them to eliminate their vulnerabilities.</li><li><strong>Allowlisting</strong> (bouncer list): only listed apps run; everything else blocked. <strong>Most secure</strong> (deny by default) but hard to manage (every app update changes the entry). Like an explicit allow ACL at the application level.</li><li><strong>Blocklisting</strong> (no-fly list): listed apps blocked; everything else runs. Easier to manage but <strong>less secure</strong> — new malware runs until you add a rule.</li><li>Domain environments deploy lists centrally via <strong>Active Directory group policies</strong>.</li><li>For higher security use allowlisting; at minimum blocklist known-bad apps.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">190 — Unnecessary Services</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Services run in the background (e.g., print spooler). Disable unneeded ones — they consume resources and add attack surface.</li><li><strong>Windows</strong>: <code>services.msc</code> (set Startup: Manual/Automatic/Disabled — Stopping alone means it restarts at reboot; must set Disabled). CLI: <code>sc stop &lt;service&gt;</code>, <code>net stop &lt;service&gt;</code>. (Windows Update service = <code>wuauserv</code>; enterprises disable it on endpoints so patches come through the patch-management system instead.)</li><li><strong>macOS</strong>: Activity Monitor → Quit/Force Quit.</li><li><strong>Linux/macOS terminal</strong>: <code>top</code> to view processes, <code>kill &lt;PID&gt;</code> to terminate.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">191 — Trusted Operating Systems</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Trusted OS (TOS)</strong>: enforces stringent security policies, usually <strong>mandatory access control (MAC)</strong> — access decided by administrator-defined policy, enforced by the OS; even the data owner cannot override. Used where integrity/confidentiality/availability are critical.</li><li><strong>Common Criteria / EAL (Evaluation Assurance Level)</strong>: EAL1 (lowest) → EAL7 (highest).</li><ul><li><strong>Integrity-178B</strong> (fighter jets — F-16, F-22, F-35, B-2, Airbus A380): <strong>EAL6</strong>, POSIX-based embedded.</li><li><strong>SELinux</strong>: <strong>EAL4+</strong>; <strong>Trusted Solaris</strong>: MAC multi-level ops with auditing + compartmentalization.</li><li>Generic OS (Windows since 7, macOS since 10.6, many Linux): <strong>EAL4 / EAL4+</strong> — methodically designed/tested, good assurance, but far below EAL6/7, which require embedded/purpose-built systems (costly).</li></ul><li><strong>TCB (Trusted Computing Base)</strong>: all parts critical to security; <strong>microkernels minimize the TCB</strong> → smaller attack surface.</li><li>Mobile: Android uses sandboxing + tools like <strong>AppArmor</strong> for MAC.</li><li>TOS trade-off: very expensive and challenging to design/maintain — balance security vs. usability/performance.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">192 — Updates and Patches</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Hotfix</strong>: a patch for a <strong>security issue</strong> — apply immediately <strong>after lab testing</strong>.</li><li><strong>Update</strong>: adds <strong>functionality/features</strong>, usually not security — and can introduce new vulnerabilities needing future hotfixes.</li><li><strong>Service pack</strong>: bundles hundreds/thousands of hotfixes + updates into one installer (e.g., Windows XP SP3).</li><li><strong>Reverse engineering risk</strong>: attackers reverse-engineer released patches within days to build exploits → unpatched systems are breached. Most headline breaches = missing patches.</li><li>Effective patch management program (9 elements): owner/team tracking vendor bulletins; automated patching mechanism covering OS + apps; include cloud resources; <strong>triage patches urgent/important/non-critical</strong>; <strong>lab test environment</strong>; detailed patching logs; firmware-update process; emergency push via change advisory board; periodic combined rollout of non-critical patches.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">193 — Patch Management Process</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>Four steps: Planning → Testing → Implementing → Auditing.</strong></p>
+<ul class="mdlist"><li><strong>Planning</strong>: policies/procedures/systems to track patches, verify compatibility, decide test/deploy methods. Tools: Microsoft Endpoint Configuration Manager or third-party.</li><li><strong>Testing</strong>: test every patch in a small lab/test workstation before network-wide deployment — patches can break unique configurations.</li><li><strong>Implementing</strong>: manual (tiny networks) or automated (large). Enterprises manage via an <strong>update server</strong> (disable the Windows Update service on endpoints). Mobile devices patch via <strong>MDM</strong>.</li><li><strong>Auditing</strong>: scan/verify patches installed correctly, find failed deployments.</li></ul>
+<ul class="mdlist"><li><strong>Patch rings</strong>: staged rollout — Ring 1: 10–20 machines → Ring 2: 50–100 (admins/service desk) → Ring 3: 1,000–2,000 → Ring 4: everyone. Limits blast radius and service-desk calls.</li><li><strong>Firmware management</strong>: network devices run firmware (Cisco IOS = &quot;inner network operating system&quot;); flash firmware to update. Cisco UCS Manager centralizes it; third-party tools (e.g., ManageEngine DeviceExpert) automate upgrade/downgrade/configuration.</li><li>Patch management = security + uptime + compliance + features.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">194 — Group Policies</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Group policy</strong>: rules applied to sets of users or computer accounts; centrally manages settings. Local editor: <strong>gpedit</strong> (Run). Domain environments get an advanced version on the domain controller.</li><li>Policies act as <strong>security templates</strong>: password complexity, account lockout, software/application restrictions.</li><li><strong>GPOs</strong> (group policy objects) harden the OS and build the <strong>secure baseline</strong> under configuration management.</li><li><strong>Baselining</strong>: measuring changes to establish what <strong>normal</strong> is, so deviations (e.g., unusual Saturday traffic spike → possible exfiltration) can be investigated. Every deviation is categorized: acceptable or investigate.</li><li><strong>AppLocker</strong> (under Application Control Policies): Windows allow/deny listing. Rule conditions: <strong>Publisher</strong> (block a compromised vendor's signed code), <strong>Path</strong> (e.g., block %WINDIR%\Temp\*), <strong>File hash</strong> (block a known malware digest). Default rules allow Program Files, Windows folder, and admins.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">195 — SELinux</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>MAC (Mandatory Access Control)</strong>: system-enforced, based on <strong>subject clearance + object labels</strong> — not owner discretion. Contrast <strong>DAC</strong>: owner controls access (chown/chmod).</li><li>Context-based permission schemes: <strong>SELinux</strong> and <strong>AppArmor</strong> (both MAC). SELinux created by the <strong>NSA</strong>; default on <strong>CentOS/Red Hat</strong>.</li><li>SELinux contexts: <strong>User</strong> (unconfined_u, user_u, sysadmin_u, root), <strong>Role</strong> (object_r for files/dirs), <strong>Type</strong> (the label — most important for fine-grained control), optional <strong>Level</strong> (sensitivity → multi-level security).</li><li><strong>Modes</strong>: <strong>Disabled</strong> (off, DAC only), <strong>Enforcing</strong> (policies applied), <strong>Permissive</strong> (logs violations but doesn't enforce — great for policy tuning).</li><li><strong>Policies</strong>: <strong>Targeted</strong> (default on RHEL/CentOS — only targeted processes confined, rest unconfined) vs <strong>Strict</strong> (MAC on everything — very hard to set up).</li><li>Violations go to the audit log; expect false positives while tuning. SELinux is only as strong as the restrictive profiles you write.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">196 — Data Encryption Levels</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Level</th><th>Tool example</th><th>Notes</th></tr></thead><tbody><tr><td><strong>Full-disk</strong></td><td>BitLocker (Windows), FileVault (macOS); hardware FDE</td><td>Whole drive; PIN/password/key at boot; survives drive removal</td></tr><tr><td><strong>Partition</strong></td><td>VeraCrypt</td><td>One partition only (e.g., sensitive docs) — less overhead than whole disk</td></tr><tr><td><strong>Volume</strong></td><td>VeraCrypt</td><td>Encrypted container of chosen size; can layer on top of FDE</td></tr><tr><td><strong>File</strong></td><td>GPG (GNU Privacy Guard)</td><td>Individual files, e.g., before emailing</td></tr><tr><td><strong>Database</strong></td><td>SQL Server TDE (Transparent Data Encryption)</td><td>Whole DB encrypted across devices/cloud; no app changes</td></tr><tr><td><strong>Record</strong></td><td>Column-level</td><td>Encrypt only sensitive columns (credit card, SSN) — most granular</td></tr></tbody></table></div>
+<p>Encryption adds read/write overhead → choose granularity to balance security vs. performance.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">197 — Secure Baselines</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Secure baseline</strong>: standardized secure starting configuration establishing a minimum security level across assets.</li><li><strong>Establish</strong>: assess data types/workflows/threats; start from frameworks (<strong>ISO 27001, NIST SP 800-53</strong>). Build a template machine (format → OS → update → secure → scan), install role-based apps, scan again, then <strong>image it</strong> as the known-good baseline. Keep refining with patches/updates.</li><li><strong>Deploy</strong>: firewalls, permissions, encryption, AV/anti-malware; automated tools/scripts apply uniformly. <strong>Windows: GPOs</strong> (password policy, user rights, audit settings). <strong>AWS: AWS Config</strong> for cloud resources.</li><li><strong>Maintain</strong>: lock down systems (users can't install software/change configs); continuous monitoring for <strong>deviation alerts</strong> → SOC remediation; periodic reviews against evolving threats; user training/awareness.</li></ul>
+<h3>High-yield rapid-fire list</h3>
+<ul class="mdlist"><li>admin/admin → change default password; port 23 → close it (Telnet = plaintext); 80→443, 25→587/465.</li><li>Allowlist = deny by default = most secure; blocklist = allow by default = easier.</li><li><code>services.msc</code> set Disabled (not just Stop); <code>sc stop</code> / <code>net stop</code>; Linux <code>kill &lt;PID&gt;</code>; <code>top</code>.</li><li>Hotfix = security, now; update = features; service pack = bundle.</li><li>Plan → Test → Implement → Audit; patch rings limit blast radius.</li><li>gpedit → GPOs → AppLocker (publisher/path/hash rules).</li><li>SELinux: NSA, RHEL/CentOS default, Targeted policy default, Permissive = log-only.</li><li>BitLocker/FileVault = FDE; VeraCrypt = partition/volume; GPG = file; TDE = database.</li><li>ISO 27001 / NIST 800-53 = baseline starting frameworks; AWS Config = cloud baselines.</li><li>EAL1–7: Integrity-178B EAL6; Windows/macOS/SELinux EAL4+; microkernel minimizes TCB.</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="malicious-activity-study-notes.html">&larr; Prev: Section 18 · Malicious Activity</a> <a class="btn ghost" href="security-techniques-study-notes.html">Next &rarr;: Section 20 · Security Techniques</a></div>
+  <script>
+    var SLUG = "hardening";
+    var TOTAL = 10;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

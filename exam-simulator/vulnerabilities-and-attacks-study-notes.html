@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 17 · Vulnerabilities and Attacks — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 17 · Vulnerabilities and Attacks &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><p class="doc-title">Section 18 — Vulnerabilities and Attacks (SY0-701 Study Notes)</p>
+<p>Exam-weight: this domain (18–19 combined) is one of the heaviest on the SY0-701. Expect direct &quot;identify the attack from a snippet/log&quot; questions — the course gives explicit exam tips for each one.</p>
+<details class="topic" open><summary><span class="t-name">166 — Hardware Vulnerabilities</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Firmware attacks</strong>: malware embedded in device firmware (BIOS/UEFI, network devices); hard to detect because it survives OS reinstalls.</li><li><strong>End-of-life / legacy / unsupported systems</strong>: no more patches = permanent vulnerabilities. Mitigate by isolating/segmenting them (e.g., VLAN + firewall rules) and planning decommissioning.</li><li><strong>Unpatched systems</strong>: known CVEs left open. Patch management is the fix.</li><li><strong>Misconfigurations</strong>: default passwords, open ports, insecure settings. Fix with configuration baselines/enforcement and hardening.</li><li>Mitigation set: hardening, patching, configuration enforcement, decommissioning, isolation/segmentation of legacy gear.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">167 — Bluetooth Attacks &amp; Best Practices</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Know the &quot;blue&quot; family — a classic matching/identification question:</p>
+<div class="tblwrap"><table><thead><tr><th>Attack</th><th>What it does</th></tr></thead><tbody><tr><td><strong>Bluejacking</strong></td><td>Sends unsolicited messages (spam) to a Bluetooth device</td></tr><tr><td><strong>Bluesnarfing</strong></td><td>Steals/reads data (contacts, call logs, texts) from the device *without* authorization</td></tr><tr><td><strong>Bluebugging</strong></td><td>Takes *control* of device functions (calls, texts)</td></tr><tr><td><strong>Bluesmack</strong></td><td>DoS — floods the device to crash/disable it</td></tr><tr><td><strong>Blueborne</strong></td><td>Worm-like airborne spread between Bluetooth devices in seconds — no pairing needed</td></tr></tbody></table></div>
+<p>Bluetooth risks: insecure pairing, device spoofing, on-path (MITM) attacks.</p>
+<p>Best practices: turn BT off when unused; non-discoverable mode by default; update firmware; pair only known devices; unique PIN/passkey; refuse unsolicited pairing requests; encrypt sensitive transfers.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">168 — Mobile Device Vulnerabilities</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Sideloading</strong>: installing apps from unofficial sources outside the app store — bypasses store review/malware screening.</li><li><strong>Jailbreak (iOS) / Root (Android)</strong>: gives escalated permissions, removes built-in protections, and often blocks official OTA updates.</li><li><strong>Insecure connections</strong>: open/public Wi-Fi and unknown Bluetooth. Prefer cellular data or 802.1X-secured enterprise Wi-Fi.</li><li><strong>MDM (Mobile Device Management)</strong> enforces: patching, configuration management/baselines, best practices — block sideloading, detect jailbreak/root, force VPN use.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">169 — SQL &amp; XML Injection</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Injection</strong> (generic): insertion of code/data through an input form so the application executes attacker input as part of a command/query.</li><li><strong>SQLi</strong>: attacker enters malicious SQL into a form field/URL parameter/cookie/header. Classic payload: <code>' OR 1=1;</code> — the apostrophe escapes the string, <code>1=1</code> is always true, so the OR makes the whole WHERE clause true → access granted.</li><ul><li><strong>Exam tip</strong>: see an apostrophe + &quot;X = X&quot; in a log → SQL injection. Guaranteed 1–2 questions.</li><li><strong>Prevention #1 = input validation / sanitization.</strong> #2 = WAF (web application firewall) in front of the app.</li><li>Attack tools exist (sqlmap automates discovery + dumping databases), but the exam only cares that you recognize and prevent it.</li></ul><li><strong>XML injection</strong>: malicious XML data sent to an XML-driven app. XML uses *custom* tags (vs HTML's fixed keywords like <code>&lt;img&gt;</code>, <code>&lt;a href&gt;</code>; vs JavaScript functions). Exam tip: any clearly-XML snippet in a question = XML vulnerability/exploitation/injection.</li><li><strong>XML bomb (&quot;billion laughs&quot;)</strong>: nested entity references expand exponentially, consuming up to GBs of memory → DoS.</li><li><strong>XXE (XML External Entity)</strong>: embeds a request for a local resource — e.g. <code>&lt;!ENTITY xxe SYSTEM &quot;file:///etc/shadow&quot;&gt;</code> reads the Linux password-hash file. Defense: validate/sanitize + disable unnecessary entity processing.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">170 — Zero-Day Attacks</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>A <strong>zero-day</strong> is a vulnerability unknown to the vendor — no patch exists. &quot;Zero-day&quot; can refer to the vulnerability, the exploit, or the malware (exam uses them interchangeably).</li><li>Zero-days are <strong>expensive</strong>, stockpiled, and used against <strong>high-value targets</strong>, usually after generic malware fails.</li><li>Signature-based AV is <strong>useless</strong> pre-signature → detection relies on behavior/heuristics (AI-driven detection, sandboxing).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">171 — Operating System Vulnerabilities</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Sources: unpatched systems, zero-days, misconfigurations, data exfiltration, malicious/compromised software updates.</li><li>Defenses: patching; host-based IPS (HIPS); configuration management; encryption at rest; endpoint protection; host firewall; allow-listing (application control); verify update signatures/hashes before installing.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">172–173 — SQLi Demo (awareness only)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p>Burp Suite captures the request (cookie/session data); sqlmap automates: find vulnerable parameter → enumerate databases (<code>--dbs</code>) → tables (<code>--tables</code>) → columns (<code>--columns</code>) → dump &amp; crack password hashes. Exam expects <strong>no tool knowledge</strong> — just awareness of why input validation matters.</p>
+</div></details>
+<details class="topic" open><summary><span class="t-name">174 — Cross-Site Scripting (XSS) &amp; Cross-Site Request Forgery (XSRF/CSRF)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<p><strong>XSS</strong> — malicious script injected into a *trusted* site, delivered to and executed in the victim's browser at the trust level of that site. Relies on missing input validation.</p>
+<ul class="mdlist"><li>Steps: find input-validation weakness → craft malicious URL → user clicks → trusted site serves page with injected code → code runs in victim's browser.</li><li><strong>Reflected / non-persistent</strong>: one-time; requires the victim to click the crafted link.</li><li><strong>Persistent / stored</strong>: code saved into the site's database — every visitor who loads that page runs it. More dangerous.</li><li><strong>DOM-based (client-side)</strong>: script manipulates the Document Object Model in the browser. Exam tip: <code>document.cookie</code>, <code>document.write</code> in the payload → DOM-based XSS.</li><li><strong>Exam tip</strong>: <code>&lt;script&gt;</code> or JavaScript inside a captured URL/log → XSS.</li><li>Uses: defacement, session-cookie theft, intercepting form data, malware install.</li></ul>
+<p><strong>Session management background</strong>: HTTP is stateless; sessions tracked via cookies. Session cookie = non-persistent (memory only); persistent cookies stored in cache until expiry/deletion. Encrypt cookies. <strong>Session hijacking</strong>: attacker steals/modifies the session cookie or predicts a weak session token (session prediction) to take over an authenticated session. Use truly random, non-predictable, one-time session tokens.</p>
+<p><strong>XSRF/CSRF</strong> — attacker gets the victim's browser to perform an *unwanted action* on a site where the victim is already authenticated (change password/email, initiate transfer). Works via the site's own session cookies — victim may not even click anything (hidden <code>&lt;img&gt;</code> tags). Prevent with: user-specific anti-CSRF tokens in forms, randomness + extra info (2FA) on password reset, require current password to change password.</p>
+<p>Exam distinguisher:</p>
+<ul class="mdlist"><li><strong>XSS</strong> = attacker code *runs in the victim's browser* on the trusted site.</li><li><strong>XSRF/CSRF</strong> = victim's browser *performs an action* they didn't intend.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">175 — Buffer Overflow</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Writing more data into a buffer than it was allocated → spills into adjacent memory.</li><li>Goal: overwrite the <strong>return pointer</strong> on the program's <strong>stack</strong> so execution jumps to attacker's code → remote code execution (&quot;smashing the stack&quot;).</li><li><strong>NOP slide</strong>: fill buffer with NOP (no-operation) instructions so the randomized/approximate return address &quot;slides&quot; down to the attacker's code.</li><li><strong>ASLR (Address Space Layout Randomization)</strong>: randomizes memory addresses of well-known programs so return pointers are hard to guess. Introduced with Windows Vista. (Bypasses exist — side-channel attacks — but out of scope.)</li><li>Exam takeaway: putting more data into memory than designed → malicious code execution.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">176 — Race Conditions</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Outcome depends on order/timing of events; attacker wins the &quot;race&quot; to use a resource before legitimate processing.</li><li>Found when multiple threads write the same variable/memory location concurrently; can be triggered via pointer dereference exploits.</li><li><strong>Dirty COW (2016)</strong>: classic race condition in the Linux kernel's <strong>copy-on-write</strong> mechanism → local privilege escalation (turn read-only file mapping into write). Hard to detect — nothing in the logs.</li><li>Three sub-types (same vulnerability, different moments):</li><ul><li><strong>TOC (time-of-check)</strong>: app checks a state, attacker changes it before the operation.</li><li><strong>TOU (time-of-use)</strong>: attacker changes state between check and use.</li><li><strong>TOE (time-of-evaluation)</strong>: inputs manipulated during a calculation/decision window.</li></ul><li><strong>Prevention: locks and mutexes</strong> — mutex = mutually exclusive flag letting only one thread into a code section (like SharePoint file checkout locks). Badly designed locks → <strong>deadlock</strong>: two processes each wait for the other to release a resource; circular dependency needs external intervention.</li></ul>
+<h3>High-yield rapid-fire list</h3>
+<ul class="mdlist"><li><code>' OR 1=1</code> → SQLi; prevent with input validation (+ WAF).</li><li><code>&lt;script&gt;…&lt;/script&gt;</code> in URL → XSS; <code>document.*</code> → DOM-based XSS.</li><li>Victim unknowingly performs an action → XSRF/CSRF → anti-CSRF tokens.</li><li>Billion laughs → XML bomb; <code>/etc/shadow</code> via entity → XXE.</li><li>Stack/return pointer/NOP → buffer overflow; ASLR = mitigation.</li><li>Steal contacts via BT → bluesnarfing; control device → bluebugging; spam → bluejacking; DoS → bluesmack; airborne worm → Blueborne.</li><li>Copy-on-write race → Dirty COW privilege escalation.</li><li>Lock resource → mutex; circular wait → deadlock.</li><li>Randomized session tokens + one-time use → stop session prediction/hijacking.</li><li>Zero-day = no patch yet; signature AV blind until a signature exists.</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="identity-and-access-management-study-notes.html">&larr; Prev: Section 16 · Identity and Access Management</a> <a class="btn ghost" href="malicious-activity-study-notes.html">Next &rarr;: Section 18 · Malicious Activity</a></div>
+  <script>
+    var SLUG = "vulnerabilities-and-attacks";
+    var TOTAL = 10;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

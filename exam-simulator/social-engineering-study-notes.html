@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 4 · Social Engineering — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 4 · Social Engineering &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  <div class="banner"><strong>Maps to exam objectives:</strong> 2.2 (explain common threat vectors &amp; attack surfaces — the human/SE vectors) and 5.6 (given a scenario, implement security awareness practices).<br>Social engineering is one of the MOST heavily tested areas of SY0-701, and most questions are pure definition discrimination: &quot;A caller claims to be from the IRS and demands payment within 24 hours or arrest — which motivational trigger?&quot; Know the <strong>six triggers</strong>, the <strong>phishing family tree</strong>, the <strong>four impersonation forms</strong>, and <strong>misinformation vs. disinformation</strong> cold — those four clusters cover most of the section's exam weight.</div>
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><details class="topic" open><summary><span class="t-name">1. What Social Engineering Is (Obj 2.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>A <strong>manipulative strategy that exploits human psychology</strong> to gain unauthorized access to <strong>systems, data, or physical spaces</strong>.</li><li>Includes <strong>written communication</strong> (email/SMS) <strong>and face-to-face interaction</strong> — attackers manipulate people into revealing confidential info or performing compromising actions, instead of using technical hacking.</li><li>Because the target is the <strong>human element</strong>, the #1 defense is <strong>security awareness training</strong> — regular training on recognizing and responding to SE attacks.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">2. The Six Motivational Triggers (Obj 2.2) — THE core list</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Trigger</th><th>Mechanism</th><th>Course example</th></tr></thead><tbody><tr><td><strong>Authority</strong></td><td>People comply with perceived power/position</td><td>Fake manager/executive, &quot;important client,&quot; or <strong>fake IRS agent</strong> demanding a &quot;late fee&quot; within 24 hours or arrest</td></tr><tr><td><strong>Urgency</strong></td><td>Immediacy/time pressure makes people skip procedures</td><td>Hands-full-of-boxes at the door; <strong>USB with slides &quot;needed in 5 minutes&quot;</strong> (skips removable-media scanning); help-desk password reset &quot;right now, big deadline&quot;</td></tr><tr><td><strong>Social proof</strong></td><td>People copy what they see others doing</td><td>Scam website boosted by <strong>likes/shares and friends' posts</strong>; course-review psychology (100k enrolled → must be good)</td></tr><tr><td><strong>Scarcity</strong></td><td>Limited availability forces quick decisions</td><td>&quot;Only 5 spots left,&quot; <strong>$1,000 MacBook (normally $2,000) for the first five buyers</strong></td></tr><tr><td><strong>Likability</strong></td><td>People respond to people they like</td><td>Red Teams staff friendly/attractive members; <strong>sports-team chit-chat</strong> (Buffalo Bills gear on a desk) to open victims up</td></tr><tr><td><strong>Fear</strong></td><td>&quot;If you don't, something bad happens&quot;</td><td>Ransomware &quot;$200 fine to decrypt&quot;; <strong>fake FBI agent threatens arrest</strong> — note this stacks <strong>fear + authority</strong></td></tr></tbody></table></div>
+<p><strong>⚠️ Traps:</strong></p>
+<ul class="mdlist"><li>Triggers <strong>combine</strong> — the FBI/ransomware scams deliberately stack fear on authority. A stem describing two triggers is common.</li><li><strong>Urgency vs. scarcity:</strong> urgency = time pressure (&quot;expires in 4 hours&quot;); scarcity = *limited quantity* (&quot;only 5 left&quot;). Scarcity is &quot;often used with urgency&quot; but the driver is limited supply.</li><li>Best defense against all of them: <strong>security awareness training</strong> (Obj 5.6).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">3. The Four Forms of Impersonation (Obj 2.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Form</th><th>Definition</th><th>Exam hook</th></tr></thead><tbody><tr><td><strong>Impersonation</strong></td><td>Assuming the identity of <strong>another person</strong> to gain access or steal data</td><td>Attacker first <strong>collects org info</strong> to make lies believable (&quot;Mike from IT, third floor — checking the workstation issues others reported&quot;). Consequences up to <strong>complete system takeover</strong></td></tr><tr><td><strong>Brand impersonation</strong></td><td>Pretending to <strong>represent a legitimate company/brand</strong> (logos, marketing language) in phishing emails/sites or social media</td><td>Defenses: user education, <strong>secure email gateways</strong>, <strong>monitor the brand's online presence</strong>. Famous case: <strong>Nov 2020 fake Eli Lilly Twitter</strong> (&quot;insulin is free&quot;) → stock dropped <strong>4% in under 24 hours</strong>, billions in market cap lost</td></tr><tr><td><strong>Typosquatting</strong> (URL hijacking / cyber-squatting)</td><td>Registering a <strong>lookalike domain with typos</strong> — *cousins, lookalikes, doppelganger domains*</td><td>gnail.com for gmail.com; <strong>Di0ntraining.com (zero for O)</strong>; hijacked <strong>subdomain of a trusted cloud provider</strong> (Diontraining.Azure.com — when the real company uses AWS). Defenses: <strong>register your own misspellings</strong> (Accolade owns acclade.com), domain-monitoring services, user training</td></tr><tr><td><strong>Watering hole attack</strong></td><td>Compromising a <strong>specific website/service the target is known to use</strong>, then delivering malware through it</td><td><strong>Passive attack</strong> — the attacker never communicates directly with the target (predator waits at the river). Defenses: <strong>patching</strong>, threat intelligence, advanced malware detection</td></tr></tbody></table></div>
+</div></details>
+<details class="topic" open><summary><span class="t-name">4. Pretexting (Obj 2.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>A <strong>fabricated, convincing scenario</strong> used to manipulate a target into divulging information or performing actions — often impersonating a trusted person or authority.</li><li>Course demo: fake toner vendor (&quot;Bob Smith, Ink and Toner Express&quot;) <strong>guesses a common printer brand so the receptionist corrects him</strong> with the real model (Konica Minolta C368), then escalates to the printer's <strong>IP address</strong> (has her photograph the touchscreen). </li><li>Classic pretext: <strong>&quot;John from Microsoft — your Windows machine is infected.&quot;</strong> (The course's mom knew it was fake because she has an <strong>iMac</strong> — Windows malware can't affect macOS.)</li><li>⚠️ <strong>Never give out information by phone</strong>, even seemingly innocent details (printer model, IP address) — they fill in the attacker's gaps. <strong>Don't fill in the gaps for callers.</strong></li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">5. The Phishing Family (Obj 2.2) — heavily tested</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Type</th><th>Channel / targeting</th><th>Distinguishing detail</th></tr></thead><tbody><tr><td><strong>Phishing</strong></td><td>Mass <strong>email</strong> — the wide net</td><td>&quot;Fisherman casts a wide net&quot;; <strong>spray and pray</strong> to hundreds of thousands; urgency/fear lures; fake login pages capture credentials</td></tr><tr><td><strong>Spear phishing</strong></td><td>Email, <strong>targeted</strong> at specific individuals/orgs</td><td>Attacker <strong>researches first</strong>; tailored content = higher success. Course test: 1M random people get a fake Bank-of-America email = <strong>phishing</strong> (random list); 500 customers of a breached bank get tailored emails = <strong>spear phishing</strong></td></tr><tr><td><strong>Whaling</strong></td><td>Spear phishing at <strong>high-profile executives (CEO/CFO)</strong></td><td>Bigger payoff (execs can <strong>approve large fund transfers</strong>); much more prep/precision; often step one of <strong>taking over the executive's account</strong> for follow-on attacks</td></tr><tr><td><strong>Business email compromise (BEC)</strong></td><td>Compromised <strong>internal</strong> email account</td><td>Take over a legitimate account via social engineering or intrusion; impersonate <strong>senior exec or trusted partner</strong>; request <strong>wire transfers, payment redirections, confidential data</strong> from <strong>finance or HR</strong>. FBI IC3: <strong>+14.5% increase, $2.7B losses</strong> in a year</td></tr><tr><td><strong>Vishing</strong></td><td><strong>Voice</strong> (phone)</td><td>Impersonate banks/government agencies; course notes people are easier to trick <strong>by phone than by email</strong></td></tr><tr><td><strong>Smishing</strong></td><td><strong>SMS/text</strong></td><td>Fraudulent links or phone numbers; urgency bait</td></tr></tbody></table></div>
+</div></details>
+<details class="topic" open><summary><span class="t-name">6. Preventing Phishing &amp; Awareness Practices (Obj 5.6)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Anti-phishing campaign</strong> = user training <strong>+ a simulated phishing campaign</strong> run by an outside contractor or <strong>SaaS platform</strong>; must be <strong>ongoing</strong> (threats evolve); users who click get <strong>in-depth remedial training</strong>.</li><li>Course demo: Trend Micro's free <strong>Phish Insight</strong> — build target list, pick a template (fake LinkedIn invite), spoof the sender (deliberately misspelled *invitations@linkedin.com* — missing a D), schedule, trigger remedial training <strong>&quot;when phished.&quot;</strong> Hovering the link reveals the real destination (websitefun.club) instead of linkedin.com.</li></ul>
+<h3>The five key indicators of a phishing email</h3>
+<ul class="mdlist"><li><strong>Urgency</strong> — &quot;claim your iPhone within 4 hours or the offer expires.&quot;</li><li><strong>Unusual requests</strong> — <strong>IT will never ask for your password; your bank will never ask for your card number</strong> by email/phone.</li><li><strong>Mismatched URLs</strong> — display text says paypal.com/login but hover reveals paypal.hacked.xyz. <strong>Always hover</strong> to see the real destination.</li><li><strong>Suspicious email addresses</strong> — the display name is just text; hover/double-click to see the real sender (e.g., mr.weirdo578@yahoo.com claiming to be PayPal/Microsoft). Official domain missing or overly complicated address = red flag.</li><li><strong>Poor spelling/grammar</strong> — often <strong>deliberate</strong>: it weeds out suspicious users early so the attacker keeps only the gullible (watch for generative AI making this indicator less reliable).</li></ul>
+<h3>When phishing is suspected</h3>
+<ul class="mdlist"><li><strong>Report</strong> it per policy (delete, or forward to the security inbox like phishing@yourdomain.com).</li><li>Triage: confirm with the indicators, <strong>inform all users</strong> (others got it too), remind them <strong>don't click links or provide info</strong>, investigate any opened/clicked messages, then <strong>review and update countermeasures</strong> (spam filters, extra training).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">7. Frauds &amp; Scams (Obj 2.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Fraud</strong> = wrongful or criminal deception for <strong>financial or personal gain</strong> — the victim is <strong>tricked into handing over</strong> money/information (vs. theft, where it's taken directly).</li><li><strong>Identity fraud vs. identity theft:</strong> fraud = <strong>using</strong> the victim's identity assets (charging on their existing card); theft = <strong>fully assuming</strong> the victim's identity (a foreign national using your SSN to get a job). Used interchangeably in practice, but <strong>CompTIA's preferred combined term is &quot;identity fraud.&quot;</strong></li><li><strong>Invoice scam</strong> — tricked into paying a <strong>fake invoice for something never ordered</strong>. Toner variation: caller &quot;confirms&quot; your printer/toner (building a pretext, recording your &quot;yes&quot;), ships grossly overpriced toner (<strong>$950 vs. ~$100 retail for two boxes</strong>), then bills with <strong>no refunds/exchanges</strong> and a recording of your agreement. Any regularly consumed office supply works.</li><li><strong>Technical invoice scam:</strong> PDF invoice attached to a <strong>spear-phishing email</strong> — embedded malicious code infects the billing employee's machine (remote access trojan). <strong>Analyze untrusted emails before opening attachments, especially invoice PDFs.</strong></li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">8. Influence Campaigns, Misinformation &amp; Disinformation (Obj 2.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Influence campaign</strong> = coordinated effort to shape <strong>public perception or behavior</strong> toward a cause, individual, or group. Can be <strong>benign</strong> (public-health vaccination drives) or <strong>malicious</strong> (election manipulation) — malicious ones usually run by <strong>nation-states or hacktivists</strong>, amplified by social media with little fact-checking.</li><li><strong>⚠️ The distinction the exam always tests:</strong></li><ul><li><strong>Misinformation</strong> = false info shared <strong>without harmful intent</strong> (honest mistakes — e.g., COVID-era claims that salt-water gargles or drinking chlorine could kill the virus).</li><li><strong>Disinformation</strong> = <strong>deliberate</strong> creation/sharing of false info <strong>to deceive</strong> (Russian state-sponsored fake Facebook/Twitter accounts in the <strong>2016 US election</strong>).</li></ul><li><strong>2020 Twitter Bitcoin scam:</strong> attackers hijacked accounts of <strong>Obama, Biden, Musk, Gates</strong> etc. and promised to &quot;double&quot; Bitcoin sent to an address — proof influence campaigns can pursue <strong>pure financial gain</strong>, not just politics.</li><li>Societal countermeasures: <strong>media literacy, fact-checking, transparency/accountability, regulation</strong>.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">9. Other Social Engineering Attacks (Obj 2.2)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<div class="tblwrap"><table><thead><tr><th>Attack</th><th>Definition</th><th>Defense</th></tr></thead><tbody><tr><td><strong>Diversion theft</strong></td><td>Manipulating a situation / creating a distraction to steal items or info; digitally: <strong>DNS spoofing</strong> sends users to a fake brand-impersonation site that harvests credentials</td><td>Verify requests; DNS protections</td></tr><tr><td><strong>Hoaxes</strong></td><td>Malicious deception spread via social media/email; causes disruption/panic, often paired with phishing (a <strong>&quot;Windows virus&quot; alert on a Mac</strong> is an obvious hoax)</td><td>Critical thinking, fact-checking, verify reliable sources</td></tr><tr><td><strong>Shoulder surfing</strong></td><td>Direct observation of PINs/passwords/paperwork — including with <strong>high-powered or CCTV cameras from far away</strong></td><td><strong>Privacy screens</strong>, keypad shields, situational awareness</td></tr><tr><td><strong>Dumpster diving</strong></td><td>Searching trash for sensitive documents; <strong>digital variant</strong>: the recycle bin / &quot;deleted&quot; files</td><td><strong>Shred paper</strong>, <strong>clean desk policy</strong>, securely <strong>overwrite</strong> deleted files on HDD/SSD/cloud</td></tr><tr><td><strong>Eavesdropping</strong></td><td>Secretly listening — phone, network interception, wiretaps, <strong>on-path (MITM) attacks</strong></td><td><strong>Encrypted communication channels</strong>, encrypt data in transit, patch systems</td></tr><tr><td><strong>Baiting</strong></td><td>Leaving a <strong>malware-infected USB drive</strong> where a curious victim will find and plug it in (malware installs in seconds)</td><td>Never use unknown USB devices; training</td></tr><tr><td><strong>Piggybacking / tailgating</strong></td><td>Following an authorized person into a secure area</td><td>See below</td></tr></tbody></table></div>
+<p><strong>Piggybacking vs. tailgating (restated — still the #1 SE trap):</strong></p>
+<ul class="mdlist"><li><strong>Tailgating</strong> = following an authorized person <strong>without their knowledge</strong> (Jane swipes; attacker slips in behind her unnoticed).</li><li><strong>Piggybacking</strong> = the attacker <strong>convinces</strong> the authorized person to let them in (delivery person with full hands asks John to hold the door; John badges them in willingly).</li><li>⚠️ New angle from this lesson: <strong>insider threats use piggybacking</strong> to enter an office/data center <strong>without their badge being recorded in the security log</strong>.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Rapid-Fire Self-Test</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>The six motivational triggers? *(authority, urgency, social proof, scarcity, likability, fear)*</li><li>Fake IRS agent demanding payment in 24 hours or arrest — which trigger(s)? *(authority; often stacked with fear)*</li><li>&quot;Only five spots left at half price&quot; — which trigger? *(scarcity)*</li><li>A scam site promoted by friends' likes and shares exploits what? *(social proof)*</li><li>Name the four impersonation forms. *(impersonation, brand impersonation, typosquatting, watering hole)*</li><li>Fake Eli Lilly tweet, Nov 2020 — result? *(4% stock drop in &lt;24h, billions in market cap)*</li><li>gnail.com and Di0ntraining.com (zero for O) are examples of? *(typosquatting — doppelganger/lookalike domains)*</li><li>Why is a watering hole attack &quot;passive&quot;? *(no direct communication with the target — malware via a trusted third-party site)*</li><li>The toner-call demo: what two facts did the attacker extract? *(printer model, then its IP address)*</li><li>1M random Americans get fake Bank of America email — phishing or spear? *(phishing — untargeted; a breached-bank customer list would be spear)*</li><li>Whaling targets whom, and why is it worth the effort? *(CEOs/CFOs — they can approve large fund transfers)*</li><li>BEC in one sentence + the FBI figures. *(compromised internal account impersonating an exec to request wire transfers from finance/HR; +14.5%, $2.7B)*</li><li>Vishing vs. smishing? *(phone voice vs. SMS text)*</li><li>List the five phishing indicators. *(urgency, unusual requests, mismatched URLs, suspicious addresses, poor grammar)*</li><li>Why do some phishers deliberately use bad grammar? *(to weed out suspicious users early, keeping only gullible victims)*</li><li>Two components of an anti-phishing campaign? *(training + simulated phishing, with remedial training for clickers)*</li><li>CompTIA's preferred combined term for identity fraud/theft? *(identity fraud)*</li><li>The toner invoice scam's bill vs. retail? *(≈$950 vs ≈$100/box — &quot;no refunds,&quot; recorded &quot;yes&quot;)*</li><li>Misinformation vs. disinformation? *(false info shared without harmful intent vs. deliberately created to deceive)*</li><li>A &quot;Windows virus&quot; warning shown to a Mac user indicates what? *(a hoax)*</li><li>Which SE attack pairs with DNS spoofing to redirect traffic to fake sites? *(diversion theft)*</li><li>Defenses against digital dumpster diving? *(securely overwrite deleted files on HDD/SSD/cloud)*</li><li>Why do insiders prefer piggybacking? *(enter without their badge being logged)*</li></ul>
+<p><strong>Passing reminder:</strong> the real SY0-701 needs <strong>750/900</strong> — expect multiple SE questions every exam: triggers (2.2), phishing-type identification (2.2), phishing indicators &amp; campaign steps (5.6), and misinformation vs. disinformation (2.2).</p>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="physical-security-study-notes.html">&larr; Prev: Section 3 · Physical Security</a> <a class="btn ghost" href="malware-study-notes.html">Next &rarr;: Section 5 · Malware</a></div>
+  <script>
+    var SLUG = "social-engineering";
+    var TOTAL = 10;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>

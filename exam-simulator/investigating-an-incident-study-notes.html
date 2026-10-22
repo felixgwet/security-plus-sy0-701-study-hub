@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 24 · Investigating an Incident — Interactive Notes</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #f0883e; --accent-dim: rgba(240,136,62,.14);
+    --green: #3fb950; --red: #f85149; --gold: #d29922; --blue: #58a6ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { width: 100%; max-width: 880px; margin: 0 auto; padding: 22px 16px 90px; }
+  a { color: var(--blue); text-decoration: none; } a:hover { text-decoration: underline; }
+  .topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar .grow { flex: 1; }
+  .badge { display: inline-block; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,136,62,.4); border-radius: 999px; padding: 4px 14px; font-size: 12px; }
+  h1 { font-size: 24px; margin: 10px 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+  .btn { display: inline-block; background: var(--accent); color: #0d1117; font-weight: 600; font-size: 14px; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  
+  .banner { background: var(--accent-dim); border: 1px solid rgba(240,136,62,.35); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; line-height: 1.65; margin-bottom: 16px; }
+  #search { width: 100%; padding: 12px 16px; font-size: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; color: var(--text); margin-bottom: 16px; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  details.topic { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  details.topic.reviewed { border-color: rgba(63,185,80,.5); }
+  details.topic summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; user-select: none; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary::before { content: '\25B8'; color: var(--accent); transition: transform .15s; flex: 0 0 auto; }
+  details.topic[open] summary::before { transform: rotate(90deg); }
+  .t-name { flex: 1; }
+  .t-review { flex: 0 0 auto; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; min-height: 30px; }
+  .t-review.done { border-color: var(--green); color: var(--green); }
+  .topic-body { padding: 2px 18px 18px 34px; font-size: 14.5px; line-height: 1.7; color: #c9d1d9; }
+  .topic-body p { margin: 8px 0; }
+  .topic-body h2 { font-size: 17px; margin: 14px 0 6px; color: var(--text); }
+  .topic-body h3 { font-size: 15px; margin: 14px 0 4px; color: var(--gold); }
+  .topic-body strong { color: var(--text); }
+  .topic-body code { background: #2d333b; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  .topic-body .mdlist { margin: 8px 0 8px 18px; }
+  .topic-body .mdlist .mdlist, .topic-body .mdlist ul { margin-left: 16px; }
+  .topic-body li { margin: 4px 0; }
+  .tblwrap { overflow-x: auto; margin: 10px 0; }
+  .tblwrap table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .tblwrap th { text-align: left; color: var(--gold); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .tblwrap td { padding: 8px 10px; border-bottom: 1px solid #21262e; vertical-align: top; }
+  .pagenav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  .pagenav .btn { font-size: 13px; padding: 10px 14px; margin: 0; max-width: 48%; }
+  @media (max-width: 600px) { .topic-body { padding-left: 18px; } details.topic summary { padding: 14px 12px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <a href="../library.html">&larr; Full library</a>
+    <span class="grow"></span>
+    <span id="prog" class="badge"></span>
+  </div>
+  <h1>Section 24 · Investigating an Incident &mdash; Interactive Notes</h1>
+  <p class="sub">Tap a topic to expand it. Search filters topics instantly. Mark topics as reviewed to track your reading progress &mdash; it is saved on this device.</p>
+  <div class="banner">The exam's hardest objective: you'll be given a <strong>log snippet</strong> and must identify the attack and recommend remediation. Practice reading each log type below.</div>
+  <input id="search" type="search" placeholder="Search these notes&hellip;" autocomplete="off">
+  <div id="cards"><details class="topic" open><summary><span class="t-name">Core Data Sources Overview</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>SIEM</strong>: aggregates sensor data for real-time analysis. Key concepts: <strong>sensors</strong> (monitored endpoints feeding data), <strong>sensitivity</strong> (how much is logged — too much overloads processing/bandwidth/storage), <strong>trends</strong> (e.g. rising failed logins = possible brute force), <strong>alerts</strong> (threshold notifications like &quot;5 failed logins&quot;), <strong>correlation</strong> (normalize IPs/hostnames AND <strong>time — use UTC</strong> across systems).</li><li><strong>Log types</strong>: network, system, application, security (failed/successful logins), web/proxy (sites visited, files touched), DNS (who resolved what), authentication (logon/logoff success/fail), <strong>dump files</strong> (memory contents written to disk on crash), VoIP (call metadata/recordings).</li><li><strong>Syslog family</strong> — central log collection: <strong>Syslog / Rsyslog / Syslog-ng</strong> are Linux/Unix-only. <strong>NXLog</strong> is <strong>cross-platform (Linux, Unix, Windows) and open source</strong> — the exam differentiator.</li><li><strong>Linux logging</strong>: <code>journalctl</code> queries systemd's <code>journald</code> daemon logs.</li><li><strong>Flow protocols</strong>: <strong>NetFlow</strong> (Cisco, proprietary; traffic metadata/summarization — who, where, how much, NOT contents), <strong>sFlow</strong> (Sampled Flow, open standard; captures 1 of N packets), <strong>IPFIX</strong> (IETF standard; used by billing/accounting — e.g. $10/GB metering).</li><li><strong>Metadata</strong> = data about data (phone bill analogy: who/when/how long, not content). Types: email (senders, servers transited), mobile, web (sites visited, time on page), file (creator, dates, size).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Reading Dashboards (Splunk example)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Dashboards in the SOC = single pane of glass. Elements: notables by category (access, endpoint, network, identity), <strong>urgency levels</strong> (unknown, informational, low, medium, high, critical), trends over time, top hosts by notable events.</li><li>Red/up = bad. A spike from ~100 to ~1000 endpoint events = investigate that host (drill down by clicking).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Automated Reports (EDR daily report example)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Fields: report ID, generation date, report period, prepared-by, <strong>executive summary</strong> (read first to decide if it needs you), alerts by severity, incident analysis (threat trends, user behavior, data-flow anomalies), recommendations, conclusion, appendix (log snippets, IPs/domains).</li><li>Worked examples: <strong>Critical</strong> — 4:53 a.m. rapid file access matching ransomware footprint → user suspended, host isolated, backup initiated. <strong>High</strong> — 20+ failed admin logins in &lt;5 min on the DC from an *internal* IP → block IP, reset password (insider or already-compromised host). <strong>Moderate</strong> — large outbound transfer to threat-intel-flagged IP → terminate connection, review (could be offsite backup = benign). <strong>Informational</strong> — FileZilla install with hash mismatch → app whitelisting blocked it; confirm with user (policy violation vs. compromised account if user denies).</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Vulnerability Scan Reports</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Header: report ID, scan date/time, scanner + definition versions, operator. <strong>Executive summary</strong> highlights themes (e.g. 50/100 hosts missing a 5-year-old patch = patch management problem). Findings listed critical→informational or by most-vulnerable host.</li><li><strong>Always validate findings manually</strong> — scanners produce false positives (Mac flagged for missing a Windows patch) and miss your compensating controls.</li><li>Authenticated vs unauthenticated attacker matters (authenticated RCE needs insider/credentials; unauthenticated RDP RCE = anyone). CVSS reflects impact scope too (Exchange server &gt; single desktop).</li><li>If no patch exists or the platform can't take it → <strong>compensating controls</strong>.</li><li><strong>Context changes priority</strong>: server being decommissioned tomorrow = deprioritize its critical CVE.</li><li>Look up CVEs at <strong>cve.org</strong>. Remediation examples: MS21-087 hotfix; disable RDP if unused; Apache Druid/Spring/Log4j updates (Log4Shell = CVE-2021-44228, fixed in Log4j 2.15.0+).</li><li>Recommendations: patch high immediately, medium next maintenance window, low per standard cycle.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Packet Capture Analysis (columns: No. · Time elapsed · Source · Destination · Protocol · Length · Info)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Record the capture start time</strong> to correlate with SIEM (timestamps are elapsed-time offsets).</li><li>Capture 1: SYN packets from one source to a sequence of destination ports (80, 23, 22, 21, 443...) = <strong>Nmap port scan</strong> (reconnaissance).</li><li>Capture 2: SYN flood from ONE source, no SYN-ACK/ACK replies = <strong>DoS (SYN flood)</strong> — half-open connections exhausting the server.</li><li>Capture 3: same destination hammered by MANY different sources (.101, .102, .103...) = <strong>DDoS</strong> (botnet).</li><li>Exam tip: in a 10-line snippet ask &quot;what are they showing me?&quot; — same source+scanning ports = scan; one source+incomplete handshakes = DoS; many sources+one victim = DDoS.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Firewall Logs</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Layer 4 firewall log</strong>: date/time, src/dst IP, src/dst port, protocol, action. One external IP incrementing source ports (54321, 54322...) while stepping through destination ports (22→80→443→8080), all blocked = <strong>port scan</strong>.</li><li><strong>Web application firewall (Layer 7, deep packet inspection)</strong> log: method (GET/POST), URI, status code. <strong>200</strong> = OK; <strong>403 Forbidden</strong> = understood but refused (WAF blocked). SQLi tells: <code>'OR '1'='1' --</code>, <code>DROP TABLE users</code> (destructive), <code>WAIT FOR DELAY</code> (time-based blind), <code>SELECT COUNT(*) FROM sysusers</code> (info gathering).</li><li><strong>SQL injection mitigation = WAF</strong> with input sanitization between users and the database.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Application Logs (Word processor example)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Normal: document open/save, templates, print jobs, email sends. <strong>Malicious</strong>: macro execution attempt <strong>blocked</strong> (event 5400) → macro security alert (5401) → macro scanned, <strong>matches known malware</strong> (5402) → file <strong>quarantined</strong> (5403) → admin alert (5409). The flagged file = <strong>Q3-Financials.docx</strong>.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Endpoint Logs (malware infection chain)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Browser opened → download <strong>setup.exe</strong> → AV flags suspicious → <strong>user overrides</strong> → stage 1 <strong>dropper</strong> runs → outbound connection to remote server → <strong>update.bin</strong> (stage 2 dropper) downloads → <strong>disables antivirus</strong> → payload deploys → malicious process (malproc.exe) spawns → <strong>unauthorized registry modification</strong> → unusual outbound traffic (<strong>data exfiltration</strong>) → <strong>breach alert from IoC</strong>.</li><li>Stage 1 dropper = downloader; stage 2 = the real payload.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">OS Security Logs (password cracking)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>PINs incrementing one at a time (123456 → 123457...) every 2 seconds, 5 fails → lockout = <strong>brute force</strong>.</li><li>Common words (puppy, baseball, cupcake) or leetspeak variants (puppy1, b@seball) = <strong>dictionary attack</strong>.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">IPS/IDS Logs</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li><strong>Action = blocked → it's an IPS</strong> (and the threat was mitigated — lower priority). <strong>Alerted/monitored = it got through</strong> — investigate first.</li><li>Among six HIGH events (SQLi 4105, buffer overflow 4110, priv-esc 4115, brute force 4120, internal network scan 4125, data exfiltration 4130), the top priority = <strong>data exfiltration that was ALERTED, not blocked</strong> — data may have left; also retune the IPS. Blocked highs are handled. (Also consider blocking repeat attacker IPs.)</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Network (Router) Logs</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>Columns: date, time, interface (Gi0/1...), action (allow/deny), details.</li><li>Normal: internal-to-internal across subnets; <strong>8.8.8.8 over UDP 53 = Google DNS</strong>; ICMP ping; SSH TCP 22; denied NetBIOS UDP 137 broadcast.</li><li><strong>Suspicious</strong>: repeated <strong>ARP replies mapping the SAME IP (192.168.1.10) to DIFFERENT MAC addresses</strong> within seconds = <strong>ARP spoofing</strong> (attacker flipping MACs). One of the exam's harder analysis questions.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">Metadata in Investigations (invoice.pdf example)</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>File metadata: name, size, type, created/modified/accessed dates, owner, checksum, file path.</li><li><strong>Checksum (MD5/SHA-256)</strong> = digital fingerprint → add to blocklists so no one else executes the same malware.</li><li><strong>Extension/type mismatch</strong>: <code>.pdf</code> whose true type is .exe/.doc = suspicious.</li><li>Odd dates (created 2012 but &quot;sent today&quot;) or created/modified/accessed all minutes ago = investigate.</li><li><strong>File path C:\TEMP\</strong> (vs. trusted user folders) = malware indicator.</li><li>Owner tells you which user/account to interview.</li></ul>
+</div></details>
+<details class="topic" open><summary><span class="t-name">High-yield exam triggers</span><span class="t-state"></span><button class="t-review" onclick="toggleReview(event,this)" title="Mark topic as reviewed">&nbsp;</button></summary><div class="topic-body">
+<ul class="mdlist"><li>&quot;Linux/Unix only logging daemon&quot; → rsyslog/syslog-ng; &quot;works on Windows too, open source&quot; → <strong>NXLog</strong>.</li><li>&quot;Same IP, two MACs, ARP replies&quot; → <strong>ARP spoofing</strong>.</li><li>&quot;OR '1'='1&quot; in URI → <strong>SQL injection → WAF</strong>.</li><li>&quot;SYN only, no ACKs, one source&quot; → <strong>SYN flood DoS</strong>; many sources → <strong>DDoS</strong>.</li><li>&quot;Sequential ports from one IP&quot; → <strong>port scan</strong>; &quot;PINs 123456, 123457...&quot; → <strong>brute force</strong>; &quot;puppy, baseball&quot; → <strong>dictionary attack</strong>.</li><li>&quot;setup.exe downloads update.bin, AV disabled, registry change, odd outbound&quot; → <strong>dropper malware + exfiltration</strong>.</li><li>&quot;Alerted vs blocked&quot; in IPS logs → <strong>alerted = got through = investigate first</strong>.</li><li>&quot;MD5/SHA-256 of malicious file&quot; → block by <strong>hash</strong> (fingerprint).</li></ul>
+</div></details></div>
+  <p id="noresults" style="display:none;color:var(--muted);padding:24px 0;text-align:center;">No topics match your search.</p>
+  <div class="pagenav"><a class="btn ghost" href="incident-response-study-notes.html">&larr; Prev: Section 23 · Incident Response</a> <a class="btn ghost" href="automation-and-orchestration-study-notes.html">Next &rarr;: Section 25 · Automation and Orchestration</a></div>
+  <script>
+    var SLUG = "investigating-an-incident";
+    var TOTAL = 13;
+    var KEY = 'secplus_review_v1';
+    function loadState(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+    function myTopics(){ var s = loadState(); return s[SLUG] || []; }
+    function saveTopics(arr){ var s = loadState(); s[SLUG] = arr; localStorage.setItem(KEY, JSON.stringify(s)); }
+    function paint(){
+      var done = myTopics();
+      document.querySelectorAll('details.topic').forEach(function(d, i){
+        var btn = d.querySelector('.t-review');
+        var isDone = done.indexOf(i) !== -1;
+        btn.textContent = isDone ? '\u2713 Reviewed' : 'Mark reviewed';
+        btn.classList.toggle('done', isDone);
+        d.classList.toggle('reviewed', isDone);
+      });
+      var el = document.getElementById('prog');
+      el.textContent = done.length + ' / ' + TOTAL + ' topics reviewed';
+      el.style.borderColor = done.length === TOTAL ? 'var(--green)' : '';
+      el.style.color = done.length === TOTAL ? 'var(--green)' : '';
+    }
+    function toggleReview(ev, btn){
+      ev.preventDefault(); ev.stopPropagation();
+      var card = btn.closest('details.topic');
+      var i = Array.prototype.indexOf.call(document.querySelectorAll('details.topic'), card);
+      var done = myTopics();
+      var at = done.indexOf(i);
+      if (at === -1) done.push(i); else done.splice(at, 1);
+      saveTopics(done); paint();
+    }
+    document.getElementById('search').addEventListener('input', function(){
+      var v = this.value.trim().toLowerCase(); var shown = 0;
+      document.querySelectorAll('details.topic').forEach(function(d){
+        var hit = !v || d.textContent.toLowerCase().indexOf(v) !== -1;
+        d.style.display = hit ? '' : 'none';
+        if (hit) shown++;
+      });
+      document.getElementById('noresults').style.display = shown ? 'none' : '';
+    });
+    paint();
+  </script>
+</div>
+</body>
+</html>
