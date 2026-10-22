@@ -81,7 +81,7 @@ const SECTIONS = [
   {num:25,slug:'automation-and-orchestration'},{num:26,slug:'security-awareness'},{num:27,slug:'exam-readiness'},
   {num:28,slug:'conclusion'}
 ];
-const NOTES_OVERRIDE = { 'cyber-resilience': 'cyber-resilience-and-redundancy-study-notes.md' };
+const NOTES_OVERRIDE = { 'cyber-resilience': 'cyber-resilience-and-redundancy-study-notes.html' };
 function titleize(s){ const small=new Set(['and','of','the','for','in','a','an','to']); return s.split('-').map((w,i)=> i>0&&small.has(w) ? w : w[0].toUpperCase()+w.slice(1)).join(' '); }
 function pct(x){ return Math.round(x*100); }
 function load(){
@@ -98,6 +98,83 @@ function fmtLeft(s){
   return m + ':' + String(ss).padStart(2,'0');
 }
 
+/* ---------- backup & restore ---------- */
+const BACKUP_KEYS = ['secplus_results_v1', 'secplus_cards_v1', 'secplus_review_v1'];
+function exportBackup(){
+  const data = {};
+  BACKUP_KEYS.forEach(k => { const v = localStorage.getItem(k); if (v) { try { data[k] = JSON.parse(v); } catch(e){} } });
+  const payload = { app: 'security-plus-sy0-701', kind: 'study-backup', version: 1, exportedAt: new Date().toISOString(), data };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'security-plus-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+function validAttempt(a){
+  return a && typeof a.exam === 'string' && typeof a.file === 'string'
+    && isFinite(+a.points) && isFinite(+a.total) && (+a.total) > 0
+    && (a.pct == null ? (a.pct = (+a.points)/(+a.total)) : isFinite(+a.pct));
+}
+function importBackup(file){
+  const reader = new FileReader();
+  reader.onload = () => {
+    let parsed;
+    try { parsed = JSON.parse(reader.result); } catch(e){ return importStatus('That file is not valid JSON.', false); }
+    // accept a full backup object {data:{...}} or a bare results array
+    const data = (parsed && parsed.data) ? parsed.data
+               : Array.isArray(parsed) ? { secplus_results_v1: parsed }
+               : null;
+    if (!data) return importStatus('Unrecognized backup format.', false);
+    let added = 0, merged = 0;
+    // results: merge by exam+date so re-importing never duplicates
+    const incoming = Array.isArray(data.secplus_results_v1) ? data.secplus_results_v1.filter(validAttempt) : [];
+    if (incoming.length){
+      const cur = load();
+      const seen = new Set(cur.map(a => a.exam + '|' + a.date));
+      incoming.forEach(a => {
+        const k = a.exam + '|' + a.date;
+        if (seen.has(k)) merged++;
+        else { cur.push(a); seen.add(k); added++; }
+      });
+      localStorage.setItem(KEY, JSON.stringify(cur));
+    }
+    // card & notes-review progress: shallow-merge per deck/topic
+    ['secplus_cards_v1', 'secplus_review_v1'].forEach(k => {
+      if (!data[k] || typeof data[k] !== 'object') return;
+      let cur = {};
+      try { cur = JSON.parse(localStorage.getItem(k) || '{}'); } catch(e){}
+      Object.entries(data[k]).forEach(([deck, st]) => { cur[deck] = Object.assign({}, cur[deck] || {}, st); });
+      localStorage.setItem(k, JSON.stringify(cur));
+    });
+    importStatus('Imported ' + added + ' new attempt' + (added === 1 ? '' : 's') + (merged ? ' (' + merged + ' already present)' : '') + '. Reloading…', true);
+    setTimeout(() => location.reload(), 1200);
+  };
+  reader.onerror = () => importStatus('Could not read that file.', false);
+  reader.readAsText(file);
+}
+function importStatus(msg, ok){
+  let el = document.getElementById('import-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = ok ? '#3fb950' : '#f85149';
+}
+function wireBackupUI(root){
+  const exp = root.querySelector('[data-export]');
+  if (exp) exp.addEventListener('click', exportBackup);
+  const inp = root.querySelector('[data-import-input]');
+  const btn = root.querySelector('[data-import]');
+  if (inp && btn) btn.addEventListener('click', () => inp.click());
+  if (inp) inp.addEventListener('change', () => { if (inp.files && inp.files[0]) importBackup(inp.files[0]); });
+}
+const backupBar = `<div style="margin-top:36px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+    <button class="btn ghost" data-export>Export backup</button>
+    <button class="btn ghost" data-import>Import backup</button>
+    <input type="file" data-import-input accept="application/json,.json" style="display:none">
+    <span id="import-status" class="muted" style="width:100%"></span>
+    <button class="btn ghost" data-clear>Clear all data</button>
+  </div>`;
+
 const attempts = load().sort((a,b)=>new Date(a.date)-new Date(b.date));
 const app = document.getElementById('app');
 
@@ -106,7 +183,12 @@ if (!attempts.length) {
     <h2 style="border:none;margin:0">No exam data yet</h2>
     <p>Finish any timed exam (CompTIA-style full exam, mega exam, or section final)<br>and your results will appear here — strengths, weaknesses, readiness, predicted score.</p>
     <a class="btn" href="exam-simulator/SY0-701-comptia-full-exam-1-foundations.html">Take CompTIA-Style Exam 1 (Foundations)</a>
-  </div>`;
+  </div>
+  <h2>Backup &amp; restore</h2>
+  <p class="muted" style="margin-top:-6px">Your history is stored only in this browser. Export a backup file after each study session and import it on your phone or another device — or to recover after a browser reset.</p>` + backupBar;
+  wireBackupUI(app.parentElement);
+  const clr = document.querySelector('[data-clear]');
+  if (clr) clr.addEventListener('click', () => { if (confirm('Delete all tracked results?')) { localStorage.removeItem(KEY); location.reload(); } });
 } else {
   // recency-weighted performance
   let wsum=0, w=0;
@@ -141,7 +223,7 @@ if (!attempts.length) {
 
   function secLinks(slug){
     const meta = SECTIONS.find(s=>s.slug===slug);
-    const notes = NOTES_OVERRIDE[slug] || (slug+'-study-notes.md');
+    const notes = NOTES_OVERRIDE[slug] || (slug+'-study-notes.html');
     let h = `<a href="exam-simulator/${slug}-quiz.html">Quiz</a>`;
     h += `<a href="exam-simulator/${encodeURIComponent(notes)}">Notes</a>`;
     if (meta) { const nn = meta.num === 0 ? '00' : String(meta.num); h += `<a href="exam-simulator/SY0-701-exam-simulator-${nn}-${slug}.html">Simulator</a>`; }
@@ -242,9 +324,13 @@ if (!attempts.length) {
     html += `<h2>Strongest areas</h2><p class="muted" style="margin-top:-6px">No section is solidly above 80% yet — your strengths will surface as you take more exams.</p>`;
   }
 
-  html += `<div style="margin-top:36px"><button class="btn ghost" onclick="if(confirm('Delete all tracked results?')){localStorage.removeItem('${KEY}');location.reload();}">Clear all data</button></div>`;
+  html += `<h2>Backup &amp; restore</h2>
+    <p class="muted" style="margin-top:-6px">Your history is stored only in this browser. Export a backup file after each study session and import it on your phone or another device — or to recover after a browser reset.</p>` + backupBar;
 
   app.innerHTML = html;
+  wireBackupUI(app);
+  const clr = document.querySelector('[data-clear]');
+  if (clr) clr.addEventListener('click', () => { if (confirm('Delete all tracked results?')) { localStorage.removeItem(KEY); location.reload(); } });
 }
 </script>
 </body>
